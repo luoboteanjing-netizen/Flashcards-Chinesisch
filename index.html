@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinesisch Flashcards</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        h1 { text-align: center; }
+        .lessons-box { border: 1px solid #ccc; padding: 10px; max-height: 200px; overflow-y: scroll; margin-bottom: 20px; background: white; }
+        .lesson-item { padding: 5px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .lesson-item:hover { background: #e0e0e0; }
+        .lesson-item.selected { background: #d0ffd0; }
+        .progress { font-size: 0.8em; color: #666; }
+        .direction-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .lang-select { padding: 10px; border: 1px solid #ccc; background: white; }
+        #switch-btn { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #voice-config-btn { display: block; width: 100%; padding: 10px; background: #28a745; color: white; border: none; margin-bottom: 10px; cursor: pointer; }
+        .button-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { padding: 10px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .card-box { border: 1px solid #ccc; padding: 20px; margin-bottom: 10px; background: white; position: relative; min-height: 150px; }
+        #solution-box { display: none; }
+        .id { font-weight: bold; position: absolute; top: 5px; left: 5px; }
+        .speak-btn { position: absolute; bottom: 5px; right: 5px; background: #17a2b8; padding: 5px; font-size: 0.8em; }
+        .word { font-size: 1.5em; margin: 5px 0; }
+        .pinyin { font-size: 1.2em; color: #666; }
+        .sentence { font-size: 1.1em; margin: 10px 0; }
+        .pos { color: #999; font-size: 0.9em; margin-left: 10px; } /* Grau und kleiner für Wortart bei Chinesisch */
+        .nav-row { display: flex; justify-content: space-between; }
+        .answer-row { display: none; flex: justify-content: space-around; margin-top: 10px; }
+        #answer-row button { background: #28a745; flex: 1; margin: 0 5px; }
+        /* Modal für Stimme */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; border: none; width: 80%; max-width: 400px; }
+        .modal input, .modal select { width: 100%; padding: 5px; margin: 5px 0; }
+        #close-modal { float: right; cursor: pointer; font-size: 20px; }
+        /* Laden-Animation */
+        .loading { text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Chinesisch Flashcards</h1>
+    
+    <div id="loading" class="loading">Lade Vokabeln...</div>
+    
+    <div id="app" style="display: none;">
+        <div id="lessons-box" class="lessons-box"></div>
+        
+        <div class="direction-row">
+            <select id="source-lang" class="lang-select">
+                <option value="de">Deutsch</option>
+                <option value="zh">Chinesisch</option>
+            </select>
+            <button id="switch-btn">Switch</button>
+            <select id="target-lang" class="lang-select">
+                <option value="zh">Chinesisch</option>
+                <option value="de">Deutsch</option>
+            </select>
+        </div>
+        
+        <button id="voice-config-btn">Stimme konfigurieren</button>
+        
+        <div class="button-row">
+            <button id="start-training">Start Training</button>
+            <button id="autoplay-btn">Autoplay</button>
+            <select id="order-select">
+                <option value="sequential">Sequentiell</option>
+                <option value="random">Zufällig</option>
+            </select>
+        </div>
+        
+        <div id="question-box" class="card-box">
+            <div class="id" id="question-id"></div>
+            <!-- Dynamisch gefüllt -->
+            <button class="speak-btn" id="speak-question">Sprechen</button>
+        </div>
+        
+        <div id="solution-box" class="card-box">
+            <!-- Dynamisch gefüllt -->
+            <button class="speak-btn" id="speak-solution">Sprechen</button>
+        </div>
+        
+        <div class="nav-row">
+            <button id="prev-card">Zurück</button>
+            <button id="show-answer">Anzeige</button>
+            <button id="next-card">Nächste</button>
+        </div>
+        
+        <div id="answer-row" class="answer-row">
+            <button id="known">Gewusst</button>
+            <button id="unknown">Nicht gewusst</button>
+        </div>
+    </div>
+    
+    <!-- Modal für Stimme -->
+    <div id="voice-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal">&times;</span>
+            <h3>Stimme konfigurieren (für <span id="modal-lang"></span>)</h3>
+            <label>Stimme: <select id="voice-select"></select></label>
+            <label>Pitch (0.5-2.0): <input type="range" id="pitch-slider" min="0.5" max="2" step="0.1" value="1"></label>
+            <span id="pitch-value">1.0</span>
+            <label>Rate (0.5-2.0): <input type="range" id="rate-slider" min="0.5" max="2" step="0.1" value="1"></label>
+            <span id="rate-value">1.0</span>
+            <button id="save-voice">Speichern</button>
+        </div>
+    </div>
+
+    <script>
+        let cards = []; // Alle Karten
+        let currentLesson = null;
+        let currentCards = []; // Gefilterte Karten der Lektion
+        let currentIndex = 0;
+        let currentOrder = 'sequential'; // random oder sequential
+        let isAutoplay = false;
+        let autoplayTimer;
+        let isRevealed = false;
+        let sourceLang = 'de';
+        let targetLang = 'zh';
+        let speech = window.speechSynthesis;
+        let voices = []; // Geladene Stimmen
+
+        // Lade Stimmen
+        speech.onvoiceschanged = () => {
+            voices = speech.getVoices();
+            updateVoiceSelect();
+        };
+        // Fallback: Stimmen laden triggern
+        if (speech.getVoices().length === 0) speech.getVoices();
+
+        // Funktion: CSV laden und parsen
+        async function loadCSV() {
+            try {
+                const response = await fetch('./data/vokabeln.csv');
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+                cards = parsed.data
+                    .slice(1) // Header ignorieren
+                    .filter(row => row[0] !== undefined && !row[0].startsWith('*'))
+                    .map(row => ({
+                        id: row[7], // H
+                        lektion: row[8], // I
+                        deWord: row[0], // A
+                        pinyinWord: row[1], // B
+                        pos: row[2], // C
+                        pinyinSentence: row[3], // D
+                        deSentence: row[4], // E
+                        hanziWord: row[5], // F
+                        hanziSentence: row[6] // G
+                    }))
+                    .filter(card => card.id && card.lektion); // Ungültige skippen
+                groupLessons();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            } catch (error) {
+                alert('Fehler beim Laden der CSV: ' + error);
+            }
+        }
+
+        // Lektionen gruppieren und UI bauen
+        function groupLessons() {
+            const lessons = {};
+            cards.forEach(card => {
+                if (!lessons[card.lektion]) lessons[card.lektion] = [];
+                lessons[card.lektion].push(card);
+            });
+            const sortedLessons = Object.keys(lessons).sort((a, b) => parseInt(a) - parseInt(b));
+            const box = document.getElementById('lessons-box');
+            box.innerHTML = '';
+            sortedLessons.forEach(lesson => {
+                const div = document.createElement('div');
+                div.className = 'lesson-item';
+                div.textContent = `Lektion ${lesson}`;
+                const progress = getLessonProgress(lesson);
+                const progressSpan = document.createElement('span');
+                progressSpan.className = 'progress';
+                progressSpan.textContent = ` (${progress}% gemeistert)`;
+                div.appendChild(progressSpan);
+                div.onclick = () => selectLesson(lesson);
+                box.appendChild(div);
+            });
+        }
+
+        function selectLesson(lesson) {
+            currentLesson = lesson;
+            currentCards = cards.filter(c => c.lektion === lesson);
+            if (currentOrder === 'random') shuffleArray(currentCards);
+            currentIndex = 0;
+            document.querySelectorAll('.lesson-item').forEach(item => item.classList.remove('selected'));
+            event.target.classList.add('selected');
+            showCurrentCard();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showCurrentCard() {
+            if (!currentCards.length) return;
+            const card = currentCards[currentIndex];
+            const questionBox = document.getElementById('question-box');
+            const idEl = document.getElementById('question-id');
+            idEl.textContent = card.id;
+            
+            let questionHtml = '';
+            if (sourceLang === 'de') {
+                questionHtml = `
+                    <div class="word">${card.deWord}</div>
+                    <div class="pos">${card.pos}</div>
+                    <div class="sentence">${card.deSentence}</div>
+                `;
+            } else { // zh
+                questionHtml = `
+                    <div class="word">${card.hanziWord}</div>
+                    <div><span class="pinyin">${card.pinyinWord}</span> <span class="pos">${card.pos}</span></div>
+                    <div class="sentence">${card.hanziSentence}</div>
+                    <div class="pinyin">${card.pinyinSentence}</div>
+                `;
+            }
+            questionBox.innerHTML = questionHtml + '<button class="speak-btn" id="speak-question">Sprechen</button>';
+            document.getElementById('speak-question').onclick = () => speakQuestion(card);
+            
+            document.getElementById('solution-box').style.display = 'none';
+            isRevealed = false;
+            document.getElementById('answer-row').style.display = 'none';
+        }
+
+        function showSolution() {
+            const card = currentCards[currentIndex];
+            const solutionBox = document.getElementById('solution-box');
+            let solutionHtml = '';
+            if (targetLang === 'de') {
+                solutionHtml = `
+                    <div class="word">${card.deWord}</div>
+                    <div class="pos">${card.pos}</div>
+                    <div class="sentence">${card.deSentence}</div>
+                `;
+            } else { // zh
+                solutionHtml = `
+                    <div class="word">${card.hanziWord}</div>
+                    <div><span class="pinyin">${card.pinyinWord}</span> <span class="pos">${card.pos}</span></div>
+                    <div class="sentence">${card.hanziSentence}</div>
+                    <div class="pinyin">${card.pinyinSentence}</div>
+                `;
+            }
+            solutionBox.innerHTML = solutionHtml + '<button class="speak-btn" id="speak-solution">Sprechen</button>';
+            document.getElementById('speak-solution').onclick = () => speakSolution(card);
+            solutionBox.style.display = 'block';
+            isRevealed = true;
+            document.getElementById('answer-row').style.display = 'flex';
+            if (isAutoplay) autoplayTimer = setTimeout(() => nextCard(), 3000); // Kurze Pause in Autoplay
+        }
+
+        // TTS-Funktionen
+        function speakQuestion(card) {
+            const text = sourceLang === 'de' ? `${card.deWord} ${card.deSentence}` : `${card.hanziWord} ${card.hanziSentence}`;
+            speakText(text, sourceLang);
+        }
+
+        function speakSolution(card) {
+            const text = targetLang === 'de' ? `${card.deWord} ${card.deSentence}` : `${card.hanziWord} ${card.hanziSentence}`;
+            speakText(text, targetLang);
+        }
+
+        function speakText(text, lang) {
+            speech.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const config = getVoiceConfig(lang);
+            utterance.voice = voices.find(v => v.lang.startsWith(config.lang)) || voices.find(v => v.lang.startsWith(lang === 'de' ? 'de' : 'zh'));
+            utterance.pitch = config.pitch;
+            utterance.rate = config.rate;
+            speech.speak(utterance);
+        }
+
+        // Voice Config
+        function updateVoiceSelect() {
+            const select = document.getElementById('voice-select');
+            select.innerHTML = '';
+            const lang = sourceLang === 'de' ? 'de' : 'zh-CN';
+            voices.filter(v => v.lang.startsWith(lang === 'de' ? 'de' : 'zh')).forEach(voice => {
+                const opt = document.createElement('option');
+                opt.value = voice.name;
+                opt.textContent = voice.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function getVoiceConfig(lang) {
+            const key = `voiceConfig_${lang}`;
+            return JSON.parse(localStorage.getItem(key)) || { lang, voice: '', pitch: 1, rate: 1 };
+        }
+
+        function saveVoiceConfig(lang) {
+            const config = {
+                lang,
+                voice: document.getElementById('voice-select').value,
+                pitch: parseFloat(document.getElementById('pitch-slider').value),
+                rate: parseFloat(document.getElementById('rate-slider').value)
+            };
+            localStorage.setItem(`voiceConfig_${lang}`, JSON.stringify(config));
+        }
+
+        // Fortschritt
+        function getLessonProgress(lesson) {
+            const lessonCards = cards.filter(c => c.lektion === lesson);
+            if (!lessonCards.length) return 0;
+            let known = 0;
+            lessonCards.forEach(card => {
+                const stats = getCardStats(card.id);
+                known += stats.known;
+            });
+            return Math.round((known / lessonCards.length) * 100);
+        }
+
+        function getCardStats(id) {
+            const key = `stats_${id}`;
+            return JSON.parse(localStorage.getItem(key)) || { known: 0, unknown: 0 };
+        }
+
+        function updateCardStats(id, known) {
+            const stats = getCardStats(id);
+            if (known) stats.known++; else stats.unknown++;
+            localStorage.setItem(`stats_${id}`, JSON.stringify(stats));
+            groupLessons(); // Refresh Progress
+        }
+
+        // Navigation
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + currentCards.length) % currentCards.length;
+            showCurrentCard();
+            clearTimeout(autoplayTimer);
+        }
+
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % currentCards.length;
+            showCurrentCard();
+            clearTimeout(autoplayTimer);
+        }
+
+        // Event Listeners
+        document.getElementById('switch-btn').onclick = () => {
+            [sourceLang, targetLang] = [targetLang, sourceLang];
+            document.getElementById('source-lang').value = sourceLang;
+            document.getElementById('target-lang').value = targetLang;
+            if (currentCards.length) showCurrentCard();
+            updateVoiceModal();
+        };
+
+        document.getElementById('source-lang').onchange = (e) => {
+            sourceLang = e.target.value;
+            targetLang = sourceLang === 'de' ? 'zh' : 'de';
+            document.getElementById('target-lang').value = targetLang;
+            if (currentCards.length) showCurrentCard();
+            updateVoiceModal();
+        };
+
+        document.getElementById('start-training').onclick = () => {
+            if (!currentLesson) return alert('Wähle eine Lektion!');
+            if (currentOrder === 'random') shuffleArray(currentCards);
+            showCurrentCard();
+            isAutoplay = false;
+            clearTimeout(autoplayTimer);
+        };
+
+        document.getElementById('autoplay-btn').onclick = () => {
+            if (!currentLesson) return alert('Wähle eine Lektion!');
+            isAutoplay = !isAutoplay;
+            document.getElementById('autoplay-btn').textContent = isAutoplay ? 'Autoplay Stop' : 'Autoplay';
+            if (isAutoplay) {
+                if (currentOrder === 'random') shuffleArray(currentCards);
+                showCurrentCard();
+                autoplayTimer = setTimeout(() => {
+                    if (isRevealed) nextCard();
+                    else showSolution();
+                }, 5000);
+            } else {
+                clearTimeout(autoplayTimer);
+            }
+        };
+
+        document.getElementById('order-select').onchange = (e) => {
+            currentOrder = e.target.value;
+            if (currentLesson && currentCards.length) {
+                if (currentOrder === 'random') shuffleArray(currentCards);
+                currentIndex = 0;
+                showCurrentCard();
+            }
+        };
+
+        document.getElementById('show-answer').onclick = showSolution;
+
+        document.getElementById('prev-card').onclick = prevCard;
+        document.getElementById('next-card').onclick = nextCard;
+
+        document.getElementById('known').onclick = () => {
+            updateCardStats(currentCards[currentIndex].id, true);
+            nextCard();
+        };
+
+        document.getElementById('unknown').onclick = () => {
+            updateCardStats(currentCards[currentIndex].id, false);
+            nextCard();
+        };
+
+        // Voice Modal
+        document.getElementById('voice-config-btn').onclick = () => {
+            document.getElementById('voice-modal').style.display = 'block';
+            updateVoiceModal();
+        };
+
+        function updateVoiceModal() {
+            const modalLangEl = document.getElementById('modal-lang');
+            modalLangEl.textContent = sourceLang === 'de' ? 'Deutsch' : 'Chinesisch';
+            const config = getVoiceConfig(sourceLang);
+            document.getElementById('pitch-slider').value = config.pitch;
+            document.getElementById('pitch-value').textContent = config.pitch;
+            document.getElementById('rate-slider').value = config.rate;
+            document.getElementById('rate-value').textContent = config.rate;
+            document.getElementById('voice-select').value = config.voice;
+            updateVoiceSelect();
+        }
+
+        document.getElementById('pitch-slider').oninput = (e) => document.getElementById('pitch-value').textContent = e.target.value;
+        document.getElementById('rate-slider').oninput = (e) => document.getElementById('rate-value').textContent = e.target.value;
+
+        document.getElementById('save-voice').onclick = () => {
+            saveVoiceConfig(sourceLang);
+            document.getElementById('voice-modal').style.display = 'none';
+        };
+
+        document.getElementById('close-modal').onclick = () => document.getElementById('voice-modal').style.display = 'none';
+
+        window.onclick = (e) => {
+            const modal = document.getElementById('voice-modal');
+            if (e.target === modal) modal.style.display = 'none';
+        };
+
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') { e.preventDefault(); document.getElementById('show-answer').click(); }
+            if (e.key === 'ArrowLeft') prevCard();
+            if (e.key === 'ArrowRight') nextCard();
+        });
+
+        // Init
+        loadCSV();
+    </script>
+</body>
+</html>
