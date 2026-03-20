@@ -1,141 +1,97 @@
-
+<!--R5 ... -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vokabel-Karteikarten</title>
-  <link rel="stylesheet" href="styles/style.css" />
+  <title>Flashcards – Chinesisch/Deutsch</title>
+  
+  <!-- PWA Meta-Tags -->
+  <meta name="theme-color" content="#4cc2ff">
+  <meta name="description" content="Lern-App für Chinesisch-Deutsch Vokabeln mit TTS und Lernmodus">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png"> <!-- Favicon, passe an -->
+  
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="app-header">
-    <h1>Vokabel-Karteikarten</h1>
+  <header>
+    <h1>Flashcards – Chinesisch/Deutsch</h1>
+
+    <!-- Controls unter der Überschrift für bessere Mobile-Ansicht -->
+    <div class="controls controls-block">
+      <!-- Language Switcher: Drei Felder in Reihe (Quell, Wechsel-Button, Ziel) -->
+      <div id="languageSwitcher">
+        <input type="hidden" id="side" value="zh" />
+        <span id="sourceLang">Chinesisch</span>
+        <button class="btn switch-btn" id="switchDir" title="Sprachrichtung wechseln">↔</button>
+        <span id="targetLang">Deutsch</span>
+      </div>
+      <input id="q" placeholder="Suche (Töne ignoriert)…" />
+      <button class="btn" id="ttsSettingsBtn" title="Stimme, Tonhöhe und Geschwindigkeit ändern">Stimme ändern</button>
+    </div>
   </header>
 
   <main class="container">
-    <!-- 2. Box: Lektionen & Lernfortschritt -->
-    <section class="panel lessons-panel">
-      <div class="panel-header">
-        <h2>Lektionen</h2>
-        <div class="lesson-controls">
-          <label class="csv-label">CSV:
-            <select id="csvSelect" title="Wähle die CSV-Datei im Ordner /data/">
-              <option value="vocab.csv">vocab.csv</option>
-            </select>
-          </label>
-          <button id="reloadCsvBtn" class="btn">Neu laden</button>
-          <button id="resetProgressBtn" class="btn btn-ghost" title="Gesamten Fortschritt löschen">Fortschritt zurücksetzen</button>
-        </div>
-      </div>
-      <div id="lessonsList" class="lessons-list" role="listbox" aria-label="Lektionsliste (scrollbar)"></div>
-    </section>
+    <div id="meta" class="muted small"></div>
 
-    <!-- 3. Sprachrichtung: Quelle - Switch - Ziel -->
-    <section class="panel direction-panel">
-      <div class="direction-grid">
-        <div class="lang-box">
-          <label>Quellsprache</label>
-          <select id="sourceLang">
-            <option value="de">Deutsch</option>
-            <option value="zh">Chinesisch</option>
-          </select>
-        </div>
-        <div class="switch-box">
-          <button id="switchDirectionBtn" class="btn btn-primary" title="Richtung wechseln" aria-label="Richtung wechseln">⇄</button>
-        </div>
-        <div class="lang-box">
-          <label>Zielsprache</label>
-          <select id="targetLang">
-            <option value="zh">Chinesisch</option>
-            <option value="de">Deutsch</option>
-          </select>
-        </div>
+    <section class="filters">
+      <div class="legend">Lektionen (aus ID, erste 3 Zeichen) – scrollbare Auswahl</div>
+      <div class="lesson-box">
+        <label class="chip"><input type="checkbox" id="lesson_all" checked> Alle</label>
+        <div id="lessonFilters" class="lesson-list"><!-- erzeugt per JS --></div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn" id="startStudy">Nur diese Auswahl lernen</button>
+        <span class="hint">(shuffle, nächste Karte, Zähler)</span>
       </div>
     </section>
 
-    <!-- 4. Stimme konfigurieren -->
-    <section class="panel voice-panel">
-      <button id="voiceConfigBtn" class="btn">Stimme konfigurieren (für Quellsprache)</button>
+    <section id="listView">
+      <div id="count"></div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" style="display:none;">Keine Karten gefunden.</div>
     </section>
 
-    <!-- 5. Start/Autoplay -->
-    <section class="panel start-panel">
-      <div class="start-grid">
-        <button id="startTrainingBtn" class="btn btn-success">Start Training</button>
-        <button id="autoplayToggleBtn" class="btn btn-ghost">Autoplay: AUS</button>
-        <label class="autoplay-delay">Delay (s): <input id="autoplayDelay" type="number" min="1" max="15" step="1" value="4"></label>
-        <label class="order-select">Reihenfolge:
-          <select id="orderMode">
-            <option value="sequential">Sequentiell</option>
-            <option value="random">Zufällig</option>
-          </select>
-        </label>
+    <section id="studyView" style="display:none;">
+      <div class="study-bar">
+        <button class="btn" id="exitStudy">Zurück zur Liste</button>
+        <button class="btn" id="reshuffle">Shuffle neu</button>
+        <div class="counter" id="counter">0 / 0</div>
       </div>
-    </section>
-
-    <!-- 6. Frage-Box -->
-    <section class="panel qa-panel">
-      <div class="qa-box" id="questionBox">
-        <div class="qa-header"><span id="cardId">—</span></div>
-        <div class="qa-content" id="questionContent"></div>
-        <div class="qa-actions">
-          <button id="speakQuestionBtn" class="icon-btn" title="Frage sprechen" aria-label="Frage sprechen">🔊</button>
+      <div class="study-card" id="studyCard">
+        <div class="id" id="studyId"></div>
+        <div class="lines" id="studyLines"></div>
+        <div id="studyActions" class="study-actions">
+          <!-- Buttons werden dynamisch per JS gerendert -->
         </div>
-      </div>
-    </section>
-
-    <!-- 7. Lösungs-Box -->
-    <section class="panel qa-panel">
-      <div class="qa-box" id="answerBox">
-        <div class="qa-header"><span>Lösung</span></div>
-        <div class="qa-content" id="answerContent"><em>Drücke „Anzeige“, um die Lösung einzublenden.</em></div>
-        <div class="qa-actions">
-          <button id="speakAnswerBtn" class="icon-btn" title="Lösung sprechen" aria-label="Lösung sprechen">🔊</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 8. Navigations-Buttons -->
-    <section class="panel nav-panel">
-      <div class="nav-grid">
-        <button id="prevBtn" class="btn">Zurück</button>
-        <button id="revealBtn" class="btn btn-primary">Anzeige</button>
-        <button id="nextBtn" class="btn">Nächste Karte</button>
-      </div>
-      <!-- 9. Gewusst / Nicht gewusst -->
-      <div class="result-grid" id="resultButtons" hidden>
-        <button id="knownBtn" class="btn btn-success">Gewusst</button>
-        <button id="unknownBtn" class="btn btn-danger">Nicht gewusst</button>
       </div>
     </section>
   </main>
 
-  <!-- Modal: Stimme konfigurieren -->
-  <dialog id="voiceModal" class="modal">
-    <form method="dialog" class="modal-content">
-      <header class="modal-header">
-        <h3>Stimme konfigurieren</h3>
-      </header>
-      <section class="modal-body">
-        <p class="muted">Es wird die Stimme für die aktuell gewählte <strong>Quellsprache</strong> konfiguriert.</p>
-        <label>Stimme
-          <select id="voiceSelect"></select>
-        </label>
-        <div class="slider-row">
-          <label>Stimmhöhe (Pitch): <input type="range" id="voicePitch" min="0" max="2" value="1" step="0.1" /><span id="pitchVal">1.0</span></label>
-        </div>
-        <div class="slider-row">
-          <label>Geschwindigkeit (Rate): <input type="range" id="voiceRate" min="0.5" max="2" value="1" step="0.1" /><span id="rateVal">1.0</span></label>
-        </div>
-      </section>
-      <footer class="modal-footer">
-        <button id="voiceTestBtn" type="button" class="btn btn-ghost">Test</button>
-        <button id="voiceSaveBtn" value="default" class="btn btn-primary">Speichern</button>
-        <button id="voiceCancelBtn" value="cancel" class="btn">Abbrechen</button>
-      </footer>
-    </form>
-  </dialog>
+  <!-- TTS Einstellungen Modal -->
+  <div id="ttsModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>TTS Einstellungen</h2>
+        <button class="close-btn" id="closeTTSModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="voiceSelect">Stimme (für aktuelle Sprache):</label>
+        <select id="voiceSelect"></select>
 
-  <script type="module" src="scripts/main.js"></script>
+        <label for="pitchSlider">Tonhöhe (Pitch): <span id="pitchValue">1.0</span></label>
+        <input type="range" id="pitchSlider" min="0.5" max="2.0" step="0.1" value="1.0">
+
+        <label for="rateSlider">Geschwindigkeit (Rate): <span id="rateValue">0.8</span></label>
+        <input type="range" id="rateSlider" min="0.5" max="2.0" step="0.1" value="0.8">
+
+        <button class="btn" id="testVoiceBtn">Stimme testen</button>
+        <button class="btn" id="saveTTSSettings">Speichern & Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
