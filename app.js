@@ -327,7 +327,6 @@ async function loadCSV(){
     const cards = toCards(rows);
     const t1 = performance.now();
     const meta = document.getElementById('meta');
-    meta.textContent = `CSV geladen • Delimiter: "${delimiter==='\t'?'TAB':delimiter}" • Karten: ${cards.length} • ${Math.round(t1 - t0)} ms • PWA: Offline deaktiviert`;
     buildLessonFilters(cards);
     render(cards);
     updateLanguageDisplay();
