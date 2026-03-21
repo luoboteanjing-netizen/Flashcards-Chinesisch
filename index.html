@@ -1,66 +1,26 @@
+<!--R5 ... -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Flashcards – Chinesisch/Deutsch</title>
-
-  <!-- PWA bewusst deaktiviert, um Online-Betrieb sauber zu halten -->
-  <!-- manifest.json -->
-
-  icons/icon-192.png
-  style.css
-
-  <style>
-    /* Kleine robuste Defaults, falls style.css fehlt */
-    :root{--bg:#0b1320;--fg:#e9f1ff;--muted:#9fb3ca;--chip:#20314a;--btn:#305780;--accent:#4cc2ff}
-    html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;background:var(--bg);color:var(--fg)}
-    header{padding:16px}
-    h1{margin:0 0 10px 0;font-size:22px}
-    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .btn{background:var(--btn);color:#fff;border:0;border-radius:6px;padding:8px 10px;cursor:pointer}
-    .switch-btn{min-width:38px}
-    .container{padding:16px}
-    .muted{color:var(--muted)}
-    .small{font-size:12px}
-    .filters{margin:8px 0 16px 0}
-    .lesson-box{display:flex;gap:10px;align-items:center}
-    .lesson-list{display:flex;gap:6px;overflow:auto;padding:6px 0}
-    .chip{background:var(--chip);padding:6px 8px;border-radius:999px;user-select:none;white-space:nowrap}
-    .chip input{margin-right:6px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-    .card{background:#141f33;border:1px solid #2a3d5c;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
-    .card .id{font-size:12px;color:var(--muted)}
-    .lines{display:flex;flex-direction:column;gap:4px}
-    .line{font-size:15px}
-    .wordline{font-weight:600;font-size:18px}
-    .wordline.zh{font-size:22px}
-    .pos{opacity:.8;font-style:italic}
-    .actions{display:flex;gap:8px;margin-top:6px}
-    .speak-btn{background:transparent;border:1px solid #456aa1;border-radius:6px;padding:6px 10px;color:#d7e6ff;cursor:pointer}
-    #empty{padding:20px;text-align:center;color:var(--muted)}
-
-    /* Lernmodus */
-    #studyView .study-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
-    #studyView .study-card{background:#141f33;border:1px solid #2a3d5c;border-radius:10px;padding:14px}
-    #studyView .counter{margin-left:auto;color:var(--muted)}
-
-    /* Modal */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center}
-    .modal-content{background:#10192b;border:1px solid #2a3d5c;border-radius:10px;min-width:280px;max-width:520px;width:92%;padding:14px}
-    .modal-header{display:flex;align-items:center}
-    .modal-header h2{margin:0;font-size:18px}
-    .close-btn{margin-left:auto;background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer}
-    .modal-body{display:grid;gap:8px;margin-top:8px}
-    select,input[type=range]{width:100%}
-    mark{background:var(--accent);color:#001a2b}
-  </style>
+  
+  <!-- PWA Meta-Tags -->
+  <meta name="theme-color" content="#4cc2ff">
+  <meta name="description" content="Lern-App für Chinesisch-Deutsch Vokabeln mit TTS und Lernmodus">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png"> <!-- Favicon, passe an -->
+  
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1>Flashcards – Chinesisch/Deutsch</h1>
+
+    <!-- Controls unter der Überschrift für bessere Mobile-Ansicht -->
     <div class="controls controls-block">
+      <!-- Language Switcher: Drei Felder in Reihe (Quell, Wechsel-Button, Ziel) -->
       <div id="languageSwitcher">
         <input type="hidden" id="side" value="zh" />
         <span id="sourceLang">Chinesisch</span>
@@ -76,10 +36,10 @@
     <div id="meta" class="muted small"></div>
 
     <section class="filters">
-      <div class="legend">Lektionen – scrollbare Auswahl</div>
+      <div class="legend">Lektionen (aus ID, erste 3 Zeichen) – scrollbare Auswahl</div>
       <div class="lesson-box">
         <label class="chip"><input type="checkbox" id="lesson_all" checked> Alle</label>
-        <div id="lessonFilters" class="lesson-list"></div>
+        <div id="lessonFilters" class="lesson-list"><!-- erzeugt per JS --></div>
       </div>
       <div class="filter-actions">
         <button class="btn" id="startStudy">Nur diese Auswahl lernen</button>
@@ -102,7 +62,9 @@
       <div class="study-card" id="studyCard">
         <div class="id" id="studyId"></div>
         <div class="lines" id="studyLines"></div>
-        <div id="studyActions" class="study-actions"></div>
+        <div id="studyActions" class="study-actions">
+          <!-- Buttons werden dynamisch per JS gerendert -->
+        </div>
       </div>
     </section>
   </main>
@@ -112,7 +74,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>TTS Einstellungen</h2>
-        <button class="close-btn" id="closeTTSModal">×</button>
+        <button class="close-btn" id="closeTTSModal">&times;</button>
       </div>
       <div class="modal-body">
         <label for="voiceSelect">Stimme (für aktuelle Sprache):</label>
@@ -130,8 +92,6 @@
     </div>
   </div>
 
-  <!-- WICHTIG: Jetzt wird *app.js* geladen -->
-  app.js</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
