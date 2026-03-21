@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Flashcards – Chinesisch/Deutsch</title>
 
-  <!-- PWA bewusst deaktiviert, um Online-Betrieb stabil zu halten -->
+  <!-- PWA bewusst deaktiviert, um Online-Betrieb sauber zu halten -->
   <!-- manifest.json -->
 
   icons/icon-192.png
+  style.css
 
-  <!-- 1) Fallback-Styles (werden von style.css überschrieben) -->
   <style>
+    /* Kleine robuste Defaults, falls style.css fehlt */
     :root{--bg:#0b1320;--fg:#e9f1ff;--muted:#9fb3ca;--chip:#20314a;--btn:#305780;--accent:#4cc2ff}
     html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;background:var(--bg);color:var(--fg)}
@@ -36,9 +37,7 @@
     .wordline{font-weight:600;font-size:18px}
     .wordline.zh{font-size:22px}
     .pos{opacity:.8;font-style:italic}
-    .actions{display:flex;gap:8px;align-items:center}
-    /* ▶️ Lautsprecher rechtsbündig (Fallback) */
-    .actions .speak-btn{margin-left:auto}
+    .actions{display:flex;gap:8px;margin-top:6px}
     .speak-btn{background:transparent;border:1px solid #456aa1;border-radius:6px;padding:6px 10px;color:#d7e6ff;cursor:pointer}
     #empty{padding:20px;text-align:center;color:var(--muted)}
 
@@ -57,9 +56,6 @@
     select,input[type=range]{width:100%}
     mark{background:var(--accent);color:#001a2b}
   </style>
-
-  <!-- 2) Dein eigentliches Stylesheet (gewinnt gegenüber Fallback) -->
-  style.css
 </head>
 <body>
   <header>
@@ -134,7 +130,8 @@
     </div>
   </div>
 
-  <!-- Dein JS -->
+  <!-- WICHTIG: Jetzt wird *app.js* geladen -->
   app.js</script>
+
 </body>
 </html>
