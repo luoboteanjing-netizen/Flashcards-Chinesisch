@@ -65,12 +65,12 @@ h1{
 
 /* SUCHFELD – klare Schriftgröße */
 #q {
-  font-size: 20px;   /* Präzise, stabil */
+  font-size: 18px;   /* Präzise, stabil */
 }
 
 /* Zähltext unter der Suche */
 #count {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* Mobile-Optimierung */
