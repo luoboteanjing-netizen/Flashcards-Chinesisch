@@ -508,6 +508,31 @@ function stopTraining() {
     updateTrainingBtn();
 
     $('#btnPrev').disabled = true;
+    $('#btnReveal').disabled = true;
+    $('#btnNext').disabled = true;
+    $('#btnPlayQ').disabled = true;
+    $('#btnPlayA').disabled = true;
+
+    disableRating();
+
+    $('#solBox').classList.add('masked');
+    $('#promptWord').textContent = "—";
+    $('#promptWordSub').innerHTML = " ";
+    $('#promptSent').textContent = "—";
+    $('#solWord').textContent = "—";
+    $('#solSent').textContent = "—";
+}
+
+function updateTrainingBtn() {
+    $('#btnStart').textContent = state.trainingOn
+        ? "Training stoppen ■"
+        : "Training starten ▶";
+}
+
+
+/* -------------------------------------------------------------------------- */
+/*                                ENDE TEIL 2                                 */
+/* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
