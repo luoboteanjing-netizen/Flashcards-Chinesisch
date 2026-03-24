@@ -1,10 +1,10 @@
-/* --------------- Flashcards – CSV Version 6.0------------ */
+/* --------------- Flashcards – CSV Version 6.0.1----------- */
 /* Komplett neue Version ohne Excel, mit CSV-Import         */
 /* CSV UTF‑8, Semikolon‑Trennung, Header-Zeile,             */
 /* Zeilen mit "*" in Spalte A werden ignoriert              */
 /* -------------------------------------------------------- */
 
-const CSV_URL = "./Long-Chinesisch_Lektionen.csv";
+const CSV_URL = ".data/Long-Chinesisch_Lektionen.csv";
 const LS_KEYS = {
     settings: 'fc_settings_v1',
     progress: 'fc_progress_v1'
