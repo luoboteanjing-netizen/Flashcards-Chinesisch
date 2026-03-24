@@ -213,7 +213,6 @@ function populateLessonSelect() {
 
     sel.innerHTML = "";
 
-    // ✅ Lektionen exakt in CSV-Reihenfolge
     const keys = state.lessonOrder;
 
     for (const k of keys) {
@@ -225,9 +224,16 @@ function populateLessonSelect() {
 
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known = p.known || 0;
-        const unknown = p.unknown || 0;
 
-        opt.textContent = `${k}  (${count} Karten)   ✅${known}   ❌${unknown}`;
+        // Fortschritt in Prozent (für Balken)
+        const percent = count > 0 ? Math.round((known / count) * 100) : 0;
+
+        opt.innerHTML = `
+            ${k} (${count}) 
+            <span class="lesson-bar">
+                <span class="lesson-bar-fill" style="width:${percent}%;"></span>
+            </span>
+        `;
 
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
@@ -281,38 +287,53 @@ function gatherPoolFromSettings() {
 /* ============================ CARD RENDERING ============================== */
 
 function setCard(entry) {
-    /* === Titel anzeigen: 
-         Karte (ID L02‑1‑01) — 4/21 — Lektion L02 
-    === */
+
+    /* === TITEL & LEKTIONS-INFOS ============================= */
 
     const cardTitle = document.querySelector("#cardTitle");
+    const cardLesson = document.querySelector("#cardLesson");
+    const lessonStats = document.querySelector("#lessonStats");
+
     if (cardTitle) {
-
-        const total = state.pool.length;
-        let pos = "?";
-
-        // Position bestimmen
-        if (state.order === "seq" && state.idx != null) {
-            pos = state.idx + 1;
-        } else {
-            const idx = state.pool.indexOf(entry);
-            pos = idx >= 0 ? idx + 1 : "?";
-        }
-
-        cardTitle.textContent =
-            `Karte (ID ${entry.id}) — ${pos}/${total} — Lektion ${entry.lesson}`;
+        cardTitle.textContent = `Karte (ID ${entry.id})`;
     }
 
-    /* === Karteninhalt setzen === */
+    if (cardLesson) {
+        cardLesson.textContent = `Lektion ${entry.lesson}`;
+    }
+
+    // Statistik: ✅x ❌y für diese Lektion
+    if (lessonStats) {
+        const ls = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
+        lessonStats.textContent = `✅ ${ls.known || 0}     ❌ ${ls.unknown || 0}`;
+    }
+	
+// Fortschritt-Balken unter dem Titel
+if (lessonStats) {
+    const cards = state.lessons.get(entry.lesson) || [];
+    const total = cards.length;
+
+    const p = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
+    const known = p.known || 0;
+
+    const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+
+    lessonStats.innerHTML = `
+        <div class="lesson-bar-large">
+            <div class="lesson-bar-large-fill" style="width:${percent}%;"></div>
+        </div>
+    `;
+}
+
+    /* === KARTENINHALT ====================================== */
 
     state.current = entry;
-    $('#solBox').classList.add('masked');
 
+    $('#solBox').classList.add('masked');
     state.startedAt = Date.now();
     state.revealedAt = null;
 
     if (state.mode === 'zh2de') {
-
         $('#promptWord').innerHTML = entry.word.zh || "—";
         $('#promptWordSub').innerHTML = formatPinyinAndPos(entry.word.py, entry.pos);
         $('#promptSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
@@ -321,7 +342,6 @@ function setCard(entry) {
         $('#solSent').textContent = entry.sent.de || "—";
 
     } else {
-
         $('#promptWord').textContent = entry.word.de || "—";
         $('#promptWordSub').innerHTML = entry.pos || "";
         $('#promptSent').textContent = entry.sent.de || "—";
@@ -488,12 +508,14 @@ function startTraining() {
             return;
         }
 
-        state.idx = (state.order === 'seq') ? 0 : null;
-
-        if (state.order === 'seq')
-            setCard(state.pool[state.idx]);
-        else
+        // ✅ WICHTIGER FIX: Sequenziellen Index korrekt setzen!
+        if (state.order === 'seq') {
+            state.idx = 0;
+            setCard(state.pool[state.idx]);   // erste Karte zeigen
+        } else {
+            state.idx = null;                 // Zufall hat keinen Index
             setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+        }
 
         state.trainingOn = true;
         updateTrainingBtn();
