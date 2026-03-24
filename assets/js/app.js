@@ -281,8 +281,9 @@ function gatherPoolFromSettings() {
 /* ============================ CARD RENDERING ============================== */
 
 function setCard(entry) {
-
-    /* === Titel: Karte (ID …) — Position X/Y === */
+    /* === Titel anzeigen: 
+         Karte (ID L02‑1‑01) — 4/21 — Lektion L02 
+    === */
 
     const cardTitle = document.querySelector("#cardTitle");
     if (cardTitle) {
@@ -290,19 +291,19 @@ function setCard(entry) {
         const total = state.pool.length;
         let pos = "?";
 
-        // Sequenziell
+        // Position bestimmen
         if (state.order === "seq" && state.idx != null) {
             pos = state.idx + 1;
         } else {
-            // Zufällig → Position über Index im Pool bestimmen
-            const p = state.pool.indexOf(entry);
-            pos = p >= 0 ? p + 1 : "?";
+            const idx = state.pool.indexOf(entry);
+            pos = idx >= 0 ? idx + 1 : "?";
         }
 
-        cardTitle.textContent = `Karte (ID: ${entry.id}) — ${pos}/${total}`;
+        cardTitle.textContent =
+            `Karte (ID ${entry.id}) — ${pos}/${total} — Lektion ${entry.lesson}`;
     }
 
-    /* === Inhalt setzen === */
+    /* === Karteninhalt setzen === */
 
     state.current = entry;
     $('#solBox').classList.add('masked');
@@ -337,7 +338,6 @@ function setCard(entry) {
     disableRating();
     renderModeUI();
 }
-
 
 /* ============================ CARD NAVIGATION ============================= */
 
