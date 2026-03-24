@@ -361,3 +361,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .card-controls {
     gap: 12px;
 }
+
+/* ================== JETZT AUFDECKEN in blau ================== */
+
+#btnReveal {
+    background: #7aa2f7 !important;     /* gleiche Farbe wie Training */
+    border-color: #7aa2f7 !important;
+    color: #081018 !important;
+    font-weight: 700 !important;
+}
