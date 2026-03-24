@@ -243,16 +243,25 @@ function populateLessonSelect() {
 
     sel.innerHTML = "";
 
-    const keys = [...state.lessons.keys()];
-    keys.sort((a,b) => a.localeCompare(b, undefined, { numeric:true }));
+    const lessonKeys = [...state.lessons.keys()];
+    lessonKeys.sort((a,b) => a.localeCompare(b, undefined, { numeric: true }));
 
-    for (const k of keys) {
+    for (const k of lessonKeys) {
         const opt = document.createElement("option");
         opt.value = k;
-        opt.textContent = k;
 
-        if (state.settings.lessons.includes(k))
+        // Fortschritt suchen oder Standard 0/0 setzen
+        const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
+        const known = p.known || 0;
+        const unknown = p.unknown || 0;
+
+        // Anzeigeformat wie früher
+        opt.textContent = `${k}   ✅${known}   ❌${unknown}`;
+
+        // bereits vorher gewählte Lessons wieder markieren
+        if (state.settings.lessons.includes(k)) {
             opt.selected = true;
+        }
 
         sel.appendChild(opt);
     }
