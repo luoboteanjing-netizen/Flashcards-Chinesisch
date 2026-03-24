@@ -1,4 +1,4 @@
-/* --------------- Flashcards – CSV Version 6.0.3----------- */
+/* --------------- Flashcards – CSV Version 6.0.4----------- */
 /* -------------------------------------------------------------------------- */
 /*                          Flashcards – Vollversion                          */
 /*              TEIL 1 von 4 — Global State · Settings · CSV Parser          */
@@ -7,15 +7,15 @@
 const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
 
 const LS_KEYS = {
-    settings: 'fc_settings_v1',
-    progress: 'fc_progress_v1'
+    settings: "fc_settings_v1",
+    progress: "fc_progress_v1"
 };
 
 /* ============================  GLOBAL STATE  =============================== */
 
 const state = {
-    mode: 'de2zh',
-    order: 'random',
+    mode: "de2zh",
+    order: "seq",   // für Zurück-Button sinnvoller Default
 
     rateDe: 0.95,
     pitchDe: 1.0,
@@ -23,7 +23,7 @@ const state = {
     pitchZh: 1.0,
 
     lessons: new Map(),
-    lessonOrder: [],   // ✅ WICHTIG: Reihenfolge wie in CSV
+    lessonOrder: [],         // ✅ Reihenfolge aus CSV gespeichert
     selectedLessons: new Set(),
 
     pool: [],
@@ -32,13 +32,13 @@ const state = {
 
     voices: [],
     browserVoice: { zh: null, de: null },
-    voicePanelTarget: 'de',
+    voicePanelTarget: "de",
 
     autoplay: { on: false, timers: [], gapMs: 800 },
 
     settings: {
-        mode: 'de2zh',
-        order: 'random',
+        mode: "de2zh",
+        order: "seq",
         rateDe: 0.95,
         pitchDe: 1.0,
         rateZh: 0.95,
@@ -63,7 +63,7 @@ const state = {
     revealedAt: null,
 
     progress: {
-        version: 'v1',
+        version: "v1",
         cards: {},
         byLesson: {}
     },
@@ -72,13 +72,14 @@ const state = {
     trainingOn: false
 };
 
-const $ = sel => document.querySelector(sel);
+const $ = (s) => document.querySelector(s);
 
-/* ============================ SETTINGS & PROGRESS ========================= */
+/* ============================ SETTINGS / PROGRESS ========================= */
 
 function saveSettings() {
-    try { localStorage.setItem(LS_KEYS.settings, JSON.stringify(state.settings)); }
-    catch (e) {}
+    try {
+        localStorage.setItem(LS_KEYS.settings, JSON.stringify(state.settings));
+    } catch (e) {}
 }
 
 function loadSettings() {
@@ -89,55 +90,54 @@ function loadSettings() {
 }
 
 function saveProgress() {
-    try { localStorage.setItem(LS_KEYS.progress, JSON.stringify(state.progress)); }
-    catch (e) {}
+    try {
+        localStorage.setItem(LS_KEYS.progress, JSON.stringify(state.progress));
+    } catch (e) {}
 }
 
 function loadProgress() {
     try {
         const p = JSON.parse(localStorage.getItem(LS_KEYS.progress) || "null");
-        if (p && p.version === 'v1') state.progress = p;
+        if (p && p.version === "v1") state.progress = p;
     } catch (e) {}
 }
 
-/* ============================ CSV PARSING (robust) ======================== */
+/* ============================ CSV PARSING ================================= */
 
 function parseCSVLine(line) {
     const result = [];
-    let current = "";
-    let insideQuotes = false;
+    let cur = "";
+    let quotes = false;
 
     for (let i = 0; i < line.length; i++) {
         const c = line[i];
 
         if (c === '"') {
-            if (insideQuotes && line[i + 1] === '"') {
-                current += '"';
+            if (quotes && line[i + 1] === '"') {
+                cur += '"';
                 i++;
             } else {
-                insideQuotes = !insideQuotes;
+                quotes = !quotes;
             }
-        } else if (c === ';' && !insideQuotes) {
-            result.push(current);
-            current = "";
+        } else if (c === ";" && !quotes) {
+            result.push(cur);
+            cur = "";
         } else {
-            current += c;
+            cur += c;
         }
     }
 
-    result.push(current);
+    result.push(cur);
     return result;
 }
 
 async function loadCSV() {
-    console.log("[CSV] Starte CSV-Ladevorgang…");
+    console.log("[CSV] Lade CSV…");
 
     try {
         const res = await fetch(CSV_URL);
-        console.log("[CSV] Fetch:", res.status);
-
         if (!res.ok) {
-            alert("CSV konnte nicht geladen werden: " + res.statusText);
+            alert("CSV konnte nicht geladen werden!");
             return;
         }
 
@@ -146,21 +146,16 @@ async function loadCSV() {
 
         parseCSV(text);
         populateLessonSelect();
-
     } catch (e) {
         console.error("[CSV] Fehler:", e);
-        alert("CSV konnte nicht geladen werden: " + e.message);
     }
 }
 
 function parseCSV(text) {
-    console.log("[CSV] parseCSV gestartet…");
-
     state.lessons.clear();
-    state.lessonOrder = [];      // ✅ Reihenfolge vorher leeren
+    state.lessonOrder = [];
 
-    const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
-
+    const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
     if (lines.length < 2) return;
 
     for (let i = 1; i < lines.length; i++) {
@@ -170,12 +165,9 @@ function parseCSV(text) {
         if (cols.length < 9) continue;
         if (cols[0].trim().startsWith("*")) continue;
 
-        const lessonClean =
-            (cols[8] || "")
-                .replace(/\uFEFF/g, "")
-                .replace(/\r/g, "")
-                .replace(/\n/g, "")
-                .trim();
+        const lesson = (cols[8] || "")
+            .replace(/\uFEFF/g, "")
+            .trim();
 
         const entry = {
             word: {
@@ -190,25 +182,34 @@ function parseCSV(text) {
                 zh: (cols[6] || "").trim()
             },
             id: (cols[7] || "").trim(),
-            lesson: lessonClean
+            lesson
         };
 
-        // ✅ neue Lektion hinzufügen + Reihenfolge speichern
-        if (!state.lessons.has(entry.lesson)) {
-            state.lessons.set(entry.lesson, []);
-            state.lessonOrder.push(entry.lesson);
+        if (!state.lessons.has(lesson)) {
+            state.lessons.set(lesson, []);
+            state.lessonOrder.push(lesson);
         }
 
-        state.lessons.get(entry.lesson).push(entry);
+        state.lessons.get(lesson).push(entry);
     }
 
     console.log("[CSV] Lessons:", state.lessonOrder);
 }
 
-/* ============================ LESSON LIST ================================ */
+/* ============================ UNICODE BAR ================================ */
+/*   ✅ Funktion war vorher NICHT definiert → jetzt korrekt vorhanden!       */
+
+function makeBar(known, total) {
+    if (total <= 0) return "░░░░░░░░░░";
+
+    const full = Math.round((known / total) * 10);
+    return "██████████".slice(0, full) + "░░░░░░░░░░".slice(full);
+}
+
+/* ============================ LESSON SELECT =============================== */
 
 function populateLessonSelect() {
-    const sel = $('#lessonSelect');
+    const sel = $("#lessonSelect");
     if (!sel) return;
 
     sel.innerHTML = "";
@@ -225,11 +226,9 @@ function populateLessonSelect() {
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known = p.known || 0;
 
-        // Unicode Balken
         const bar = makeBar(known, count);
 
         opt.textContent = `${k} (${count}) ${bar}`;
-
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
         }
@@ -250,7 +249,6 @@ function resetSessionStats() {
         ttrSum: 0,
         ttrCount: 0
     };
-    renderSessionStats();
 }
 
 function gatherPool() {
@@ -266,7 +264,9 @@ function gatherPool() {
 
 function gatherPoolFromSettings() {
     state.selectedLessons.clear();
-    (state.settings.lessons || []).forEach(x => state.selectedLessons.add(x));
+    (state.settings.lessons || []).forEach((x) =>
+        state.selectedLessons.add(x)
+    );
     gatherPool();
 }
 
