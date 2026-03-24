@@ -1107,6 +1107,38 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
 
+	/* === Autoplay-Button neben Training-Button platzieren – stabile Version === */
+
+(function placeAutoplayButton() {
+    const trainingBtn = document.querySelector("#btnStart");
+    const autoplayBtn = document.querySelector("#btnAutoplay");
+
+    if (!trainingBtn || !autoplayBtn) {
+        console.warn("[UI] Training- oder Autoplay-Button noch nicht verfügbar.");
+        return;
+    }
+
+    const parent = trainingBtn.parentNode;
+
+    // Prüfen, ob die Gruppe bereits existiert
+    let group = parent.querySelector(".training-group");
+
+    if (!group) {
+        // Neue Gruppe erstellen (Flex-Container)
+        group = document.createElement("div");
+        group.className = "training-group";
+
+        // Training-Button in die Gruppe verschieben
+        parent.insertBefore(group, trainingBtn);
+        group.appendChild(trainingBtn);
+    }
+
+    // Autoplay-Button in die gleiche Gruppe setzen
+    group.appendChild(autoplayBtn);
+
+    console.log("[UI] Autoplay-Button stabil neben Training-Button platziert.");
+})();
+``
 
     /* ============================ BUTTON EVENTS =========================== */
 
