@@ -322,3 +322,42 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-radius: 5px;
     background: #7bd88f;
 }
+/* ================== BUTTON-KOSMETIK ================== */
+
+/* --- 1. Buttons in ratebar gleich breit --- */
+.ratebar .btn {
+    flex: 1 1 0;            /* alle gleich breit */
+    max-width: none;
+    text-align: center;
+}
+
+/* --- 2. Buttons in der Aufdecken-Zeile gleich breit --- */
+.card-controls .btn {
+    flex: 1 1 0;            /* gleiche Breite */
+    max-width: none;
+    text-align: center;
+}
+
+/* --- 3. Zentrierte Ausrichtung beider Zeilen --- */
+.card-controls,
+.ratebar {
+    justify-content: center;
+    display: flex;
+}
+
+/* --- 4. Optional: kleine Mindestbreite hinzufügen --- */
+.card-controls .btn,
+.ratebar .btn {
+    min-width: 140px;       /* kann angepasst werden */
+}
+
+/* --- 5. „Unsicher“-Button soll exakt so breit sein wie „Jetzt aufdecken“ --- */
+/* Da jetzt alle Buttons gleiche Breite haben, ist das automatisch erfüllt. */
+
+/* --- 6. Zusätzliche Feinkorrektur (Abstände) --- */
+.ratebar {
+    gap: 12px;
+}
+.card-controls {
+    gap: 12px;
+}
