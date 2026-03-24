@@ -331,13 +331,30 @@ function setCard(entry, fromHistory = false) {
     state.revealedAt = null;
 
     if (state.mode === 'zh2de') {
-        $('#promptWord').innerHTML = entry.word.zh || "—";
-        $('#promptWordSub').innerHTML = formatPinyinAndPos(entry.word.py, entry.pos);
-        $('#promptSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
 
-        $('#solWord').textContent = entry.word.de || "—";
-        $('#solSent').textContent = entry.sent.de || "—";
+    // Wortanzeige (Hanzi)
+    $('#promptWord').innerHTML = entry.word.zh || "—";
 
+    // Unter dem Wort: Pinyin + Wortart
+    // z.B. "dǎkāi (Verb)"
+    let wordInfo = entry.word.py || "";
+    if (entry.pos) {
+        wordInfo += ` (${entry.pos})`;
+    }
+    $('#promptWordSub').innerHTML = wordInfo;
+
+    // Satz: oben Hanzi, darunter Pinyin
+    // z.B.:
+    // 请打开书。
+    // qǐng dǎkāi shū。
+    let sentenceHanzi = entry.sent.zh || "";
+    let sentencePinyin = entry.sent.py || "";
+    $('#promptSent').innerHTML = `${sentenceHanzi}<br><span class="zh-pinyin">${sentencePinyin}</span>`;
+
+    // Lösung auf Deutsch
+    $('#solWord').textContent = entry.word.de || "—";
+    $('#solSent').textContent = entry.sent.de || "—";
+}
     } else {
         $('#promptWord').textContent = entry.word.de || "—";
         $('#promptWordSub').innerHTML = entry.pos || "";
