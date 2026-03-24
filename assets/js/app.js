@@ -280,50 +280,51 @@ function gatherPoolFromSettings() {
 
 /* ============================ CARD RENDERING ============================== */
 
-
-
 function setCard(entry) {
 
-// Titel setzen: Karte (ID: xxx) — Position X/Y
-const cardTitle = document.querySelector("#cardTitle");
-if (cardTitle) {
-    // Position bestimmen
-    let pos = "?";
-    let total = state.pool.length;
+    /* === Titel: Karte (ID …) — Position X/Y === */
 
-    if (state.order === "seq" && state.idx != null) {
-        pos = state.idx + 1;
-    } else {
-        // bei Zufall: Position anhand der ersten passenden Karte im Pool bestimmen
-        pos = state.pool.indexOf(entry) + 1;
+    const cardTitle = document.querySelector("#cardTitle");
+    if (cardTitle) {
+
+        const total = state.pool.length;
+        let pos = "?";
+
+        // Sequenziell
+        if (state.order === "seq" && state.idx != null) {
+            pos = state.idx + 1;
+        } else {
+            // Zufällig → Position über Index im Pool bestimmen
+            const p = state.pool.indexOf(entry);
+            pos = p >= 0 ? p + 1 : "?";
+        }
+
+        cardTitle.textContent = `Karte (ID: ${entry.id}) — ${pos}/${total}`;
     }
 
-    cardTitle.textContent = `Karte (ID: ${entry.id}) — ${pos}/${total}`;
-}
+    /* === Inhalt setzen === */
 
     state.current = entry;
-
     $('#solBox').classList.add('masked');
+
     state.startedAt = Date.now();
     state.revealedAt = null;
 
     if (state.mode === 'zh2de') {
-        // Frage (ZH → DE)
+
         $('#promptWord').innerHTML = entry.word.zh || "—";
         $('#promptWordSub').innerHTML = formatPinyinAndPos(entry.word.py, entry.pos);
         $('#promptSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
 
-        // Lösung
         $('#solWord').textContent = entry.word.de || "—";
         $('#solSent').textContent = entry.sent.de || "—";
 
     } else {
-        // Frage (DE → ZH)
+
         $('#promptWord').textContent = entry.word.de || "—";
         $('#promptWordSub').innerHTML = entry.pos || "";
         $('#promptSent').textContent = entry.sent.de || "—";
 
-        // Lösung
         $('#solWord').innerHTML = formatZh(entry.word.zh, entry.word.py);
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
@@ -341,16 +342,19 @@ if (cardTitle) {
 /* ============================ CARD NAVIGATION ============================= */
 
 function nextCard() {
-    if (!state.pool.length) return alert("Bitte Lektionen auswählen und übernehmen.");
+    if (!state.pool.length)
+        return alert("Bitte Lektionen auswählen und übernehmen.");
 
     if (state.order === 'seq') {
+
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
 
         setCard(state.pool[state.idx]);
+
     } else {
-        const random = Math.floor(Math.random() * state.pool.length);
-        setCard(state.pool[random]);
+        const r = Math.floor(Math.random() * state.pool.length);
+        setCard(state.pool[r]);
     }
 }
 
@@ -417,24 +421,24 @@ function rate(mark) {
     if (!state.current) return;
 
     state.session.done++;
-
     if (mark === 'known') state.session.known++;
     else if (mark === 'unsure') state.session.unsure++;
     else state.session.unknown++;
 
     renderSessionStats();
 
-    // Fort­schritt pro Lektion
+    // Fortschritt pro Lektion
     const lesson = state.current.lesson;
+
     if (lesson) {
-        if (!state.progress.byLesson[lesson])
+        if (!state.progress.byLesson[lesson]) {
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
+        }
 
         if (mark === 'known') state.progress.byLesson[lesson].known++;
         if (mark === 'unknown') state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
-        populateLessonSelect();
     }
 
     disableRating();
@@ -504,31 +508,7 @@ function stopTraining() {
     updateTrainingBtn();
 
     $('#btnPrev').disabled = true;
-    $('#btnReveal').disabled = true;
-    $('#btnNext').disabled = true;
-    $('#btnPlayQ').disabled = true;
-    $('#btnPlayA').disabled = true;
 
-    disableRating();
-
-    $('#solBox').classList.add('masked');
-    $('#promptWord').textContent = "—";
-    $('#promptWordSub').innerHTML = " ";
-    $('#promptSent').textContent = "—";
-    $('#solWord').textContent = "—";
-    $('#solSent').textContent = "—";
-}
-
-function updateTrainingBtn() {
-    $('#btnStart').textContent = state.trainingOn
-        ? "Training stoppen ■"
-        : "Training starten ▶";
-}
-
-
-/* -------------------------------------------------------------------------- */
-/*                                ENDE TEIL 2                                 */
-/* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
