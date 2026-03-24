@@ -354,7 +354,7 @@ function setCard(entry, fromHistory = false) {
     // Lösung auf Deutsch
     $('#solWord').textContent = entry.word.de || "—";
     $('#solSent').textContent = entry.sent.de || "—";
-}
+
     } else {
         $('#promptWord').textContent = entry.word.de || "—";
         $('#promptWordSub').innerHTML = entry.pos || "";
