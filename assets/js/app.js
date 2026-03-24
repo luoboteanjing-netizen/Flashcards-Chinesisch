@@ -243,22 +243,26 @@ function populateLessonSelect() {
 
     sel.innerHTML = "";
 
-    const lessonKeys = [...state.lessons.keys()];
-    lessonKeys.sort((a,b) => a.localeCompare(b, undefined, { numeric: true }));
+    // Reihenfolge wie in der CSV
+    const lessonKeys = state.lessonOrder;
 
     for (const k of lessonKeys) {
         const opt = document.createElement("option");
         opt.value = k;
 
-        // Fortschritt suchen oder Standard 0/0 setzen
+        // Anzahl Karten in der Lektion
+        const cards = state.lessons.get(k) || [];
+        const count = cards.length;
+
+        // Fortschritt (known/unknown)
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known = p.known || 0;
         const unknown = p.unknown || 0;
 
-        // Anzeigeformat wie früher
-        opt.textContent = `${k}   ✅${known}   ❌${unknown}`;
+        // Text zusammensetzen
+        opt.textContent = `${k}  (${count} Karten)   ✅${known}   ❌${unknown}`;
 
-        // bereits vorher gewählte Lessons wieder markieren
+        // Ausgewählt?
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
         }
@@ -310,7 +314,27 @@ function gatherPoolFromSettings() {
 
 /* ============================ CARD RENDERING ============================== */
 
+
+
 function setCard(entry) {
+
+// Titel setzen: Karte (ID: xxx) — Position X/Y
+const cardTitle = document.querySelector("#cardTitle");
+if (cardTitle) {
+    // Position bestimmen
+    let pos = "?";
+    let total = state.pool.length;
+
+    if (state.order === "seq" && state.idx != null) {
+        pos = state.idx + 1;
+    } else {
+        // bei Zufall: Position anhand der ersten passenden Karte im Pool bestimmen
+        pos = state.pool.indexOf(entry) + 1;
+    }
+
+    cardTitle.textContent = `Karte (ID: ${entry.id}) — ${pos}/${total}`;
+}
+
     state.current = entry;
 
     $('#solBox').classList.add('masked');
