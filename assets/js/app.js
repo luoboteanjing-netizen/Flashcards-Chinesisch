@@ -3,12 +3,10 @@
 /*                          Flashcards – Vollversion                          */
 /*                   CSV-Import + Debug + Vollständige App                    */
 /* -------------------------------------------------------------------------- */
-/* Dieses ist TEIL 1 von 4. Bitte nicht allein verwenden. Am Ende alle 4 Teile
-   direkt untereinander in EINE Datei kopieren: assets/js/app.js */
 /* -------------------------------------------------------------------------- */
-
-
-/* ============================  GLOBAL SETTINGS  ============================ */
+/*                          Flashcards – Vollversion                          */
+/*              TEIL 1 von 4 — Global State · Settings · CSV Parser          */
+/* -------------------------------------------------------------------------- */
 
 const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
 
@@ -44,12 +42,10 @@ const state = {
     settings: {
         mode: 'de2zh',
         order: 'random',
-
         rateDe: 0.95,
         pitchDe: 1.0,
         rateZh: 0.95,
         pitchZh: 1.0,
-
         lessons: [],
         browserVoiceZh: null,
         browserVoiceDe: null,
@@ -81,8 +77,7 @@ const state = {
 
 const $ = sel => document.querySelector(sel);
 
-
-/* ============================  SETTINGS  ================================== */
+/* ============================ SETTINGS & PROGRESS ========================= */
 
 function saveSettings() {
     try { localStorage.setItem(LS_KEYS.settings, JSON.stringify(state.settings)); }
@@ -96,8 +91,6 @@ function loadSettings() {
     } catch (e) {}
 }
 
-/* ============================  PROGRESS  ================================= */
-
 function saveProgress() {
     try { localStorage.setItem(LS_KEYS.progress, JSON.stringify(state.progress)); }
     catch (e) {}
@@ -110,8 +103,38 @@ function loadProgress() {
     } catch (e) {}
 }
 
+/* ============================ CSV PARSING (robust!) ======================= */
 
-/* ============================  CSV IMPORT + DEBUG ========================= */
+/**
+ * Robuster CSV‑Parser für Semikolon‑getrennte Werte.
+ * Unterstützt Anführungszeichen und chinesische Zeichen.
+ */
+function parseCSVLine(line) {
+    const result = [];
+    let current = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+
+        if (c === '"') {
+            // Doppelte Anführungszeichen → escaped quote
+            if (insideQuotes && line[i + 1] === '"') {
+                current += '"';
+                i++;
+            } else {
+                insideQuotes = !insideQuotes;
+            }
+        } else if (c === ';' && !insideQuotes) {
+            result.push(current);
+            current = "";
+        } else {
+            current += c;
+        }
+    }
+    result.push(current);
+    return result;
+}
 
 async function loadCSV() {
     console.log("[CSV] Starte CSV-Ladevorgang…");
@@ -127,18 +150,17 @@ async function loadCSV() {
             return;
         }
 
-        const text = await res.text();
-        console.log("[CSV] Zeichen im CSV:", text.length);
+        // UTF‑8 erzwingen
+        const buf = await res.arrayBuffer();
+        const text = new TextDecoder("utf-8").decode(buf);
+
+        console.log("[CSV] Zeichen:", text.length);
         console.log("[CSV] Vorschau:\n" + text.slice(0, 200));
 
         parseCSV(text);
 
-        console.log("[CSV] parseCSV abgeschlossen.");
         console.log("[CSV] Lessons:", [...state.lessons.keys()]);
-
         populateLessonSelect();
-        console.log("[CSV] LessonSelect erstellt.");
-
     } catch (err) {
         console.error("[CSV] Fehler:", err);
         alert("CSV konnte nicht geladen werden: " + err.message);
@@ -154,7 +176,7 @@ function parseCSV(text) {
     console.log("[CSV] Zeilen gesamt:", lines.length);
 
     if (lines.length <= 1) {
-        console.warn("[CSV] Keine Datenzeilen gefunden.");
+        console.warn("[CSV] Keine Datenzeilen vorhanden.");
         return;
     }
 
@@ -165,19 +187,26 @@ function parseCSV(text) {
 
     for (let i = 1; i < lines.length; i++) {
         const raw = lines[i];
-        const cols = raw.split(";");
+        const cols = parseCSVLine(raw);
 
         if (cols.length < 9) {
             skipped++;
-            console.warn(`[CSV] Zeile ${i+1}: Zu wenige Spalten.`);
+            console.warn(`[CSV] Zeile ${i + 1}: Zu wenige Spalten.`);
             continue;
         }
 
+        // Zeilen ignorieren, die mit * beginnen
         if (cols[0].trim().startsWith("*")) {
             skipped++;
-            console.log(`[CSV] Zeile ${i+1}: Übersprungen (*).`);
             continue;
         }
+
+        const lessonClean =
+            (cols[8] || "")
+                .replace(/\uFEFF/g, "")
+                .replace(/\r/g, "")
+                .replace(/\n/g, "")
+                .trim();
 
         const entry = {
             word: {
@@ -192,22 +221,21 @@ function parseCSV(text) {
                 zh: (cols[6] || "").trim()
             },
             id: (cols[7] || "").trim(),
-            lesson: (cols[8] || "").trim()
+            lesson: lessonClean
         };
 
         imported++;
 
-        if (!state.lessons.has(entry.lesson))
+        if (!state.lessons.has(entry.lesson)) {
             state.lessons.set(entry.lesson, []);
-
+        }
         state.lessons.get(entry.lesson).push(entry);
     }
 
-    console.log(`[CSV] Import: ${imported} geladen, ${skipped} übersprungen.`);
+    console.log(`[CSV] Import abgeschlossen: ${imported} geladen, ${skipped} übersprungen.`);
 }
 
-
-/* ============================  LESSON HANDLING ============================ */
+/* ============================ LESSON HANDLING ============================= */
 
 function populateLessonSelect() {
     const sel = $('#lessonSelect');
@@ -230,8 +258,7 @@ function populateLessonSelect() {
     }
 }
 
-
-/* ============================  POOL HANDLING ============================== */
+/* ============================ POOL HANDLING =============================== */
 
 function resetSessionStats() {
     state.session = {
@@ -263,10 +290,9 @@ function gatherPoolFromSettings() {
     gatherPool();
 }
 
-
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 1                                 */
-/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */--- */
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 2 von 4                                 */
 /*      Card Rendering · Navigation · Rating · Session Stats · Training       */
