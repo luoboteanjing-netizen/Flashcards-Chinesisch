@@ -1,4 +1,4 @@
-/* --------------- Flashcards – CSV Version 6.0.4----------- */
+/* --------------- Flashcards – CSV Version 6.0.5----------- */
 /* -------------------------------------------------------------------------- */
 /*                          Flashcards – Vollversion                          */
 /*              TEIL 1 von 4 — Global State · Settings · CSV Parser          */
@@ -281,50 +281,23 @@ function gatherPoolFromSettings() {
 
 /* ============================ CARD RENDERING ============================== */
 
-function setCard(entry) {
-
-    /* === TITEL & LEKTIONS-INFOS ============================= */
-
-	
-	
-    const cardTitle = document.querySelector("#cardTitle");
-    const cardLesson = document.querySelector("#cardLesson");
-    const lessonStats = document.querySelector("#lessonStats");
-	
 function setCard(entry, fromHistory = false) {
 
-    // 👉 NUR wenn NICHT aus History-Navigation
+    // 👉 History nur erweitern, wenn NICHT aus History-Navigation
     if (!fromHistory) {
         pushToHistory(entry);
     }
-	
-	/* === Zufallsmodus: History aufbauen === */
-if (state.order === "random") {
 
-    // Wenn wir normale Navigation machen (nicht "Zurück")
-    if (state.historyPos === -1 || entry.id !== state.history[state.historyPos]?.id) {
+    const cardTitle = document.querySelector("#cardTitle");
+    const cardLesson = document.querySelector("#cardLesson");
+    const lessonStats = document.querySelector("#lessonStats");
 
-        // Wenn History voll → erste entfernen
-        if (state.history.length >= 10) {
-            state.history.shift();
-        }
-
-        // Eintrag hinzufügen
-        state.history.push(entry);
-        state.historyPos = state.history.length - 1;
-    }
-}
-	
-	
- 	 // Sequenzielle Position aktualisieren (wichtiger Fix!)
+    // Sequenz-Index synchronisieren
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
-        if (pos >= 0) {
-            state.idx = pos;
+        if (pos >= 0) state.idx = pos;
     }
-}
-	
-	
+
     if (cardTitle) {
         cardTitle.textContent = `Karte (ID ${entry.id})`;
     }
@@ -333,31 +306,21 @@ if (state.order === "random") {
         cardLesson.textContent = `Lektion ${entry.lesson}`;
     }
 
-    // Statistik: ✅x ❌y für diese Lektion
     if (lessonStats) {
-        const ls = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
-        lessonStats.textContent = `✅ ${ls.known || 0}     ❌ ${ls.unknown || 0}`;
+        const cards = state.lessons.get(entry.lesson) || [];
+        const total = cards.length;
+
+        const p = state.progress.byLesson[entry.lesson] || { known: 0 };
+        const known = p.known || 0;
+
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+
+        lessonStats.innerHTML = `
+            <div class="lesson-bar-large">
+                <div class="lesson-bar-large-fill" style="width:${percent}%;"></div>
+            </div>
+        `;
     }
-	
-	    updateNavButtons();
-}
-	
-// Fortschritt-Balken unter dem Titel
-if (lessonStats) {
-    const cards = state.lessons.get(entry.lesson) || [];
-    const total = cards.length;
-
-    const p = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
-    const known = p.known || 0;
-
-    const percent = total > 0 ? Math.round((known / total) * 100) : 0;
-
-    lessonStats.innerHTML = `
-        <div class="lesson-bar-large">
-            <div class="lesson-bar-large-fill" style="width:${percent}%;"></div>
-        </div>
-    `;
-}
 
     /* === KARTENINHALT ====================================== */
 
@@ -384,13 +347,14 @@ if (lessonStats) {
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
-    $('#btnNext').disabled = false;
     $('#btnReveal').disabled = false;
     $('#btnPlayQ').disabled = false;
     $('#btnPlayA').disabled = false;
 
     disableRating();
     renderModeUI();
+
+    updateNavButtons();
 }
 
 /* ============================ CARD NAVIGATION ============================= */
