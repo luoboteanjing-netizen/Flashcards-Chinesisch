@@ -27,7 +27,7 @@ const state = {
     selectedLessons: new Set(),
 
     pool: [],
-    idx: null,
+    idx: null,history: [],historyPos: -1,
     current: null,
 
     voices: [],
@@ -291,6 +291,24 @@ function setCard(entry) {
     const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
 
+	/* === Zufallsmodus: History aufbauen === */
+if (state.order === "random") {
+
+    // Wenn wir normale Navigation machen (nicht "Zurück")
+    if (state.historyPos === -1 || entry.id !== state.history[state.historyPos]?.id) {
+
+        // Wenn History voll → erste entfernen
+        if (state.history.length >= 10) {
+            state.history.shift();
+        }
+
+        // Eintrag hinzufügen
+        state.history.push(entry);
+        state.historyPos = state.history.length - 1;
+    }
+}
+	
+	
  	 // Sequenzielle Position aktualisieren (wichtiger Fix!)
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
@@ -368,16 +386,19 @@ if (lessonStats) {
 /* ============================ CARD NAVIGATION ============================= */
 
 function nextCard() {
+
     if (!state.pool.length)
         return alert("Bitte Lektionen auswählen und übernehmen.");
 
-    if (state.order === 'seq') {
+    // Zufallsmodus → History-Forward markieren
+    if (state.order === "random") {
+        state.historyPos = -1;
+    }
 
+    if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
-
         setCard(state.pool[state.idx]);
-
     } else {
         const r = Math.floor(Math.random() * state.pool.length);
         setCard(state.pool[r]);
@@ -385,12 +406,35 @@ function nextCard() {
 }
 
 function prevCard() {
-    if (state.order !== 'seq' || !state.pool.length) return;
 
-    if (state.idx == null) state.idx = 0;
-    else state.idx = (state.idx - 1 + state.pool.length) % state.pool.length;
+    if (!state.pool.length) return;
 
-    setCard(state.pool[state.idx]);
+    // === SEQUENZIELLER MODUS =====================================
+    if (state.order === "seq") {
+
+        if (state.idx == null) {
+            const pos = state.pool.findIndex(c => c.id === state.current?.id);
+            state.idx = pos >= 0 ? pos : 0;
+        }
+
+        state.idx = (state.idx - 1 + state.pool.length) % state.pool.length;
+        setCard(state.pool[state.idx]);
+        return;
+    }
+
+    // === ZUFALLSMODUS MIT HISTORY =================================
+    if (state.order === "random") {
+
+        if (state.historyPos > 0) {
+            state.historyPos--;
+            const entry = state.history[state.historyPos];
+            setCard(entry);
+            return;
+        }
+
+        // Keine History mehr → optional gleiche Karte behalten
+        console.log("[History] Kein weiterer Rückschritt möglich.");
+    }
 }
 
 
@@ -495,6 +539,11 @@ function renderSessionStats() {
 function startTraining() {
     if (!state.trainingOn) {
 
+	// History zurücksetzen
+state.history = [];
+state.historyPos = -1;
+``
+	
         const sel = $('#lessonSelect');
         state.selectedLessons.clear();
 
