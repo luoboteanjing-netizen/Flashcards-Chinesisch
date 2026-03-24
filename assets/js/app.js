@@ -290,7 +290,14 @@ function setCard(entry) {
     const cardTitle = document.querySelector("#cardTitle");
     const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
+	
+function setCard(entry, fromHistory = false) {
 
+    // 👉 NUR wenn NICHT aus History-Navigation
+    if (!fromHistory) {
+        pushToHistory(entry);
+    }
+	
 	/* === Zufallsmodus: History aufbauen === */
 if (state.order === "random") {
 
@@ -331,6 +338,9 @@ if (state.order === "random") {
         const ls = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
         lessonStats.textContent = `✅ ${ls.known || 0}     ❌ ${ls.unknown || 0}`;
     }
+	
+	    updateNavButtons();
+}
 	
 // Fortschritt-Balken unter dem Titel
 if (lessonStats) {
@@ -385,58 +395,60 @@ if (lessonStats) {
 
 /* ============================ CARD NAVIGATION ============================= */
 
+function pushToHistory(entry) {
+
+    // Wenn wir nicht am Ende sind → Forward-History löschen
+    if (state.historyPos < state.history.length - 1) {
+        state.history = state.history.slice(0, state.historyPos + 1);
+    }
+
+    state.history.push(entry);
+    state.historyPos = state.history.length - 1;
+
+    updateNavButtons();
+}
+
+function updateNavButtons() {
+    $('#btnPrev').disabled = state.historyPos <= 0;
+    $('#btnNext').disabled = state.pool.length === 0;
+}
+
 function nextCard() {
 
-    if (!state.pool.length)
-        return alert("Bitte Lektionen auswählen und übernehmen.");
+    if (!state.pool.length) return;
 
-    // Zufallsmodus → History-Forward markieren
-    if (state.order === "random") {
-        state.historyPos = -1;
+    // 👉 Wenn wir in der History zurückgegangen sind → vorwärts gehen
+    if (state.historyPos < state.history.length - 1) {
+        state.historyPos++;
+        setCard(state.history[state.historyPos], true);
+        return;
     }
+
+    // 👉 Normal neue Karte erzeugen
+    let next;
 
     if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
-        setCard(state.pool[state.idx]);
+
+        next = state.pool[state.idx];
+
     } else {
-        const r = Math.floor(Math.random() * state.pool.length);
-        setCard(state.pool[r]);
+        next = state.pool[Math.floor(Math.random() * state.pool.length)];
     }
+
+    setCard(next);
 }
 
 function prevCard() {
 
-    if (!state.pool.length) return;
-
-    // === SEQUENZIELLER MODUS =====================================
-    if (state.order === "seq") {
-
-        if (state.idx == null) {
-            const pos = state.pool.findIndex(c => c.id === state.current?.id);
-            state.idx = pos >= 0 ? pos : 0;
-        }
-
-        state.idx = (state.idx - 1 + state.pool.length) % state.pool.length;
-        setCard(state.pool[state.idx]);
-        return;
+    if (state.historyPos > 0) {
+        state.historyPos--;
+        setCard(state.history[state.historyPos], true);
     }
 
-    // === ZUFALLSMODUS MIT HISTORY =================================
-    if (state.order === "random") {
-
-        if (state.historyPos > 0) {
-            state.historyPos--;
-            const entry = state.history[state.historyPos];
-            setCard(entry);
-            return;
-        }
-
-        // Keine History mehr → optional gleiche Karte behalten
-        console.log("[History] Kein weiterer Rückschritt möglich.");
-    }
+    updateNavButtons();
 }
-
 
 /* ============================ FORMATTING ================================= */
 
@@ -542,7 +554,7 @@ function startTraining() {
 	// History zurücksetzen
 state.history = [];
 state.historyPos = -1;
-``
+
 	
         const sel = $('#lessonSelect');
         state.selectedLessons.clear();
