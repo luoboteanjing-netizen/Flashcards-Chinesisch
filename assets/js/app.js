@@ -1,8 +1,4 @@
-/* --------------- Flashcards – CSV Version 6.0.2----------- */
-/* -------------------------------------------------------------------------- */
-/*                          Flashcards – Vollversion                          */
-/*                   CSV-Import + Debug + Vollständige App                    */
-/* -------------------------------------------------------------------------- */
+/* --------------- Flashcards – CSV Version 6.0.3----------- */
 /* -------------------------------------------------------------------------- */
 /*                          Flashcards – Vollversion                          */
 /*              TEIL 1 von 4 — Global State · Settings · CSV Parser          */
@@ -27,6 +23,7 @@ const state = {
     pitchZh: 1.0,
 
     lessons: new Map(),
+    lessonOrder: [],   // ✅ WICHTIG: Reihenfolge wie in CSV
     selectedLessons: new Set(),
 
     pool: [],
@@ -103,12 +100,8 @@ function loadProgress() {
     } catch (e) {}
 }
 
-/* ============================ CSV PARSING (robust!) ======================= */
+/* ============================ CSV PARSING (robust) ======================== */
 
-/**
- * Robuster CSV‑Parser für Semikolon‑getrennte Werte.
- * Unterstützt Anführungszeichen und chinesische Zeichen.
- */
 function parseCSVLine(line) {
     const result = [];
     let current = "";
@@ -118,7 +111,6 @@ function parseCSVLine(line) {
         const c = line[i];
 
         if (c === '"') {
-            // Doppelte Anführungszeichen → escaped quote
             if (insideQuotes && line[i + 1] === '"') {
                 current += '"';
                 i++;
@@ -132,38 +124,32 @@ function parseCSVLine(line) {
             current += c;
         }
     }
+
     result.push(current);
     return result;
 }
 
 async function loadCSV() {
     console.log("[CSV] Starte CSV-Ladevorgang…");
-    console.log("[CSV] Pfad:", CSV_URL);
 
     try {
         const res = await fetch(CSV_URL);
-        console.log("[CSV] Fetch:", res.status, res.statusText);
+        console.log("[CSV] Fetch:", res.status);
 
         if (!res.ok) {
-            console.error("[CSV] Fehler beim Laden!", res.status, res.statusText);
             alert("CSV konnte nicht geladen werden: " + res.statusText);
             return;
         }
 
-        // UTF‑8 erzwingen
         const buf = await res.arrayBuffer();
         const text = new TextDecoder("utf-8").decode(buf);
 
-        console.log("[CSV] Zeichen:", text.length);
-        console.log("[CSV] Vorschau:\n" + text.slice(0, 200));
-
         parseCSV(text);
-
-        console.log("[CSV] Lessons:", [...state.lessons.keys()]);
         populateLessonSelect();
-    } catch (err) {
-        console.error("[CSV] Fehler:", err);
-        alert("CSV konnte nicht geladen werden: " + err.message);
+
+    } catch (e) {
+        console.error("[CSV] Fehler:", e);
+        alert("CSV konnte nicht geladen werden: " + e.message);
     }
 }
 
@@ -171,35 +157,18 @@ function parseCSV(text) {
     console.log("[CSV] parseCSV gestartet…");
 
     state.lessons.clear();
+    state.lessonOrder = [];      // ✅ Reihenfolge vorher leeren
 
     const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
-    console.log("[CSV] Zeilen gesamt:", lines.length);
 
-    if (lines.length <= 1) {
-        console.warn("[CSV] Keine Datenzeilen vorhanden.");
-        return;
-    }
-
-    console.log("[CSV] Header:", lines[0]);
-
-    let imported = 0;
-    let skipped = 0;
+    if (lines.length < 2) return;
 
     for (let i = 1; i < lines.length; i++) {
         const raw = lines[i];
         const cols = parseCSVLine(raw);
 
-        if (cols.length < 9) {
-            skipped++;
-            console.warn(`[CSV] Zeile ${i + 1}: Zu wenige Spalten.`);
-            continue;
-        }
-
-        // Zeilen ignorieren, die mit * beginnen
-        if (cols[0].trim().startsWith("*")) {
-            skipped++;
-            continue;
-        }
+        if (cols.length < 9) continue;
+        if (cols[0].trim().startsWith("*")) continue;
 
         const lessonClean =
             (cols[8] || "")
@@ -224,18 +193,19 @@ function parseCSV(text) {
             lesson: lessonClean
         };
 
-        imported++;
-
+        // ✅ neue Lektion hinzufügen + Reihenfolge speichern
         if (!state.lessons.has(entry.lesson)) {
             state.lessons.set(entry.lesson, []);
+            state.lessonOrder.push(entry.lesson);
         }
+
         state.lessons.get(entry.lesson).push(entry);
     }
 
-    console.log(`[CSV] Import abgeschlossen: ${imported} geladen, ${skipped} übersprungen.`);
+    console.log("[CSV] Lessons:", state.lessonOrder);
 }
 
-/* ============================ LESSON HANDLING ============================= */
+/* ============================ LESSON LIST ================================ */
 
 function populateLessonSelect() {
     const sel = $('#lessonSelect');
@@ -243,26 +213,22 @@ function populateLessonSelect() {
 
     sel.innerHTML = "";
 
-    // Reihenfolge wie in der CSV
-    const lessonKeys = state.lessonOrder;
+    // ✅ Lektionen exakt in CSV-Reihenfolge
+    const keys = state.lessonOrder;
 
-    for (const k of lessonKeys) {
+    for (const k of keys) {
         const opt = document.createElement("option");
         opt.value = k;
 
-        // Anzahl Karten in der Lektion
         const cards = state.lessons.get(k) || [];
         const count = cards.length;
 
-        // Fortschritt (known/unknown)
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known = p.known || 0;
         const unknown = p.unknown || 0;
 
-        // Text zusammensetzen
         opt.textContent = `${k}  (${count} Karten)   ✅${known}   ❌${unknown}`;
 
-        // Ausgewählt?
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
         }
@@ -287,12 +253,12 @@ function resetSessionStats() {
 }
 
 function gatherPool() {
-    const arr = [];
-    for (const lesson of state.selectedLessons) {
-        const l = state.lessons.get(lesson);
-        if (l) arr.push(...l);
+    const out = [];
+    for (const k of state.selectedLessons) {
+        const arr = state.lessons.get(k);
+        if (arr) out.push(...arr);
     }
-    state.pool = arr;
+    state.pool = out;
     state.idx = null;
     resetSessionStats();
 }
