@@ -225,15 +225,10 @@ function populateLessonSelect() {
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known = p.known || 0;
 
-        // Fortschritt in Prozent (für Balken)
-        const percent = count > 0 ? Math.round((known / count) * 100) : 0;
+        // Unicode Balken
+        const bar = makeBar(known, count);
 
-        opt.innerHTML = `
-            ${k} (${count}) 
-            <span class="lesson-bar">
-                <span class="lesson-bar-fill" style="width:${percent}%;"></span>
-            </span>
-        `;
+        opt.textContent = `${k} (${count}) ${bar}`;
 
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
@@ -290,10 +285,21 @@ function setCard(entry) {
 
     /* === TITEL & LEKTIONS-INFOS ============================= */
 
+	
+	
     const cardTitle = document.querySelector("#cardTitle");
     const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
 
+ 	 // Sequenzielle Position aktualisieren (wichtiger Fix!)
+    if (state.order === "seq") {
+        const pos = state.pool.indexOf(entry);
+        if (pos >= 0) {
+            state.idx = pos;
+    }
+}
+	
+	
     if (cardTitle) {
         cardTitle.textContent = `Karte (ID ${entry.id})`;
     }
