@@ -1235,10 +1235,12 @@ btnHome.addEventListener("click", showHomeScreen);
     console.log("[UI] Autoplay-Button stabil neben Training-Button platziert.");
 })();
 
-    /* ============================ BUTTON EVENTS =========================== */
+/* ============================ BUTTON EVENTS =========================== */
 
-    // Richtungswechsel
-    $('#btnSwapMode').addEventListener("click", () => {
+// Richtungswechsel
+const btnSwapMode = document.getElementById('btnSwapMode');
+if (btnSwapMode) {
+    btnSwapMode.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === 'de2zh' ? 'zh2de' : 'de2zh';
         state.settings.mode = state.mode;
@@ -1246,123 +1248,194 @@ btnHome.addEventListener("click", showHomeScreen);
         renderModeUI();
         if (state.current) setCard(state.current);
     });
+} else {
+    console.warn('[UI] Element #btnSwapMode nicht gefunden – Event nicht gebunden.');
+}
 
-    // Reihenfolge
-    $('#btnOrderToggle').addEventListener("click", () => {
+// Reihenfolge
+const btnOrderToggle = document.getElementById('btnOrderToggle');
+if (btnOrderToggle) {
+    btnOrderToggle.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.order = state.order === "random" ? "seq" : "random";
         state.settings.order = state.order;
         saveSettings();
         renderModeUI();
     });
+} else {
+    console.warn('[UI] Element #btnOrderToggle nicht gefunden.');
+}
 
-    // Autoplay
-    $('#btnAutoplay').addEventListener("click", () => {
+// Autoplay
+const btnAutoplay = document.getElementById('btnAutoplay');
+if (btnAutoplay) {
+    btnAutoplay.addEventListener("click", () => {
         toggleAutoplay();
     });
+} else {
+    console.warn('[UI] Element #btnAutoplay nicht gefunden.');
+}
 
-    // Gap Slider
-    $('#gapRange').addEventListener("input", e => {
+// Gap Slider
+const gapRange = document.getElementById('gapRange');
+if (gapRange) {
+    gapRange.addEventListener("input", e => {
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
         state.settings.autoplayGap = state.autoplay.gapMs;
-        $('#gapVal').textContent = `(${s.toFixed(1)} s)`;
+        const gapVal = document.getElementById('gapVal');
+        if (gapVal) gapVal.textContent = `(${s.toFixed(1)} s)`;
         saveSettings();
     });
+} else {
+    console.warn('[UI] Element #gapRange nicht gefunden.');
+}
 
-    /* ---- Voice Controls ---- */
-
-    $('#btnVoiceDe').addEventListener("click", () => {
+// ---- Voice Controls ----
+const btnVoiceDe = document.getElementById('btnVoiceDe');
+if (btnVoiceDe) {
+    btnVoiceDe.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         openVoicesPanelFor("de");
     });
-    $('#btnVoiceZh').addEventListener("click", () => {
+}
+
+const btnVoiceZh = document.getElementById('btnVoiceZh');
+if (btnVoiceZh) {
+    btnVoiceZh.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         openVoicesPanelFor("zh");
     });
-    $('#btnCloseVoices').addEventListener("click", closeVoices);
+}
 
-    // Rate / Pitch German
-    $('#rateDeRange').addEventListener("input", e => {
+const btnCloseVoices = document.getElementById('btnCloseVoices');
+if (btnCloseVoices) {
+    btnCloseVoices.addEventListener("click", closeVoices);
+}
+
+// Rate / Pitch German
+const rateDeRange = document.getElementById('rateDeRange');
+if (rateDeRange) {
+    rateDeRange.addEventListener("input", e => {
         stopAutoplayOnUserAction();
         state.rateDe = parseFloat(e.target.value);
         state.settings.rateDe = state.rateDe;
-        $('#rateDeVal').textContent = `(${state.rateDe.toFixed(2)})`;
+        const rateDeVal = document.getElementById('rateDeVal');
+        if (rateDeVal) rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
         saveSettings();
     });
-    $('#pitchDeRange').addEventListener("input", e => {
+}
+
+const pitchDeRange = document.getElementById('pitchDeRange');
+if (pitchDeRange) {
+    pitchDeRange.addEventListener("input", e => {
         stopAutoplayOnUserAction();
         state.pitchDe = parseFloat(e.target.value);
         state.settings.pitchDe = state.pitchDe;
-        $('#pitchDeVal').textContent = `(${state.pitchDe.toFixed(2)})`;
+        const pitchDeVal = document.getElementById('pitchDeVal');
+        if (pitchDeVal) pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
         saveSettings();
     });
+}
 
-    // Rate / Pitch Chinese
-    $('#rateZhRange').addEventListener("input", e => {
+// Rate / Pitch Chinese (ähnlich für rateZhRange und pitchZhRange)
+const rateZhRange = document.getElementById('rateZhRange');
+if (rateZhRange) {
+    rateZhRange.addEventListener("input", e => {
         stopAutoplayOnUserAction();
         state.rateZh = parseFloat(e.target.value);
         state.settings.rateZh = state.rateZh;
-        $('#rateZhVal').textContent = `(${state.rateZh.toFixed(2)})`;
+        const rateZhVal = document.getElementById('rateZhVal');
+        if (rateZhVal) rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
         saveSettings();
     });
-    $('#pitchZhRange').addEventListener("input", e => {
+}
+
+const pitchZhRange = document.getElementById('pitchZhRange');
+if (pitchZhRange) {
+    pitchZhRange.addEventListener("input", e => {
         stopAutoplayOnUserAction();
         state.pitchZh = parseFloat(e.target.value);
         state.settings.pitchZh = state.pitchZh;
-        $('#pitchZhVal').textContent = `(${state.pitchZh.toFixed(2)})`;
+        const pitchZhVal = document.getElementById('pitchZhVal');
+        if (pitchZhVal) pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
         saveSettings();
     });
+}
 
-
-    /* ---- Training ---- */
-
-    $('#btnStart').addEventListener("click", () => {
+// ---- Training ----
+const btnStart = document.getElementById('btnStart');
+if (btnStart) {
+    btnStart.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
     });
+}
 
-    $('#btnNext').addEventListener("click", () => {
+const btnNext = document.getElementById('btnNext');
+if (btnNext) {
+    btnNext.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         nextCard();
     });
+}
 
-    $('#btnPrev').addEventListener("click", () => {
+const btnPrev = document.getElementById('btnPrev');
+if (btnPrev) {
+    btnPrev.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         prevCard();
     });
+}
 
-    $('#btnReveal').addEventListener("click", () => {
+const btnReveal = document.getElementById('btnReveal');
+if (btnReveal) {
+    btnReveal.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         doReveal();
     });
+}
 
-    $('#btnPlayQ').addEventListener("click", () => {
+const btnPlayQ = document.getElementById('btnPlayQ');
+if (btnPlayQ) {
+    btnPlayQ.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playQuestion();
     });
+}
 
-    $('#btnPlayA').addEventListener("click", () => {
+const btnPlayA = document.getElementById('btnPlayA');
+if (btnPlayA) {
+    btnPlayA.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playAnswer();
     });
+}
 
-
-    /* ---- Rating ---- */
-
-    $('#btnRateKnown').addEventListener("click", () => {
+// ---- Rating ----
+const btnRateKnown = document.getElementById('btnRateKnown');
+if (btnRateKnown) {
+    btnRateKnown.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("known");
     });
-    $('#btnRateUnsure').addEventListener("click", () => {
+}
+
+const btnRateUnsure = document.getElementById('btnRateUnsure');
+if (btnRateUnsure) {
+    btnRateUnsure.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("unsure");
     });
-    $('#btnRateUnknown').addEventListener("click", () => {
+}
+
+const btnRateUnknown = document.getElementById('btnRateUnknown');
+if (btnRateUnknown) {
+    btnRateUnknown.addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("unknown");
     });
-
+}
 
     /* ---- Lessons ---- */
 
