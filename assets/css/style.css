@@ -380,7 +380,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     display: flex;
     justify-content: space-between;   /* Äußere Buttons außen */
     align-items: center;              /* vertikal exakt bündig */
-    width: 100%;
+    width: 80%;
     padding: 0 4px;                   /* minimaler Rand */
     gap: 8px;                         /* harmonischer Abstand */
 }
