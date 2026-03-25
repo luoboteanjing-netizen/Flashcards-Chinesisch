@@ -370,3 +370,43 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: #081018 !important;
     font-weight: 700 !important;
 }
+
+/* =======================================================
+   KOMPAKTE STEUERUNGS-BUTTONS AUF EINER LINIE
+   ======================================================= */
+
+/* Container der drei Buttons (Zurück – Aufdecken – Weiter) */
+.card-controls {
+    display: flex;
+    justify-content: space-between;   /* Äußere Buttons außen */
+    align-items: center;              /* vertikal exakt bündig */
+    width: 100%;
+    padding: 0 4px;                   /* minimaler Rand */
+    gap: 8px;                         /* harmonischer Abstand */
+}
+
+/* Äußere Buttons: Zurück + Weiter */
+#btnPrev,
+#btnNext {
+    flex: 0 0 120px;                  /* feste Breite links + rechts */
+    text-align: center;
+}
+
+/* Mittlerer Button: Aufdecken */
+#btnReveal {
+    flex: 1 1 auto;                   /* nimmt den restlichen Platz ein */
+    max-width: 220px;                 /* nicht zu breit */
+    margin: 0 auto;
+    text-align: center;
+
+    /* Blauer Stil wie Training-Button */
+    background: #7aa2f7 !important;
+    border-color: #7aa2f7 !important;
+    color: #081018 !important;
+    font-weight: 700 !important;
+}
+
+/* Optional: Icons entfernen wenn gewünscht */
+#btnReveal::after {
+    content: "";
+}
