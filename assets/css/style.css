@@ -411,82 +411,44 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     content: "";
 }
 
-/* ===========================================================
-   NEUER LERNSCREEN
-   =========================================================== */
-
 .hidden {
     display: none !important;
 }
 
-#learnScreen {
-    margin-top: 20px;
-}
-
 .learn-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     margin-bottom: 12px;
 }
 
-.learn-header .title {
-    font-size: 20px;
-    font-weight: 800;
-}
-
-/* ✅ Fixe Boxhöhen */
 .card-box {
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 12px;
     margin-bottom: 12px;
-    background: var(--card);
 }
 
 .word-box {
-    height: 120px;     /* fix */
+    height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .sent-box {
-    height: 130px;     /* fix */
+    height: 140px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-/* ✅ Lösung bleibt flexible Box */
-.solution {
-    margin-top: 12px;
-}
-
-/* ✅ Buttons zentriert & kompakt */
 .card-controls {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 14px;
-}
-
-.card-controls .btn {
-    flex: 0 0 120px;
 }
 
 #btnReveal {
     flex: 1 1 auto;
     max-width: 240px;
-    text-align: center;
 }
-
-/* ✅ Rating kompakt */
-.ratebar {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin: 14px 0;
-}
-
-.ratebar
