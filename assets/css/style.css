@@ -395,7 +395,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Mittlerer Button: Aufdecken */
 #btnReveal {
     flex: 1 1 auto;                   /* nimmt den restlichen Platz ein */
-    max-width: 220px;                 /* nicht zu breit */
+    max-width: 120px;                 /* nicht zu breit */
     margin: 0 auto;
     text-align: center;
 
