@@ -567,6 +567,7 @@ state.historyPos = -1;
 
         state.trainingOn = true;
         updateTrainingBtn();
+		showLearnScreen();
 		
 
     } else {
@@ -1182,6 +1183,22 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
 
+const homeScreen = document.querySelector(".cfg");
+const learnScreen = document.querySelector("#learnScreen");
+const btnHome = document.querySelector("#btnHome");
+
+function showLearnScreen() {
+    homeScreen.classList.add("hidden");
+    learnScreen.classList.remove("hidden");
+}
+
+function showHomeScreen() {
+    homeScreen.classList.remove("hidden");
+    learnScreen.classList.add("hidden");
+    stopTraining();      // dein bestehendes StopTraining bleibt intakt
+}
+
+btnHome.addEventListener("click", showHomeScreen);	
 	
 /* === Autoplay-Button neben Training-Button platzieren — stabile Version === */
 
