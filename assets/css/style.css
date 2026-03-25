@@ -348,7 +348,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* --- 4. Optional: kleine Mindestbreite hinzufügen --- */
 .card-controls .btn,
 .ratebar .btn {
-    min-width: 140px;       /* kann angepasst werden */
+    min-width: 100px;       /* kann angepasst werden */
 }
 
 /* --- 5. „Unsicher“-Button soll exakt so breit sein wie „Jetzt aufdecken“ --- */
@@ -388,14 +388,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Äußere Buttons: Zurück + Weiter */
 #btnPrev,
 #btnNext {
-    flex: 0 0 120px;                  /* feste Breite links + rechts */
+    flex: 0 0 100px;                  /* feste Breite links + rechts */
     text-align: center;
 }
 
 /* Mittlerer Button: Aufdecken */
 #btnReveal {
     flex: 1 1 auto;                   /* nimmt den restlichen Platz ein */
-    max-width: 120px;                 /* nicht zu breit */
+    max-width: 100px;                 /* nicht zu breit */
     margin: 0 auto;
     text-align: center;
 
