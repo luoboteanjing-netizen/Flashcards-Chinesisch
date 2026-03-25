@@ -6,22 +6,23 @@
 
     <title>Chinesisch Flashcards – CSV Version</title>
 
-    https://fonts.googleapis.com
-    https://fonts.gstatic.com
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
 
-    https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap
-
-    assets/css/style.css?v=20260324
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/style.css?v=20260324" />
 </head>
 
 <body>
     <main class="container">
 
         <!-- ============================================================
-             HOMESCREEN (bleibt wie vorher)
+             HOMESCREEN
         =============================================================== -->
 
-        <section class="card cfg">
+        <section class="card cfg" id="homeScreen">
             <header>
                 <h1>Flashcards <span class="muted">Deutsch ↔ 中文</span></h1>
                 <p class="subtitle">Lektion, Richtung und Reihenfolge wählen · Karte lernen</p>
@@ -67,7 +68,7 @@
                             Pausen‑Zeit zwischen Karten:
                             <span id="gapVal" class="hint">(0.8 s)</span>
                         </label>
-                        <input id="gapRange" type="range" min="0.6" max="2.5" step="0.1" value="0.8">
+                        <input id="gapRange" type="range" min="0.6" max="2.5" step="0.1" value="0.8" />
                     </div>
 
                     <div class="two-col mt12">
@@ -100,9 +101,8 @@
             </div>
         </section>
 
-
         <!-- ============================================================
-             NEUER LERN‑SCREEN
+             LERN-SCREEN
         =============================================================== -->
 
         <section id="learnScreen" class="card learn hidden">
@@ -112,13 +112,13 @@
                 <div class="title" id="learnTitle">Training</div>
             </div>
 
-            <!-- Fixe Wort‑Karte -->
+            <!-- Wort -->
             <div class="card-box word-box">
                 <div id="promptWord" class="prompt big">—</div>
                 <div id="promptWordSub" class="prompt sub small"></div>
             </div>
 
-            <!-- Fixe Satz‑Karte -->
+            <!-- Satz -->
             <div class="card-box sent-box">
                 <div id="promptSent" class="prompt">—</div>
             </div>
@@ -150,6 +150,7 @@
             </div>
 
             <div id="lessonStats" class="stats-bar"></div>
+
         </section>
 
         <!-- ============================================================
@@ -175,6 +176,6 @@
 
     </main>
 
-    assets/js/app.js?v=20260324</script>
+    <script src="assets/js/app.js?v=20260324"></script>
 </body>
 </html>
