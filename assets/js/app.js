@@ -1198,7 +1198,7 @@ function showHomeScreen() {
     stopTraining();   // Training sauber beenden
 }
 
-btnHome.addEventListener("click", showHomeScreen	
+btnHome.addEventListener("click", showHomeScreen);
 	
 	
 /* === Autoplay-Button neben Training-Button platzieren — stabile Version === */
