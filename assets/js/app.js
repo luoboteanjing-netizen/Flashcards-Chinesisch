@@ -567,7 +567,7 @@ state.historyPos = -1;
 
         state.trainingOn = true;
         updateTrainingBtn();
-		showLearnScreen();     // ✅ Wechsel auf Lernscreen
+		
 
     } else {
         stopTraining();
@@ -1182,24 +1182,6 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
 
-/* === Umschalten Homescreen <-> Lernscreen === */
-const homeScreen = document.querySelector(".cfg");          // Konfig-Karte
-const learnScreen = document.querySelector("#learnScreen");
-const btnHome = document.querySelector("#btnHome");
-
-function showLearnScreen() {
-    homeScreen.classList.add("hidden");
-    learnScreen.classList.remove("hidden");
-}
-
-function showHomeScreen() {
-    homeScreen.classList.remove("hidden");
-    learnScreen.classList.add("hidden");
-    stopTraining();   // Training sauber beenden
-}
-
-btnHome.addEventListener("click", showHomeScreen);
-	
 	
 /* === Autoplay-Button neben Training-Button platzieren — stabile Version === */
 
