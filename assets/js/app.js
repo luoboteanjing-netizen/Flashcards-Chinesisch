@@ -1249,7 +1249,6 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         const parent = trainingBtn.parentNode;
-
         let group = parent.querySelector(".training-group");
 
         if (!group) {
@@ -1353,7 +1352,6 @@ window.addEventListener("DOMContentLoaded", () => {
     $('#btnStart').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
-		
     });
 
     $('#btnNext').addEventListener("click", () => {
@@ -1371,12 +1369,15 @@ window.addEventListener("DOMContentLoaded", () => {
         doReveal();
     });
 
-    $('#btnPlayQ').addEventListener("click", () => {
+
+    /* ---- NEW SPEAKER ICONS ---- */
+
+    $('#speakerQuestion').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playQuestion();
     });
 
-    $('#btnPlayA').addEventListener("click", () => {
+    $('#speakerAnswer').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playAnswer();
     });
