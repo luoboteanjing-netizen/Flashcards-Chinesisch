@@ -23,11 +23,13 @@ const state = {
     pitchZh: 1.0,
 
     lessons: new Map(),
-    lessonOrder: [],         // ✅ Reihenfolge aus CSV gespeichert
+    lessonOrder: [],         
     selectedLessons: new Set(),
 
     pool: [],
-    idx: null,history: [],historyPos: -1,
+    idx: null,
+    history: [],
+    historyPos: -1,
     current: null,
 
     voices: [],
@@ -165,9 +167,7 @@ function parseCSV(text) {
         if (cols.length < 9) continue;
         if (cols[0].trim().startsWith("*")) continue;
 
-        const lesson = (cols[8] || "")
-            .replace(/\uFEFF/g, "")
-            .trim();
+        const lesson = (cols[8] || "").replace(/\uFEFF/g, "").trim();
 
         const entry = {
             word: {
@@ -197,7 +197,6 @@ function parseCSV(text) {
 }
 
 /* ============================ UNICODE BAR ================================ */
-/*   ✅ Funktion war vorher NICHT definiert → jetzt korrekt vorhanden!       */
 
 function makeBar(known, total) {
     if (total <= 0) return "░░░░░░░░░░";
@@ -264,15 +263,14 @@ function gatherPool() {
 
 function gatherPoolFromSettings() {
     state.selectedLessons.clear();
-    (state.settings.lessons || []).forEach((x) =>
-        state.selectedLessons.add(x)
-    );
+    (state.settings.lessons || []).forEach((x) => state.selectedLessons.add(x));
     gatherPool();
 }
 
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 2 von 4                                 */
 /*      Card Rendering · Navigation · Rating · Session Stats · Training       */
@@ -317,7 +315,8 @@ function setCard(entry, fromHistory = false) {
 
         lessonStats.innerHTML = `
             <div class="lesson-bar-large">
-                <div class="lesson-bar-large-fill" style="width:${percent}%;"></div>
+                <div class="lesson-bar-large-fill" style="width:${percent}%;">
+                </div>
             </div>
         `;
     }
@@ -332,28 +331,24 @@ function setCard(entry, fromHistory = false) {
 
     if (state.mode === 'zh2de') {
 
-    // Wortanzeige (Hanzi)
-    $('#promptWord').innerHTML = entry.word.zh || "—";
+        // Wortanzeige (Hanzi)
+        $('#promptWord').innerHTML = entry.word.zh || "—";
 
-    // Unter dem Wort: Pinyin + Wortart
-    // z.B. "dǎkāi (Verb)"
-    let wordInfo = entry.word.py || "";
-    if (entry.pos) {
-        wordInfo += ` (${entry.pos})`;
-    }
-    $('#promptWordSub').innerHTML = wordInfo;
+        // Unter dem Wort: Pinyin + Wortart
+        let wordInfo = entry.word.py || "";
+        if (entry.pos) {
+            wordInfo += ` (${entry.pos})`;
+        }
+        $('#promptWordSub').innerHTML = wordInfo;
 
-    // Satz: oben Hanzi, darunter Pinyin
-    // z.B.:
-    // 请打开书。
-    // qǐng dǎkāi shū。
-    let sentenceHanzi = entry.sent.zh || "";
-    let sentencePinyin = entry.sent.py || "";
-    $('#promptSent').innerHTML = `${sentenceHanzi}<br><span class="zh-pinyin">${sentencePinyin}</span>`;
+        // Satz + Pinyin
+        let sentenceHanzi = entry.sent.zh || "";
+        let sentencePinyin = entry.sent.py || "";
+        $('#promptSent').innerHTML = `${sentenceHanzi}<br><span class="zh-pinyin">${sentencePinyin}</span>`;
 
-    // Lösung auf Deutsch
-    $('#solWord').textContent = entry.word.de || "—";
-    $('#solSent').textContent = entry.sent.de || "—";
+        // Lösung auf Deutsch
+        $('#solWord').textContent = entry.word.de || "—";
+        $('#solSent').textContent = entry.sent.de || "—";
 
     } else {
         $('#promptWord').textContent = entry.word.de || "—";
@@ -373,6 +368,7 @@ function setCard(entry, fromHistory = false) {
 
     updateNavButtons();
 }
+
 
 /* ============================ CARD NAVIGATION ============================= */
 
@@ -431,12 +427,13 @@ function prevCard() {
     updateNavButtons();
 }
 
+
 /* ============================ FORMATTING ================================= */
 
 function formatZh(hz, py) {
     const h = (hz || "").trim();
     const p = (py || "").trim();
-    return p ? `${h}\n${p}` : (h || "—");
+    return p ? `${h}<br>${p}` : (h || "—");
 }
 
 function formatPinyinAndPos(py, pos) {
@@ -532,11 +529,10 @@ function renderSessionStats() {
 function startTraining() {
     if (!state.trainingOn) {
 
-	// History zurücksetzen
-state.history = [];
-state.historyPos = -1;
+        // History zurücksetzen
+        state.history = [];
+        state.historyPos = -1;
 
-	
         const sel = $('#lessonSelect');
         state.selectedLessons.clear();
 
@@ -561,13 +557,12 @@ state.historyPos = -1;
             state.idx = 0;
             setCard(state.pool[state.idx]);   // erste Karte zeigen
         } else {
-            state.idx = null;                 // Zufall hat keinen Index
+            state.idx = null;
             setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
         }
 
         state.trainingOn = true;
         updateTrainingBtn();
-		
 
     } else {
         stopTraining();
@@ -604,6 +599,7 @@ function updateTrainingBtn() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
+
 
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
@@ -771,7 +767,6 @@ function closeVoices() {
 /* ============================ TTS BUILDER ================================= */
 
 function ttsPrime(cb) {
-    // Workaround: minimal delay, "warms up" speech engine.
     setTimeout(cb, 150);
 }
 
@@ -813,14 +808,13 @@ const VOICE_PACK = {
     male2: "zh-CN-YunyangNeural"
 };
 
-let NATIVE_TTS_ENDPOINT = "";       // Wenn leer → fallback auf Browser TTS
+let NATIVE_TTS_ENDPOINT = "";       
 let nativeVoiceChoice = "female1";
 const nativeAudioCache = new Map();
 
 async function nativeMandarinSpeak(text) {
     if (!text) return;
 
-    // Kein Server definiert → Browser TTS verwenden
     if (!NATIVE_TTS_ENDPOINT) {
         const u = buildUtterance(text, "zh");
         speechSynthesis.speak(u);
@@ -1127,6 +1121,7 @@ function stopAutoplayOnUserAction() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 3                                 */
 /* -------------------------------------------------------------------------- */
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 4 von 4                                 */
 /*                 Event Listener · Mode Switch · Init Routine                */
@@ -1182,41 +1177,36 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
 
-	
-/* === Autoplay-Button neben Training-Button platzieren — stabile Version === */
 
-(function placeAutoplayButton() {
-    const trainingBtn = document.querySelector("#btnStart");
-    const autoplayBtn = document.querySelector("#btnAutoplay");
+    /* === Autoplay-Button stabil neben Training-Button platzieren === */
 
-    if (!trainingBtn || !autoplayBtn) {
-        console.warn("[UI] Training oder Autoplay Button nicht gefunden.");
-        return;
-    }
+    (function placeAutoplayButton() {
+        const trainingBtn = document.querySelector("#btnStart");
+        const autoplayBtn = document.querySelector("#btnAutoplay");
 
-    const parent = trainingBtn.parentNode;
+        if (!trainingBtn || !autoplayBtn) {
+            console.warn("[UI] Training oder Autoplay Button nicht gefunden.");
+            return;
+        }
 
-    // Prüfen, ob Gruppe existiert
-    let group = parent.querySelector(".training-group");
+        const parent = trainingBtn.parentNode;
 
-    if (!group) {
-        // Neue Flex-Gruppe erstellen
-        group = document.createElement("div");
-        group.className = "training-group";
+        let group = parent.querySelector(".training-group");
 
-        // Training-Button in Gruppe verschieben
-        parent.insertBefore(group, trainingBtn);
-        group.appendChild(trainingBtn);
-    }
+        if (!group) {
+            group = document.createElement("div");
+            group.className = "training-group";
 
-    // Autoplay-Button in die Gruppe einfügen
-    group.appendChild(autoplayBtn);
+            parent.insertBefore(group, trainingBtn);
+            group.appendChild(trainingBtn);
+        }
 
-    // 🎨 Autoplay soll genauso aussehen wie Training-Button
-    autoplayBtn.classList.add("primary");
+        group.appendChild(autoplayBtn);
+        autoplayBtn.classList.add("primary");
 
-    console.log("[UI] Autoplay-Button stabil neben Training-Button platziert.");
-})();
+        console.log("[UI] Autoplay-Button stabil neben Training-Button platziert.");
+    })();
+
 
     /* ============================ BUTTON EVENTS =========================== */
 
@@ -1252,6 +1242,7 @@ window.addEventListener("DOMContentLoaded", () => {
         $('#gapVal').textContent = `(${s.toFixed(1)} s)`;
         saveSettings();
     });
+
 
     /* ---- Voice Controls ---- */
 
@@ -1429,4 +1420,3 @@ window.addEventListener("DOMContentLoaded", () => {
 /* -------------------------------------------------------------------------- */
 /*                             ENDE TEIL 4 (FINAL)                             */
 /* -------------------------------------------------------------------------- */
-
