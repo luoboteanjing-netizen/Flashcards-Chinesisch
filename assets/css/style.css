@@ -411,3 +411,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     content: "";
 }
 
+/* Mindesthöhe für 6 Textzeilen */
+#promptBox, #solBox {
+    min-height: calc(1.25em * 6);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
