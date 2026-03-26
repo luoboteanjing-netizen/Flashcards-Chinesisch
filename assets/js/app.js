@@ -1103,13 +1103,27 @@ function autoplayStep() {
 function toggleAutoplay() {
     if (!state.autoplay.on) {
 
+        // Pool sicherstellen
         if (!ensurePoolForAutoplay()) return;
 
         setAutoplay(true);
         requestWakeLock();
 
-        scrollToBottom();
+        // ✅ AUTOPLAY-FIX: erste Karte laden, falls noch keine angezeigt wurde
+        if (!state.current) {
+            if (state.order === "seq") {
+                state.idx = 0;
+                setCard(state.pool[state.idx]);
+            } else {
+                const first = state.pool[Math.floor(Math.random() * state.pool.length)];
+                setCard(first);
+            }
 
+            syncCardHeights();
+            scrollToBottom();
+        }
+
+        scrollToBottom();
         autoplayStep();
 
     } else {
