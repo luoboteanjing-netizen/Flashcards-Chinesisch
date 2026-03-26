@@ -319,13 +319,29 @@ function setCard(entry, fromHistory = false) {
 
         const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        lessonStats.innerHTML = `
-            <div class="lesson-bar-large">
-                <div class="lesson-bar-large-fill" style="width:${percent}%;">
-                </div>
-            </div>
-        `;
-    }
+		
+
+		if (lessonStats) {
+    const cards = state.lessons.get(entry.lesson) || [];
+    const total = cards.length;
+
+    const p = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
+    const known = p.known || 0;
+    const unknown = p.unknown || 0;
+
+    // Prozent für visuelle Breite
+    const greenPct = total > 0 ? (known / total) * 100 : 0;
+    const redPct   = total > 0 ? (unknown / total) * 100 : 0;
+
+    lessonStats.innerHTML = `
+        <div class="lesson-bar-large">
+            <div class="lesson-bar-red" style="width:${redPct}%;"></div>
+            <div class="lesson-bar-green" style="width:${greenPct}%; left:${redPct}%;"></div>
+        </div>
+    `;
+}
+		
+		
 
     /* === KARTENINHALT ====================================== */
 
