@@ -420,18 +420,23 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     justify-content: flex-start;
 }
 
+#promptBox, #solBox {
+    position: relative;
+}
+
 /* Speaker auf Karten */
 
 .card-speaker {
     position: absolute;
     bottom: 8px;
     right: 8px;
-    font-size: 1.4rem;
-    color: #666;
+    font-size: 1.6rem;
+    color: #333;              /* nicht ausgegraut */
     cursor: pointer;
-    opacity: 0.85;
-    transition: opacity 0.15s ease;
+    opacity: 1;              /* volle Sichtbarkeit */
+    z-index: 10;             /* wichtig: immer oben! */
 }
+
 .card-speaker:hover {
     opacity: 1;
 }
@@ -439,4 +444,17 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Lösungskarte darf sichtbare Speaker haben */
 #solBox .card-speaker {
     color: #333;
+}
+
+#btnPlayQ, #btnPlayA {
+    display: none !important;
+}
+
+#promptBox .card-speaker {
+    opacity: 1 !important;
+}
+
+#speakerQuestion,
+#speakerAnswer {
+    color: #333;  /* gleiche Farbe */
 }
