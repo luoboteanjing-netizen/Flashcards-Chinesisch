@@ -366,9 +366,25 @@ function setCard(entry, fromHistory = false) {
     disableRating();
     renderModeUI();
 
+	syncCardHeights();
     updateNavButtons();
 }
 
+function syncCardHeights() {
+    const q = document.querySelector("#promptBox");
+    const a = document.querySelector("#solBox");
+
+    if (!q || !a) return;
+
+    // Zurücksetzen, um korrekte natürliche Höhe zu messen
+    q.style.minHeight = "";
+    a.style.minHeight = "";
+
+    const h = Math.max(q.offsetHeight, a.offsetHeight);
+
+    q.style.minHeight = h + "px";
+    a.style.minHeight = h + "px";
+}
 
 /* ============================ CARD NAVIGATION ============================= */
 
@@ -415,6 +431,7 @@ function nextCard() {
     }
 
     setCard(next);
+	syncCardHeights();
 }
 
 function prevCard() {
@@ -425,6 +442,7 @@ function prevCard() {
     }
 
     updateNavButtons();
+	syncCardHeights();
 }
 
 
@@ -452,6 +470,7 @@ function formatPinyinAndPos(py, pos) {
 
 function doReveal() {
     $('#solBox').classList.remove('masked');
+	syncCardHeights();
 
     state.revealedAt = Date.now();
     const ttr = state.revealedAt - (state.startedAt || state.revealedAt);
@@ -556,6 +575,7 @@ function startTraining() {
         if (state.order === 'seq') {
             state.idx = 0;
             setCard(state.pool[state.idx]);   // erste Karte zeigen
+			scrollToBottom();
         } else {
             state.idx = null;
             setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
@@ -608,6 +628,15 @@ function updateTrainingBtn() {
 
 
 /* ============================ VOICE TESTING ================================ */
+
+function scrollToBottom() {
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
+    }, 50);
+}
 
 function isZhVoice(v) {
     const L = (v.lang || "").toLowerCase();
@@ -1036,9 +1065,11 @@ function autoplayStep() {
                                 else state.idx = (state.idx + 1) % state.pool.length;
 
                                 setCard(state.pool[state.idx]);
+								syncCardHeights();
                             } else {
                                 setCard(
                                     state.pool[Math.floor(Math.random() * state.pool.length)]
+									syncCardHeights();
                                 );
                             }
 
@@ -1059,6 +1090,7 @@ function toggleAutoplay() {
         if (!ensurePoolForAutoplay()) return;
 
         setAutoplay(true);
+		scrollToBottom();
         requestWakeLock();
 
         setTimeout(() => {
@@ -1294,6 +1326,7 @@ window.addEventListener("DOMContentLoaded", () => {
     $('#btnStart').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
+		
     });
 
     $('#btnNext').addEventListener("click", () => {
