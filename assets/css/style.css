@@ -419,3 +419,24 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     flex-direction: column;
     justify-content: flex-start;
 }
+
+/* Speaker auf Karten */
+
+.card-speaker {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 1.4rem;
+    color: #666;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.15s ease;
+}
+.card-speaker:hover {
+    opacity: 1;
+}
+
+/* Lösungskarte darf sichtbare Speaker haben */
+#solBox .card-speaker {
+    color: #333;
+}
