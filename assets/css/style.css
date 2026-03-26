@@ -322,6 +322,31 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-radius: 5px;
     background: #7bd88f;
 }
+
+.lesson-bar-large {
+    width: 100%;
+    height: 12px;
+    background: #ccc;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lesson-bar-red {
+    height: 100%;
+    background: #e74c3c; /* rot */
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.lesson-bar-green {
+    height: 100%;
+    background: #2ecc71; /* grün */
+    position: absolute;
+    left: 0;
+    top: 0;
+}
 /* ================== BUTTON-KOSMETIK ================== */
 
 /* --- 1. Buttons in ratebar gleich breit --- */
