@@ -412,8 +412,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 /* Mindesthöhe für 6 Textzeilen */
-#promptBox, #solBox {
-    min-height: calc(1.25em * 6);
+#promptBox,
+#solBox {
+    min-height: 40vh;   /* 40% der Viewport-Höhe */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
