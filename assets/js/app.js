@@ -310,38 +310,25 @@ function setCard(entry, fromHistory = false) {
         cardLesson.textContent = `Lektion ${entry.lesson}`;
     }
 
+    /* ✅ NEUER 2-FARBIGER FORTSCHRITTSBALKEN */
     if (lessonStats) {
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
 
-        const p = state.progress.byLesson[entry.lesson] || { known: 0 };
+        const p = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
         const known = p.known || 0;
+        const unknown = p.unknown || 0;
 
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+        const greenPct = total > 0 ? (known / total) * 100 : 0;
+        const redPct   = total > 0 ? (unknown / total) * 100 : 0;
 
-		
-
-		if (lessonStats) {
-    const cards = state.lessons.get(entry.lesson) || [];
-    const total = cards.length;
-
-    const p = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
-    const known = p.known || 0;
-    const unknown = p.unknown || 0;
-
-    // Prozent für visuelle Breite
-    const greenPct = total > 0 ? (known / total) * 100 : 0;
-    const redPct   = total > 0 ? (unknown / total) * 100 : 0;
-
-    lessonStats.innerHTML = `
-        <div class="lesson-bar-large">
-            <div class="lesson-bar-red" style="width:${redPct}%;"></div>
-            <div class="lesson-bar-green" style="width:${greenPct}%; left:${redPct}%;"></div>
-        </div>
-    `;
-}
-		
-		
+        lessonStats.innerHTML = `
+            <div class="lesson-bar-large">
+                <div class="lesson-bar-red" style="width:${redPct}%;"></div>
+                <div class="lesson-bar-green" style="width:${greenPct}%; left:${redPct}%;"></div>
+            </div>
+        `;
+    }
 
     /* === KARTENINHALT ====================================== */
 
@@ -353,22 +340,18 @@ function setCard(entry, fromHistory = false) {
 
     if (state.mode === 'zh2de') {
 
-        // Wortanzeige (Hanzi)
         $('#promptWord').innerHTML = entry.word.zh || "—";
 
-        // Unter dem Wort: Pinyin + Wortart
         let wordInfo = entry.word.py || "";
         if (entry.pos) {
             wordInfo += ` (${entry.pos})`;
         }
         $('#promptWordSub').innerHTML = wordInfo;
 
-        // Satz + Pinyin
         let sentenceHanzi = entry.sent.zh || "";
         let sentencePinyin = entry.sent.py || "";
         $('#promptSent').innerHTML = `${sentenceHanzi}<br><span class="zh-pinyin">${sentencePinyin}</span>`;
 
-        // Lösung auf Deutsch
         $('#solWord').textContent = entry.word.de || "—";
         $('#solSent').textContent = entry.sent.de || "—";
 
@@ -382,37 +365,19 @@ function setCard(entry, fromHistory = false) {
     }
 
     $('#btnReveal').disabled = false;
-    $('#btnPlayQ').disabled = false;
-    $('#btnPlayA').disabled = false;
 
     disableRating();
     renderModeUI();
-
-	syncCardHeights();
     updateNavButtons();
-}
 
-function syncCardHeights() {
-    const q = document.querySelector("#promptBox");
-    const a = document.querySelector("#solBox");
-
-    if (!q || !a) return;
-
-    // Zurücksetzen, um korrekte natürliche Höhe zu messen
-    q.style.minHeight = "";
-    a.style.minHeight = "";
-
-    const h = Math.max(q.offsetHeight, a.offsetHeight);
-
-    q.style.minHeight = h + "px";
-    a.style.minHeight = h + "px";
+    /* ✅ Kartenhöhe synchron halten */
+    syncCardHeights();
 }
 
 /* ============================ CARD NAVIGATION ============================= */
 
 function pushToHistory(entry) {
 
-    // Wenn wir nicht am Ende sind → Forward-History löschen
     if (state.historyPos < state.history.length - 1) {
         state.history = state.history.slice(0, state.historyPos + 1);
     }
@@ -432,14 +397,13 @@ function nextCard() {
 
     if (!state.pool.length) return;
 
-    // 👉 Wenn wir in der History zurückgegangen sind → vorwärts gehen
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
+        syncCardHeights();
         return;
     }
 
-    // 👉 Normal neue Karte erzeugen
     let next;
 
     if (state.order === 'seq') {
@@ -453,7 +417,7 @@ function nextCard() {
     }
 
     setCard(next);
-	syncCardHeights();
+    syncCardHeights();
 }
 
 function prevCard() {
@@ -463,8 +427,8 @@ function prevCard() {
         setCard(state.history[state.historyPos], true);
     }
 
+    syncCardHeights();
     updateNavButtons();
-	syncCardHeights();
 }
 
 
@@ -492,7 +456,6 @@ function formatPinyinAndPos(py, pos) {
 
 function doReveal() {
     $('#solBox').classList.remove('masked');
-	syncCardHeights();
 
     state.revealedAt = Date.now();
     const ttr = state.revealedAt - (state.startedAt || state.revealedAt);
@@ -504,6 +467,7 @@ function doReveal() {
 
     enableRating();
     renderSessionStats();
+    syncCardHeights();
 }
 
 function enableRating() {
@@ -528,7 +492,6 @@ function rate(mark) {
 
     renderSessionStats();
 
-    // Fortschritt pro Lektion
     const lesson = state.current.lesson;
 
     if (lesson) {
@@ -570,7 +533,6 @@ function renderSessionStats() {
 function startTraining() {
     if (!state.trainingOn) {
 
-        // History zurücksetzen
         state.history = [];
         state.historyPos = -1;
 
@@ -593,11 +555,9 @@ function startTraining() {
             return;
         }
 
-        // ✅ WICHTIGER FIX: Sequenziellen Index korrekt setzen!
         if (state.order === 'seq') {
             state.idx = 0;
-            setCard(state.pool[state.idx]);   // erste Karte zeigen
-			scrollToBottom();
+            setCard(state.pool[state.idx]);
         } else {
             state.idx = null;
             setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
@@ -605,6 +565,7 @@ function startTraining() {
 
         state.trainingOn = true;
         updateTrainingBtn();
+        scrollToBottom();
 
     } else {
         stopTraining();
@@ -618,8 +579,6 @@ function stopTraining() {
     $('#btnPrev').disabled = true;
     $('#btnReveal').disabled = true;
     $('#btnNext').disabled = true;
-    $('#btnPlayQ').disabled = true;
-    $('#btnPlayA').disabled = true;
 
     disableRating();
 
