@@ -220,14 +220,20 @@ function populateLessonSelect() {
         opt.value = k;
 
         const cards = state.lessons.get(k) || [];
-        const count = cards.length;
+        const total = cards.length;
 
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known = p.known || 0;
+        const unknown = p.unknown || 0;
 
-        const bar = makeBar(known, count);
+        // Prozentzahl ermitteln
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        opt.textContent = `${k} (${count}) ${bar}`;
+        // ✅ EXAKT DEINE FORMATVORGABE
+        opt.textContent =
+            `${k} (${total}) · 🟩 ${known}  🟥 ${unknown}  (${percent}%)`;
+
+        // Vorauswahl aus Settings
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
         }
