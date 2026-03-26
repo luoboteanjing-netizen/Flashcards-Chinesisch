@@ -1068,7 +1068,7 @@ function autoplayStep() {
 								syncCardHeights();
                             } else {
                                 setCard(
-                                    state.pool[Math.floor(Math.random() * state.pool.length)]
+                                    state.pool[Math.floor(Math.random() * state.pool.length)];
 									syncCardHeights();
                                 );
                             }
