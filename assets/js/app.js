@@ -619,15 +619,26 @@ function updateTrainingBtn() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
-
-
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
 /* -------------------------------------------------------------------------- */
 
 
-/* ============================ VOICE TESTING ================================ */
+/* ============================ NEW FUNCTIONS ================================ */
+
+function syncCardHeights() {
+    const q = document.querySelector("#promptBox");
+    const a = document.querySelector("#solBox");
+    if (!q || !a) return;
+
+    q.style.minHeight = "";
+    a.style.minHeight = "";
+
+    const h = Math.max(q.offsetHeight, a.offsetHeight);
+    q.style.minHeight = h + "px";
+    a.style.minHeight = h + "px";
+}
 
 function scrollToBottom() {
     setTimeout(() => {
@@ -637,6 +648,9 @@ function scrollToBottom() {
         });
     }, 50);
 }
+
+
+/* ============================ VOICE TESTING ================================ */
 
 function isZhVoice(v) {
     const L = (v.lang || "").toLowerCase();
@@ -837,7 +851,7 @@ const VOICE_PACK = {
     male2: "zh-CN-YunyangNeural"
 };
 
-let NATIVE_TTS_ENDPOINT = "";       
+let NATIVE_TTS_ENDPOINT = "";
 let nativeVoiceChoice = "female1";
 const nativeAudioCache = new Map();
 
@@ -1018,8 +1032,10 @@ function ensurePoolForAutoplay() {
     if (state.order === "seq") {
         state.idx = 0;
         setCard(state.pool[state.idx]);
+        syncCardHeights();
     } else {
         setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+        syncCardHeights();
     }
 
     return true;
@@ -1065,12 +1081,11 @@ function autoplayStep() {
                                 else state.idx = (state.idx + 1) % state.pool.length;
 
                                 setCard(state.pool[state.idx]);
-								syncCardHeights();
+                                syncCardHeights();
+
                             } else {
-                                setCard(
-                                    state.pool[Math.floor(Math.random() * state.pool.length)];
-									syncCardHeights();
-                                );
+                                setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+                                syncCardHeights();
                             }
 
                             autoplayStep();
@@ -1087,15 +1102,13 @@ function autoplayStep() {
 
 function toggleAutoplay() {
     if (!state.autoplay.on) {
+
         if (!ensurePoolForAutoplay()) return;
 
         setAutoplay(true);
-		scrollToBottom();
         requestWakeLock();
 
-        setTimeout(() => {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }, 60);
+        scrollToBottom();
 
         autoplayStep();
 
