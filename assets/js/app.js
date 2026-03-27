@@ -1078,7 +1078,12 @@ function releaseWakeLock() {
 /* ============================ AUTOPLAY SAFETY ============================ */
 
 function stopAutoplayOnUserAction() {
-    if (state.autoplay.on) setAutoplay(false);
+    if (state.autoplay.on) {
+        setAutoplay(false);
+        speechSynthesis.cancel();
+        state.autoplay.timers.forEach(id => clearTimeout(id));
+        state.autoplay.timers = [];
+    }
 }
 
 
