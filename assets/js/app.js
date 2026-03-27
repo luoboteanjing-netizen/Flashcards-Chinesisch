@@ -314,6 +314,8 @@ function scrollToBottom() {
 
 /* ============================ CARD RENDERING ============================ */
 
+/* ============================ CARD RENDERING ============================ */
+
 function setCard(entry, fromHistory = false) {
 
     if (!fromHistory) pushToHistory(entry);
@@ -321,6 +323,13 @@ function setCard(entry, fromHistory = false) {
     state.current = entry;
     state.startedAt = Date.now();
     state.revealedAt = null;
+
+    /* ------ Titel für Lektion & Karte (ID) setzen ------ */
+    const cardTitle  = document.querySelector("#cardTitle");
+    const cardLesson = document.querySelector("#cardLesson");
+
+    if (cardTitle)  cardTitle.textContent  = `Karte (ID ${entry.id})`;
+    if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
     /* -------- Fortschrittsbalken -------- */
     const stats = document.querySelector("#lessonStats");
