@@ -276,6 +276,8 @@ function gatherPoolFromSettings() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- *
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 2 von 4                                 */
 /*      Card Rendering · Navigation · Rating · Session Stats · Training       */
@@ -283,7 +285,6 @@ function gatherPoolFromSettings() {
 
 
 /* ============================ MODE UI RENDERING =========================== */
-/* ✅ Wieder eingefügt, da TEIL 4 diese Funktion benötigt */
 
 function renderModeUI() {
     const left = $('#modeLeft');
@@ -314,7 +315,7 @@ function setCard(entry, fromHistory = false) {
 
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenz-Position setzen
+    // Sequenzposition setzen
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
@@ -341,7 +342,7 @@ function setCard(entry, fromHistory = false) {
         `;
     }
 
-    /* === Karteninhalt ====================================== */
+    /* ===== Karteninhalt setzen ===== */
 
     state.current = entry;
     $('#solBox').classList.add('masked');
@@ -352,10 +353,8 @@ function setCard(entry, fromHistory = false) {
     if (state.mode === 'zh2de') {
 
         $('#promptWord').innerHTML = entry.word.zh || "—";
-
-        let wordInfo = entry.word.py || "";
-        if (entry.pos) wordInfo += ` (${entry.pos})`;
-        $('#promptWordSub').innerHTML = wordInfo;
+        $('#promptWordSub').innerHTML = entry.word.py || "";
+        $('#promptPOS').textContent = entry.pos || "";
 
         $('#promptSent').innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
@@ -366,21 +365,19 @@ function setCard(entry, fromHistory = false) {
     } else {
 
         $('#promptWord').textContent = entry.word.de || "—";
-        $('#promptWordSub').innerHTML = entry.pos || "";
+        $('#promptWordSub').innerHTML = entry.word.py || "";
+        $('#promptPOS').textContent = entry.pos || "";
+
         $('#promptSent').textContent = entry.sent.de || "—";
 
         $('#solWord').innerHTML = formatZh(entry.word.zh, entry.word.py);
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
-    /* === Buttons initial === */
-
-    $('#btnReveal').disabled = false;
+    // Buttons initialisieren
     hideRatingButtons();
     showNavButtons();
-
     updateNavButtons();
-
     syncCardHeights();
 }
 
@@ -406,14 +403,12 @@ function nextCard() {
 
     if (!state.pool.length) return;
 
-    // Vorwärts in der History
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
         return;
     }
 
-    // Neue Karte
     let next;
     if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
@@ -455,18 +450,19 @@ function doReveal() {
     showRatingButtons();
 
     enableRating();
-    renderSessionStats();
     syncCardHeights();
 }
 
 function enableRating() {
     $('#btnRateKnown').disabled = false;
     $('#btnRateUnknown').disabled = false;
+    $('#btnRateUnsure').disabled = false;
 }
 
 function disableRating() {
     $('#btnRateKnown').disabled = true;
     $('#btnRateUnknown').disabled = true;
+    $('#btnRateUnsure').disabled = true;
 }
 
 function showRatingButtons() {
@@ -493,11 +489,14 @@ function rate(mark) {
 
     if (!state.current) return;
 
-    // Statistik aktualisieren
+    // Session-Statistik
     state.session.done++;
-    if (mark === 'known') state.session.known++;
-    else state.session.unknown++;
 
+    if (mark === 'known') state.session.known++;
+    else if (mark === 'unknown') state.session.unknown++;
+    else if (mark === 'unsure') state.session.unsure++;
+
+    // Fortschritt speichern (nur bei known/unknown)
     const lesson = state.current.lesson;
 
     if (lesson) {
@@ -510,6 +509,7 @@ function rate(mark) {
         saveProgress();
     }
 
+    // UI zurücksetzen
     hideRatingButtons();
     showNavButtons();
     disableRating();
@@ -599,6 +599,7 @@ function stopTraining() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
@@ -1178,7 +1179,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     /* ============================ BUTTON EVENTS =========================== */
 
-    // Modus wechseln
     $('#btnSwapMode').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
@@ -1188,7 +1188,6 @@ window.addEventListener("DOMContentLoaded", () => {
         if (state.current) setCard(state.current);
     });
 
-    // Reihenfolge
     $('#btnOrderToggle').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.order = state.order === "random" ? "seq" : "random";
@@ -1197,10 +1196,10 @@ window.addEventListener("DOMContentLoaded", () => {
         renderModeUI();
     });
 
-    // Autoplay
     $('#btnAutoplay').addEventListener("click", toggleAutoplay);
 
-    // Gap Slider
+
+    /* ---- Slider ---- */
     $('#gapRange').addEventListener("input", e => {
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
@@ -1208,6 +1207,7 @@ window.addEventListener("DOMContentLoaded", () => {
         $('#gapVal').textContent = `(${s}s)`;
         saveSettings();
     });
+
 
     /* ---- Lautsprecher ---- */
 
@@ -1220,6 +1220,7 @@ window.addEventListener("DOMContentLoaded", () => {
         stopAutoplayOnUserAction();
         playAnswer();
     });
+
 
     /* ---- Training ---- */
 
@@ -1243,6 +1244,7 @@ window.addEventListener("DOMContentLoaded", () => {
         doReveal();
     });
 
+
     /* ---- Rating ---- */
 
     $('#btnRateKnown').addEventListener("click", () => {
@@ -1254,6 +1256,12 @@ window.addEventListener("DOMContentLoaded", () => {
         stopAutoplayOnUserAction();
         rate("unknown");
     });
+
+    $('#btnRateUnsure').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unsure");
+    });
+
 
     /* ---- Lessons ---- */
 
@@ -1287,7 +1295,8 @@ window.addEventListener("DOMContentLoaded", () => {
         if (state.trainingOn) stopTraining();
     });
 
-    /* ---- Import / Export ---- */
+
+    /* ---- Export / Import ---- */
 
     $('#btnExport').addEventListener("click", () => {
         const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
@@ -1325,7 +1334,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 });
-
 /* -------------------------------------------------------------------------- */
 /*                             ENDE TEIL 4 (FINAL)                             */
 /* -------------------------------------------------------------------------- */
