@@ -306,3 +306,15 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     margin-top: 4px;
     font-style: italic;
 }
+
+/* ✅ Karteninhalt horizontal zentrieren */
+#promptBox, 
+#solBox {
+    text-align: center;
+}
+
+/* ✅ Zeilenabstand 2x für bessere Lesbarkeit */
+#promptBox .prompt,
+#solBox .sol-text {
+    line-height: 2.0;
+}
