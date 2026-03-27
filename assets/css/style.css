@@ -407,3 +407,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 .lt-known   { color: var(--good); }
 .lt-unknown { color: var(--bad);  }
+
+#lessonSelect {
+    display: none;
+}
