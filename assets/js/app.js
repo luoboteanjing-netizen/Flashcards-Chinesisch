@@ -121,39 +121,23 @@ function parseCSVLine(line) {
     let cur = "";
     let quotes = false;
 
-    for (let i = 1; i < lines.length; i++) {
-    const cols = parseCSVLine(lines[i]);
-    if (cols.length < 9) continue;
+    for (let i = 0; i < line.length; i++) {
+        const c = line[i];
 
-    // ✅ Skip disabled/commented rows (start with "*")
-    const firstCell = (cols[0] || "").replace(/\uFEFF/g, "").trim();
-    if (firstCell.startsWith("*")) continue;
-
-    const lesson = (cols[8] || "").replace(/\uFEFF/g, "").trim();
-
-    const entry = {
-        word: {
-            de: (cols[0] || "").trim(),
-            py: (cols[1] || "").trim(),
-            zh: (cols[5] || "").trim()
-        },
-        pos: (cols[2] || "").trim(),
-        sent: {
-            py: (cols[3] || "").trim(),
-            de: (cols[4] || "").trim(),
-            zh: (cols[6] || "").trim()
-        },
-        id: (cols[7] || "").trim(),
-        lesson
-    };
-
-    if (!state.lessons.has(lesson)) {
-        state.lessons.set(lesson, []);
-        state.lessonOrder.push(lesson);
+        if (c === '"') {
+            if (quotes && line[i + 1] === '"') {
+                cur += '"';
+                i++;
+            } else {
+                quotes = !quotes;
+            }
+        } else if (c === ";" && !quotes) {
+            result.push(cur);
+            cur = "";
+        } else {
+            cur += c;
+        }
     }
-
-    state.lessons.get(lesson).push(entry);
-}
 
     result.push(cur);
     return result;
@@ -174,17 +158,26 @@ async function loadCSV() {
 }
 
 function parseCSV(text) {
+
     state.lessons.clear();
     state.lessonOrder = [];
 
-    const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
     if (lines.length < 2) return;
 
     for (let i = 1; i < lines.length; i++) {
+
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
 
-        const lesson = (cols[8] || "").replace(/\uFEFF/g, "").trim();
+        // ✅ Skip disabled/commented rows (starting with "*")
+        const firstCell = (cols[0] || "").replace(/\uFEFF/g, "").trim();
+        if (firstCell.startsWith("*")) continue;
+
+        // ✅ Extract lesson name
+        const lesson = (cols[8] || "")
+            .replace(/\uFEFF/g, "")
+            .trim();
 
         const entry = {
             word: {
@@ -202,10 +195,12 @@ function parseCSV(text) {
             lesson
         };
 
+        // ✅ Insert lesson & entry into the map
         if (!state.lessons.has(lesson)) {
             state.lessons.set(lesson, []);
             state.lessonOrder.push(lesson);
         }
+
         state.lessons.get(lesson).push(entry);
     }
 }
