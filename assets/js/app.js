@@ -1013,13 +1013,17 @@ function autoplayStep() {
 
 function toggleAutoplay() {
 
+    // === AUTOPLAY START ===
     if (!state.autoplay.on) {
 
+        // Pool laden falls leer
         if (!ensurePoolForAutoplay()) return;
 
+        // Autoplay aktivieren
         setAutoplay(true);
         requestWakeLock();
 
+        // Falls noch keine Karte angezeigt wurde
         if (!state.current) {
             if (state.order === "seq") {
                 state.idx = 0;
@@ -1032,10 +1036,23 @@ function toggleAutoplay() {
 
         scrollToBottom();
         autoplayStep();
-
-    } else {
-        setAutoplay(false);
+        return;
     }
+
+    // === AUTOPLAY STOP ===
+    // (WICHTIG: ALLES abbrechen – keine weiteren Timer, kein Speech)
+    setAutoplay(false);
+
+    try { speechSynthesis.cancel(); } catch (e) {}
+
+    if (state.autoplay.timers && state.autoplay.timers.length > 0) {
+        state.autoplay.timers.forEach(id => clearTimeout(id));
+    }
+
+    state.autoplay.timers = [];
+
+    // Verhindert ein sofortiges Wiederstarten
+    return;
 }
 
 
