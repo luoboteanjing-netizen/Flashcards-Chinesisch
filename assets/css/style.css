@@ -495,9 +495,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     text-align: center;
     width: 100%;
 }
-#btnRateUnsure {
-    display: none !important;
-}
+
 /* Bewertung erst anzeigen nach Reveal */
 .rate-buttons {
     display: none;
@@ -519,4 +517,16 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #promptWord, #promptWordSub, #promptSent,
 #solWord, #solSent {
     text-align: center;
+}
+/* Mehr Abstand zwischen Zeilen im Prompt und in der Lösung */
+#promptBox .prompt,
+#solBox .sol-text {
+    line-height: 1.9;   /* fast doppelt so viel wie vorher */
+}
+.prompt.pos,
+.sol-pos {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
 }
