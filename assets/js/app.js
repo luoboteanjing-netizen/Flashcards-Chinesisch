@@ -276,10 +276,9 @@ function gatherPoolFromSettings() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
-
 /* -------------------------------------------------------------------------- */
-/*                               TEIL 2 von 4                                 */
-/*      Card Rendering · Navigation · Rating · Session Stats · Training       */
+/*                     TEIL 2 + TEIL 4 (Komplett integriert)                 */
+/*      Card Rendering · Navigation · Rating · Session · Training · UI       */
 /* -------------------------------------------------------------------------- */
 
 
@@ -287,7 +286,6 @@ function gatherPoolFromSettings() {
 
 function setCard(entry, fromHistory = false) {
 
-    // 👉 History nur erweitern, wenn NICHT aus History-Navigation
     if (!fromHistory) {
         pushToHistory(entry);
     }
@@ -296,21 +294,18 @@ function setCard(entry, fromHistory = false) {
     const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenz-Index synchronisieren
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
     }
 
-    if (cardTitle) {
+    if (cardTitle)
         cardTitle.textContent = `Karte (ID ${entry.id})`;
-    }
 
-    if (cardLesson) {
+    if (cardLesson)
         cardLesson.textContent = `Lektion ${entry.lesson}`;
-    }
 
-    /* ✅ NEUER 2-FARBIGER FORTSCHRITTSBALKEN */
+    /* ✅ Neuer zweifarbiger Fortschrittsbalken */
     if (lessonStats) {
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
@@ -324,13 +319,13 @@ function setCard(entry, fromHistory = false) {
 
         lessonStats.innerHTML = `
             <div class="lesson-bar-large">
-                <div class="lesson-bar-red" style="width:${redPct}%;"></div>
-                <div class="lesson-bar-green" style="width:${greenPct}%; left:${redPct}%;"></div>
+                <div class="lesson-bar-red" style="width:${redPct}%"></div>
+                <div class="lesson-bar-green" style="left:${redPct}%; width:${greenPct}%"></div>
             </div>
         `;
     }
 
-    /* === KARTENINHALT ====================================== */
+    /* ============ Karteninhalt setzen =============== */
 
     state.current = entry;
 
@@ -342,20 +337,18 @@ function setCard(entry, fromHistory = false) {
 
         $('#promptWord').innerHTML = entry.word.zh || "—";
 
-        let wordInfo = entry.word.py || "";
-        if (entry.pos) {
-            wordInfo += ` (${entry.pos})`;
-        }
-        $('#promptWordSub').innerHTML = wordInfo;
+        let wi = entry.word.py || "";
+        if (entry.pos) wi += ` (${entry.pos})`;
+        $('#promptWordSub').innerHTML = wi;
 
-        let sentenceHanzi = entry.sent.zh || "";
-        let sentencePinyin = entry.sent.py || "";
-        $('#promptSent').innerHTML = `${sentenceHanzi}<br><span class="zh-pinyin">${sentencePinyin}</span>`;
+        $('#promptSent').innerHTML =
+            `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
 
         $('#solWord').textContent = entry.word.de || "—";
         $('#solSent').textContent = entry.sent.de || "—";
 
     } else {
+
         $('#promptWord').textContent = entry.word.de || "—";
         $('#promptWordSub').innerHTML = entry.pos || "";
         $('#promptSent').textContent = entry.sent.de || "—";
@@ -364,20 +357,20 @@ function setCard(entry, fromHistory = false) {
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
+    /* Buttons initial */
     $('#btnReveal').disabled = false;
+    hideRatingButtons();
+    showNavButtons();
 
-    disableRating();
-    renderModeUI();
     updateNavButtons();
-
-    /* ✅ Kartenhöhe synchron halten */
+    renderModeUI();
     syncCardHeights();
 }
+
 
 /* ============================ CARD NAVIGATION ============================= */
 
 function pushToHistory(entry) {
-
     if (state.historyPos < state.history.length - 1) {
         state.history = state.history.slice(0, state.historyPos + 1);
     }
@@ -390,11 +383,10 @@ function pushToHistory(entry) {
 
 function updateNavButtons() {
     $('#btnPrev').disabled = state.historyPos <= 0;
-    $('#btnNext').disabled = state.pool.length === 0;
+    $('#btnNext').disabled = !state.pool.length;
 }
 
 function nextCard() {
-
     if (!state.pool.length) return;
 
     if (state.historyPos < state.history.length - 1) {
@@ -405,13 +397,10 @@ function nextCard() {
     }
 
     let next;
-
     if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
-
         next = state.pool[state.idx];
-
     } else {
         next = state.pool[Math.floor(Math.random() * state.pool.length)];
     }
@@ -421,7 +410,6 @@ function nextCard() {
 }
 
 function prevCard() {
-
     if (state.historyPos > 0) {
         state.historyPos--;
         setCard(state.history[state.historyPos], true);
@@ -440,17 +428,6 @@ function formatZh(hz, py) {
     return p ? `${h}<br>${p}` : (h || "—");
 }
 
-function formatPinyinAndPos(py, pos) {
-    const a = (py || "").trim();
-    const b = (pos || "").trim();
-
-    if (a && b) return `${a}\n${b}`;
-    if (a) return a;
-    if (b) return b;
-
-    return "";
-}
-
 
 /* ============================ REVEAL / RATING ============================= */
 
@@ -465,6 +442,9 @@ function doReveal() {
         state.session.ttrCount++;
     }
 
+    hideNavButtons();
+    showRatingButtons();
+
     enableRating();
     renderSessionStats();
     syncCardHeights();
@@ -472,14 +452,32 @@ function doReveal() {
 
 function enableRating() {
     $('#btnRateKnown').disabled = false;
-    $('#btnRateUnsure').disabled = false;
     $('#btnRateUnknown').disabled = false;
 }
 
 function disableRating() {
     $('#btnRateKnown').disabled = true;
-    $('#btnRateUnsure').disabled = true;
     $('#btnRateUnknown').disabled = true;
+}
+
+function showRatingButtons() {
+    document.getElementById('ratingButtons').classList.add('visible');
+}
+
+function hideRatingButtons() {
+    document.getElementById('ratingButtons').classList.remove('visible');
+}
+
+function hideNavButtons() {
+    $('#btnPrev').style.display = 'none';
+    $('#btnReveal').style.display = 'none';
+    $('#btnNext').style.display = 'none';
+}
+
+function showNavButtons() {
+    $('#btnPrev').style.display = '';
+    $('#btnReveal').style.display = '';
+    $('#btnNext').style.display = '';
 }
 
 function rate(mark) {
@@ -487,17 +485,14 @@ function rate(mark) {
 
     state.session.done++;
     if (mark === 'known') state.session.known++;
-    else if (mark === 'unsure') state.session.unsure++;
     else state.session.unknown++;
 
     renderSessionStats();
 
     const lesson = state.current.lesson;
-
     if (lesson) {
-        if (!state.progress.byLesson[lesson]) {
+        if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
-        }
 
         if (mark === 'known') state.progress.byLesson[lesson].known++;
         if (mark === 'unknown') state.progress.byLesson[lesson].unknown++;
@@ -505,7 +500,10 @@ function rate(mark) {
         saveProgress();
     }
 
+    hideRatingButtons();
+    showNavButtons();
     disableRating();
+
     nextCard();
 }
 
@@ -524,7 +522,7 @@ function renderSessionStats() {
         : "—";
 
     $('#sessionStats').textContent =
-        `Karten: ${s.done}/${s.total} · Korrekt: ${acc} · Ø Aufdeck‑Zeit: ${avg}s`;
+        `Karten: ${s.done}/${s.total} · Korrekt: ${acc} · Ø ${avg}s`;
 }
 
 
@@ -560,7 +558,8 @@ function startTraining() {
             setCard(state.pool[state.idx]);
         } else {
             state.idx = null;
-            setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+            const r = state.pool[Math.floor(Math.random() * state.pool.length)];
+            setCard(r);
         }
 
         state.trainingOn = true;
@@ -597,9 +596,185 @@ function updateTrainingBtn() {
 }
 
 
-/* -------------------------------------------------------------------------- */
-/*                                ENDE TEIL 2                                 */
-/* -------------------------------------------------------------------------- */
+/* ============================ DOM INIT (TEIL 4) ============================ */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    loadSettings();
+    loadProgress();
+
+    state.mode = state.settings.mode || 'de2zh';
+    state.order = state.settings.order || 'random';
+
+    state.autoplay.gapMs =
+        typeof state.settings.autoplayGap === 'number'
+            ? state.settings.autoplayGap
+            : 800;
+
+    state.rateDe = state.settings.rateDe;
+    state.pitchDe = state.settings.pitchDe;
+    state.rateZh = state.settings.rateZh;
+    state.pitchZh = state.settings.pitchZh;
+
+    renderModeUI();
+    loadCSV();
+
+
+    /* ---------- EVENT LISTENER ---------- */
+
+    $('#btnSwapMode').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.mode = state.mode === 'de2zh' ? 'zh2de' : 'de2zh';
+        state.settings.mode = state.mode;
+        saveSettings();
+        renderModeUI();
+        if (state.current) setCard(state.current);
+    });
+
+    $('#btnOrderToggle').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.order = state.order === "random" ? "seq" : "random";
+        state.settings.order = state.order;
+        saveSettings();
+        renderModeUI();
+    });
+
+    $('#btnAutoplay').addEventListener("click", toggleAutoplay);
+
+    $('#gapRange').addEventListener("input", e => {
+        const s = parseFloat(e.target.value) || 0.8;
+        state.autoplay.gapMs = Math.round(s * 1000);
+        state.settings.autoplayGap = state.autoplay.gapMs;
+        $('#gapVal').textContent = `(${s.toFixed(1)} s)`;
+        saveSettings();
+    });
+
+
+    /* ---- Neue Lautsprecher-Icons ---- */
+
+    $('#speakerQuestion').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        playQuestion();
+    });
+
+    $('#speakerAnswer').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        playAnswer();
+    });
+
+
+    /* ---- Training ---- */
+
+    $('#btnStart').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        startTraining();
+    });
+
+    $('#btnNext').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        nextCard();
+    });
+
+    $('#btnPrev').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        prevCard();
+    });
+
+    $('#btnReveal').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        doReveal();
+    });
+
+
+    /* ---- Rating ---- */
+
+    $('#btnRateKnown').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("known");
+    });
+
+    $('#btnRateUnknown').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unknown");
+    });
+
+
+    /* ---- Lessons ---- */
+
+    $('#btnUseLessons').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+
+        const sel = $('#lessonSelect');
+        const picked = [];
+
+        for (const o of sel.selectedOptions) picked.push(o.value);
+
+        state.settings.lessons = picked;
+        saveSettings();
+        gatherPoolFromSettings();
+    });
+
+    $('#btnClearLessons').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+
+        state.selectedLessons.clear();
+        state.settings.lessons = [];
+        saveSettings();
+
+        state.pool = [];
+        state.idx = null;
+        resetSessionStats();
+
+        const sel = $('#lessonSelect');
+        for (const o of sel.options) o.selected = false;
+
+        if (state.trainingOn) stopTraining();
+    });
+
+
+    /* ---- Export / Import ---- */
+
+    $('#btnExport').addEventListener("click", () => {
+        const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
+            type: "application/json"
+        });
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "progress.json";
+        a.click();
+
+        setTimeout(() => URL.revokeObjectURL(a.href), 600);
+    });
+
+    $('#fileImport').addEventListener("change", e => {
+        stopAutoplayOnUserAction();
+
+        const f = e.target.files?.[0];
+        if (!f) return;
+
+        const r = new FileReader();
+        r.onload = () => {
+            try {
+                const p = JSON.parse(r.result);
+                if (p && p.version === "v1") {
+                    state.progress = p;
+                    saveProgress();
+                    populateLessonSelect();
+                    alert("Fortschritt importiert.");
+                } else {
+                    alert("Ungültiges Format.");
+                }
+            } catch (err) {
+                alert("Import fehlgeschlagen: " + err.message);
+            }
+        };
+
+        r.readAsText(f);
+        e.target.value = "";
+    });
+
+});
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
@@ -1160,305 +1335,4 @@ function stopAutoplayOnUserAction() {
 
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 3                                 */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               TEIL 4 von 4                                 */
-/*                 Event Listener · Mode Switch · Init Routine                */
-/* -------------------------------------------------------------------------- */
-
-
-/* ============================ MODE + UI ================================== */
-
-function renderModeUI() {
-    const left = $('#modeLeft');
-    const right = $('#modeRight');
-
-    if (!left || !right) return;
-
-    if (state.mode === 'de2zh') {
-        left.textContent = "🇩🇪 DE";
-        right.textContent = "🇨🇳 ZH";
-    } else {
-        left.textContent = "🇨🇳 ZH";
-        right.textContent = "🇩🇪 DE";
-    }
-
-    $('#btnOrderToggle').textContent =
-        "Reihenfolge: " + (state.order === 'seq' ? "Sequenziell" : "Zufällig");
-
-    updateTrainingBtn();
-}
-
-
-/* ============================ DOM INIT =================================== */
-
-window.addEventListener("DOMContentLoaded", () => {
-    console.log("[INIT] DOM geladen – Initialisierung startet…");
-
-    loadSettings();
-    loadProgress();
-
-    state.mode = state.settings.mode || 'de2zh';
-    state.order = state.settings.order || 'random';
-
-    state.autoplay.gapMs =
-        typeof state.settings.autoplayGap === 'number'
-            ? state.settings.autoplayGap
-            : 800;
-
-    state.rateDe = state.settings.rateDe;
-    state.pitchDe = state.settings.pitchDe;
-    state.rateZh = state.settings.rateZh;
-    state.pitchZh = state.settings.pitchZh;
-
-    renderModeUI();
-
-    console.log("[INIT] CSV-Import wird gestartet…");
-    loadCSV();
-
-
-    /* === Autoplay-Button stabil neben Training-Button platzieren === */
-
-    (function placeAutoplayButton() {
-        const trainingBtn = document.querySelector("#btnStart");
-        const autoplayBtn = document.querySelector("#btnAutoplay");
-
-        if (!trainingBtn || !autoplayBtn) {
-            console.warn("[UI] Training oder Autoplay Button nicht gefunden.");
-            return;
-        }
-
-        const parent = trainingBtn.parentNode;
-        let group = parent.querySelector(".training-group");
-
-        if (!group) {
-            group = document.createElement("div");
-            group.className = "training-group";
-
-            parent.insertBefore(group, trainingBtn);
-            group.appendChild(trainingBtn);
-        }
-
-        group.appendChild(autoplayBtn);
-        autoplayBtn.classList.add("primary");
-
-        console.log("[UI] Autoplay-Button stabil neben Training-Button platziert.");
-    })();
-
-
-    /* ============================ BUTTON EVENTS =========================== */
-
-    // Richtungswechsel
-    $('#btnSwapMode').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        state.mode = state.mode === 'de2zh' ? 'zh2de' : 'de2zh';
-        state.settings.mode = state.mode;
-        saveSettings();
-        renderModeUI();
-        if (state.current) setCard(state.current);
-    });
-
-    // Reihenfolge
-    $('#btnOrderToggle').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        state.order = state.order === "random" ? "seq" : "random";
-        state.settings.order = state.order;
-        saveSettings();
-        renderModeUI();
-    });
-
-    // Autoplay
-    $('#btnAutoplay').addEventListener("click", () => {
-        toggleAutoplay();
-    });
-
-    // Gap Slider
-    $('#gapRange').addEventListener("input", e => {
-        const s = parseFloat(e.target.value) || 0.8;
-        state.autoplay.gapMs = Math.round(s * 1000);
-        state.settings.autoplayGap = state.autoplay.gapMs;
-        $('#gapVal').textContent = `(${s.toFixed(1)} s)`;
-        saveSettings();
-    });
-
-
-    /* ---- Voice Controls ---- */
-
-    $('#btnVoiceDe').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        openVoicesPanelFor("de");
-    });
-    $('#btnVoiceZh').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        openVoicesPanelFor("zh");
-    });
-    $('#btnCloseVoices').addEventListener("click", closeVoices);
-
-    // Rate / Pitch German
-    $('#rateDeRange').addEventListener("input", e => {
-        stopAutoplayOnUserAction();
-        state.rateDe = parseFloat(e.target.value);
-        state.settings.rateDe = state.rateDe;
-        $('#rateDeVal').textContent = `(${state.rateDe.toFixed(2)})`;
-        saveSettings();
-    });
-    $('#pitchDeRange').addEventListener("input", e => {
-        stopAutoplayOnUserAction();
-        state.pitchDe = parseFloat(e.target.value);
-        state.settings.pitchDe = state.pitchDe;
-        $('#pitchDeVal').textContent = `(${state.pitchDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    // Rate / Pitch Chinese
-    $('#rateZhRange').addEventListener("input", e => {
-        stopAutoplayOnUserAction();
-        state.rateZh = parseFloat(e.target.value);
-        state.settings.rateZh = state.rateZh;
-        $('#rateZhVal').textContent = `(${state.rateZh.toFixed(2)})`;
-        saveSettings();
-    });
-    $('#pitchZhRange').addEventListener("input", e => {
-        stopAutoplayOnUserAction();
-        state.pitchZh = parseFloat(e.target.value);
-        state.settings.pitchZh = state.pitchZh;
-        $('#pitchZhVal').textContent = `(${state.pitchZh.toFixed(2)})`;
-        saveSettings();
-    });
-
-
-    /* ---- Training ---- */
-
-    $('#btnStart').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        startTraining();
-    });
-
-    $('#btnNext').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        nextCard();
-    });
-
-    $('#btnPrev').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        prevCard();
-    });
-
-    $('#btnReveal').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        doReveal();
-    });
-
-
-    /* ---- NEW SPEAKER ICONS ---- */
-
-    $('#speakerQuestion').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        playQuestion();
-    });
-
-    $('#speakerAnswer').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        playAnswer();
-    });
-
-
-    /* ---- Rating ---- */
-
-    $('#btnRateKnown').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("known");
-    });
-    $('#btnRateUnsure').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unsure");
-    });
-    $('#btnRateUnknown').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unknown");
-    });
-
-
-    /* ---- Lessons ---- */
-
-    $('#btnUseLessons').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        const sel = $('#lessonSelect');
-        const picked = [];
-
-        for (const o of sel.selectedOptions) picked.push(o.value);
-
-        state.settings.lessons = picked;
-        saveSettings();
-        gatherPoolFromSettings();
-    });
-
-    $('#btnClearLessons').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        state.selectedLessons.clear();
-        state.settings.lessons = [];
-        saveSettings();
-
-        state.pool = [];
-        state.idx = null;
-        resetSessionStats();
-
-        const sel = $('#lessonSelect');
-        for (const o of sel.options) o.selected = false;
-
-        if (state.trainingOn) stopTraining();
-    });
-
-
-    /* ---- Export / Import ---- */
-
-    $('#btnExport').addEventListener("click", () => {
-        const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
-            type: "application/json"
-        });
-
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "progress.json";
-        a.click();
-
-        setTimeout(() => URL.revokeObjectURL(a.href), 600);
-    });
-
-    $('#fileImport').addEventListener("change", e => {
-        stopAutoplayOnUserAction();
-
-        const f = e.target.files?.[0];
-        if (!f) return;
-
-        const r = new FileReader();
-        r.onload = () => {
-            try {
-                const p = JSON.parse(r.result);
-                if (p && p.version === "v1") {
-                    state.progress = p;
-                    saveProgress();
-                    populateLessonSelect();
-                    alert("Fortschritt importiert.");
-                } else {
-                    alert("Ungültiges Format.");
-                }
-            } catch (err) {
-                alert("Import fehlgeschlagen: " + err.message);
-            }
-        };
-
-        r.readAsText(f);
-        e.target.value = "";
-    });
-
-    console.log("[INIT] Alle Event Listener aktiviert. App bereit.");
-});
-
-
-/* -------------------------------------------------------------------------- */
-/*                             ENDE TEIL 4 (FINAL)                             */
 /* -------------------------------------------------------------------------- */
