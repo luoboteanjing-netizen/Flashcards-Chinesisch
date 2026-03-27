@@ -1391,38 +1391,31 @@ setTimeout(refreshVoices, 300);
     /*                                LESSON MGMT                              */
     /* ====================================================================== */
 
-    $("#btnUseLessons").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
+   $('#btnClearLessons').addEventListener("click", () => {
+    stopAutoplayOnUserAction();
 
-        const sel = $("#lessonSelect");
-        const picked = [];
+    // Daten leeren
+    state.selectedLessons.clear();
+    state.settings.lessons = [];
+    saveSettings();
 
-        for (const o of sel.selectedOptions) picked.push(o.value);
+    // Kartenpool zurücksetzen
+    state.pool = [];
+    state.idx = null;
+    resetSessionStats();
 
-        state.settings.lessons = picked;
-        saveSettings();
+    // Auswahl im <select> entfernen
+    const sel = $('#lessonSelect');
+    for (const o of sel.options) o.selected = false;
 
-        gatherPoolFromSettings();
+    // ✅ visuelle Auswahl in der Tabelle entfernen
+    document.querySelectorAll(".lt-row.selected").forEach(row => {
+        row.classList.remove("selected");
     });
 
-    $("#btnClearLessons").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        state.settings.lessons = [];
-        saveSettings();
-
-        state.selectedLessons.clear();
-        state.pool = [];
-        state.idx = null;
-
-        resetSessionStats();
-
-        const sel = $("#lessonSelect");
-        for (const o of sel.options) o.selected = false;
-
-        if (state.trainingOn) stopTraining();
-    });
-
+    // Training ggf. stoppen
+    if (state.trainingOn) stopTraining();
+});
 
     /* ====================================================================== */
     /*                              IMPORT / EXPORT                            */
