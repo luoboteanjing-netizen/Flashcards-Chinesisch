@@ -382,8 +382,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-        100px   /* Lektionstitel */
-        40px    /* total */
+        60px   /* Lektionstitel */
+        60px    /* total */
         60px    /* known */
         60px    /* unknown */
         60px;   /* percent */
@@ -410,4 +410,52 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 #lessonSelect {
     display: none;
+}
+
+/* Scrollbare Lektionsliste */
+.lesson-table {
+    max-height: 260px;      /* Höhe frei wählbar */
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Perfektes Grid für 5 Spalten */
+.lt-row {
+    display: grid;
+    grid-template-columns:
+        140px   /* Lektion */
+        50px    /* Karten */
+        50px    /* ✅ */
+        60px    /* ❌ */
+        50px;   /* % */
+    gap: 8px;
+    padding: 4px 6px;
+    font-size: 14px;
+    align-items: center;
+    background: #1b2330;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ✅ Sticky Header oben fixiert */
+.lt-head {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #283344;
+    font-weight: 700;
+    padding: 6px;
+    border-bottom: 2px solid #1e2530;
+}
+
+/* Farben */
+.lt-known   { color: var(--good); }
+.lt-unknown { color: var(--bad);  }
+
+/* Auswahlzustand */
+.lt-row.selected {
+    background: #334155;
 }
