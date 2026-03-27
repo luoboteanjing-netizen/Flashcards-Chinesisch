@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chinesisch Flashcards – v5.5 (Browser optimiert)</title>
+    <title>Chinesisch Flashcards – v5.5</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,6 @@
 </head>
 
 <body>
-
 <main class="container">
 
 <header>
@@ -32,9 +31,12 @@
 </header>
 
 
-<!-- ======================= KONFIGURATION ======================= -->
-<section class="card cfg">
 
+<!-- ================================================================ -->
+<!--                KONFIGURATION / EINSTELLUNGEN                    -->
+<!-- ================================================================ -->
+
+<section class="card cfg">
     <div class="grid-2">
 
         <!-- Lektionen -->
@@ -48,14 +50,13 @@
             </div>
         </div>
 
-        <!-- Richtung / Reihenfolge -->
+        <!-- Modus / Reihenfolge -->
         <div class="pane">
-
             <div class="lbl">Richtung</div>
 
             <div class="mode-inline">
                 <div class="mode-item" id="modeLeft">🇩🇪 DE</div>
-                <button id="btnSwapMode" class="btn ghost swap" title="Richtung umschalten">⇄</button>
+                <button id="btnSwapMode" class="btn ghost swap">⇄</button>
                 <div class="mode-item" id="modeRight">🇨🇳 ZH</div>
             </div>
 
@@ -64,7 +65,7 @@
                 <button id="btnAutoplay" class="btn ghost">Autoplay ▶︎</button>
             </div>
 
-            <!-- Autoplay Abstand -->
+            <!-- Autoplay Gap -->
             <div class="mt8 gap-row">
                 <label class="lbl">Pausen‑Zeit zwischen Karten:
                     <span id="gapVal" class="hint">(0.8 s)</span>
@@ -96,18 +97,19 @@
                 </div>
             </div>
 
-            <!-- Training Start -->
             <div class="stack mt12">
                 <button id="btnStart" class="btn primary">Training starten ▶</button>
             </div>
-
         </div>
     </div>
-
 </section>
 
 
-<!-- ======================= LERNBEREICH ======================= -->
+
+<!-- ================================================================ -->
+<!--                        LERNBEREICH / KARTEN                      -->
+<!-- ================================================================ -->
+
 <section class="card learn" id="learnSection">
 
     <div class="section-title">
@@ -115,8 +117,8 @@
         <span id="cardLesson" style="float:right;"></span>
     </div>
 
-    <!-- Fortschrittsbalken -->
     <div id="lessonStats" class="stats-bar"></div>
+
 
     <!-- FRAGE -->
     <div id="promptBox" class="prompt-box">
@@ -125,6 +127,8 @@
             <div class="prompt-col">
                 <div id="promptWord" class="prompt big">—</div>
                 <div id="promptWordSub" class="prompt sub small"></div>
+                <!-- ✅ Neue POS-Zeile -->
+                <div id="promptPOS" class="prompt pos small"></div>
             </div>
         </div>
 
@@ -142,8 +146,8 @@
 
     <!-- LÖSUNG -->
     <div class="solution">
-
         <div id="solBox" class="sol masked">
+
             <div class="sol-part">
                 <div id="solWord" class="sol-text">—</div>
             </div>
@@ -154,9 +158,10 @@
                 <!-- Lautsprecher -->
                 <div id="speakerAnswer" class="card-speaker">🔊</div>
             </div>
-        </div>
 
+        </div>
     </div>
+
 
     <!-- Navigation -->
     <div class="card-controls">
@@ -165,20 +170,27 @@
         <button id="btnNext" class="btn" disabled>Nächste Karte ▶</button>
     </div>
 
-    <!-- ✅ Neue Bewertung – jetzt korrekt! -->
+
+    <!-- ✅ Neue Bewertung -->
     <div id="ratingButtons" class="rate-buttons">
         <button id="btnRateKnown" class="btn rate good" disabled>✅ Gewusst</button>
+        <button id="btnRateUnsure" class="btn rate unsure" disabled>🤔 Unsicher</button>
         <button id="btnRateUnknown" class="btn rate bad" disabled>❌ Nicht gewusst</button>
     </div>
 
-    <!-- Session Stats -->
+
     <div id="sessionStats" class="stats-bar">—</div>
 
 </section>
 
 
-<!-- ======================= VOICES PANEL ======================= -->
+
+<!-- ================================================================ -->
+<!--                      VOICE PANEL (DEBUG)                         -->
+<!-- ================================================================ -->
+
 <div id="voicePanel" class="debug hidden">
+
     <div class="debug-head">
         <div class="title">Stimmen</div>
         <button id="btnCloseVoices" class="btn ghost">✕</button>
@@ -195,9 +207,11 @@
             <div id="dbgVoices"></div>
         </div>
     </div>
+
 </div>
 
-<script src="assets/js/app.js"></script>
 
+
+<script src="assets/js/app.js"></script>
 </body>
 </html>
