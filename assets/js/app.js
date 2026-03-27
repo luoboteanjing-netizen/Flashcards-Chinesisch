@@ -1,7 +1,10 @@
-/* --------------- Flashcards – CSV Version 6.0.5----------- */
+/* ========================================================================== */
+/*                           FLASHCARDS – VERSION OPTION A                    */
+/*                       Repaired, Stabilized, Fully Functional               */
+/* ========================================================================== */
+
 /* -------------------------------------------------------------------------- */
-/*                          Flashcards – Vollversion                          */
-/*              TEIL 1 von 4 — Global State · Settings · CSV Parser          */
+/* TEIL 1 – GLOBAL STATE · SETTINGS · CSV PARSER                              */
 /* -------------------------------------------------------------------------- */
 
 const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
@@ -11,32 +14,41 @@ const LS_KEYS = {
     progress: "fc_progress_v1"
 };
 
-/* ============================  GLOBAL STATE  =============================== */
+const $ = (s) => document.querySelector(s);
+
+/* ============================ GLOBAL STATE =============================== */
 
 const state = {
     mode: "de2zh",
-    order: "seq",   // für Zurück-Button sinnvoller Default
+    order: "seq",
 
+    // TTS settings
     rateDe: 0.95,
     pitchDe: 1.0,
     rateZh: 0.95,
     pitchZh: 1.0,
 
     lessons: new Map(),
-    lessonOrder: [],         
+    lessonOrder: [],
     selectedLessons: new Set(),
 
     pool: [],
     idx: null,
+
     history: [],
     historyPos: -1,
+
     current: null,
 
     voices: [],
     browserVoice: { zh: null, de: null },
     voicePanelTarget: "de",
 
-    autoplay: { on: false, timers: [], gapMs: 800 },
+    autoplay: {
+        on: false,
+        timers: [],
+        gapMs: 800
+    },
 
     settings: {
         mode: "de2zh",
@@ -73,8 +85,6 @@ const state = {
     wakeLock: null,
     trainingOn: false
 };
-
-const $ = (s) => document.querySelector(s);
 
 /* ============================ SETTINGS / PROGRESS ========================= */
 
@@ -134,22 +144,16 @@ function parseCSVLine(line) {
 }
 
 async function loadCSV() {
-    console.log("[CSV] Lade CSV…");
-
     try {
         const res = await fetch(CSV_URL);
-        if (!res.ok) {
-            alert("CSV konnte nicht geladen werden!");
-            return;
-        }
-
         const buf = await res.arrayBuffer();
         const text = new TextDecoder("utf-8").decode(buf);
 
         parseCSV(text);
         populateLessonSelect();
     } catch (e) {
-        console.error("[CSV] Fehler:", e);
+        alert("Fehler beim Laden der CSV.");
+        console.error(e);
     }
 }
 
@@ -161,11 +165,8 @@ function parseCSV(text) {
     if (lines.length < 2) return;
 
     for (let i = 1; i < lines.length; i++) {
-        const raw = lines[i];
-        const cols = parseCSVLine(raw);
-
+        const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
-        if (cols[0].trim().startsWith("*")) continue;
 
         const lesson = (cols[8] || "").replace(/\uFEFF/g, "").trim();
 
@@ -189,20 +190,8 @@ function parseCSV(text) {
             state.lessons.set(lesson, []);
             state.lessonOrder.push(lesson);
         }
-
         state.lessons.get(lesson).push(entry);
     }
-
-    console.log("[CSV] Lessons:", state.lessonOrder);
-}
-
-/* ============================ UNICODE BAR ================================ */
-
-function makeBar(known, total) {
-    if (total <= 0) return "░░░░░░░░░░";
-
-    const full = Math.round((known / total) * 10);
-    return "██████████".slice(0, full) + "░░░░░░░░░░".slice(full);
 }
 
 /* ============================ LESSON SELECT =============================== */
@@ -213,9 +202,7 @@ function populateLessonSelect() {
 
     sel.innerHTML = "";
 
-    const keys = state.lessonOrder;
-
-    for (const k of keys) {
+    for (const k of state.lessonOrder) {
         const opt = document.createElement("option");
         opt.value = k;
 
@@ -223,17 +210,13 @@ function populateLessonSelect() {
         const total = cards.length;
 
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
-        const known = p.known || 0;
-        const unknown = p.unknown || 0;
+        const known = p.known;
+        const unknown = p.unknown;
 
-        // Prozentzahl ermitteln
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+        const pct = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        // ✅ EXAKT DEINE FORMATVORGABE
-        opt.textContent =
-            `${k} (${total}) · 🟩 ${known}  🟥 ${unknown}  (${percent}%)`;
+        opt.textContent = `${k} (${total}) · 🟩 ${known} 🟥 ${unknown} (${pct}%)`;
 
-        // Vorauswahl aus Settings
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
         }
@@ -273,365 +256,27 @@ function gatherPoolFromSettings() {
     gatherPool();
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                ENDE TEIL 1                                 */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               TEIL 2 von 4                                 */
-/*      Card Rendering · Navigation · Rating · Session Stats · Training       */
-/* -------------------------------------------------------------------------- */
-
-
-/* ============================ CARD RENDERING ============================== */
-
-function setCard(entry, fromHistory = false) {
-
-    // 👉 History nur erweitern, wenn NICHT aus History-Navigation
-    if (!fromHistory) {
-        pushToHistory(entry);
-    }
-
-    const cardTitle = document.querySelector("#cardTitle");
-    const cardLesson = document.querySelector("#cardLesson");
-    const lessonStats = document.querySelector("#lessonStats");
-
-    // Sequenz-Index synchronisieren
-    if (state.order === "seq") {
-        const pos = state.pool.indexOf(entry);
-        if (pos >= 0) state.idx = pos;
-    }
-
-    if (cardTitle) {
-        cardTitle.textContent = `Karte (ID ${entry.id})`;
-    }
-
-    if (cardLesson) {
-        cardLesson.textContent = `Lektion ${entry.lesson}`;
-    }
-
-    if (lessonStats) {
-        const cards = state.lessons.get(entry.lesson) || [];
-        const total = cards.length;
-
-        const p = state.progress.byLesson[entry.lesson] || { known: 0 };
-        const known = p.known || 0;
-
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
-
-        lessonStats.innerHTML = `
-            <div class="lesson-bar-large">
-                <div class="lesson-bar-large-fill" style="width:${percent}%;">
-                </div>
-            </div>
-        `;
-    }
-
-    /* === KARTENINHALT ====================================== */
-
-    state.current = entry;
-
-    $('#solBox').classList.add('masked');
-    state.startedAt = Date.now();
-    state.revealedAt = null;
-
-    if (state.mode === 'zh2de') {
-
-        // Wortanzeige (Hanzi)
-        $('#promptWord').innerHTML = entry.word.zh || "—";
-
-        // Unter dem Wort: Pinyin + Wortart
-        let wordInfo = entry.word.py || "";
-        if (entry.pos) {
-            wordInfo += ` (${entry.pos})`;
-        }
-        $('#promptWordSub').innerHTML = wordInfo;
-
-        // Satz + Pinyin
-        let sentenceHanzi = entry.sent.zh || "";
-        let sentencePinyin = entry.sent.py || "";
-        $('#promptSent').innerHTML = `${sentenceHanzi}<br><span class="zh-pinyin">${sentencePinyin}</span>`;
-
-        // Lösung auf Deutsch
-        $('#solWord').textContent = entry.word.de || "—";
-        $('#solSent').textContent = entry.sent.de || "—";
-
-    } else {
-        $('#promptWord').textContent = entry.word.de || "—";
-        $('#promptWordSub').innerHTML = entry.pos || "";
-        $('#promptSent').textContent = entry.sent.de || "—";
-
-        $('#solWord').innerHTML = formatZh(entry.word.zh, entry.word.py);
-        $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
-    }
-
-    $('#btnReveal').disabled = false;
-    $('#btnPlayQ').disabled = false;
-    $('#btnPlayA').disabled = false;
-
-    disableRating();
-    renderModeUI();
-
-	syncCardHeights();
-    updateNavButtons();
-}
-
-function syncCardHeights() {
-    const q = document.querySelector("#promptBox");
-    const a = document.querySelector("#solBox");
-
-    if (!q || !a) return;
-
-    // Zurücksetzen, um korrekte natürliche Höhe zu messen
-    q.style.minHeight = "";
-    a.style.minHeight = "";
-
-    const h = Math.max(q.offsetHeight, a.offsetHeight);
-
-    q.style.minHeight = h + "px";
-    a.style.minHeight = h + "px";
-}
-
-/* ============================ CARD NAVIGATION ============================= */
-
-function pushToHistory(entry) {
-
-    // Wenn wir nicht am Ende sind → Forward-History löschen
-    if (state.historyPos < state.history.length - 1) {
-        state.history = state.history.slice(0, state.historyPos + 1);
-    }
-
-    state.history.push(entry);
-    state.historyPos = state.history.length - 1;
-
-    updateNavButtons();
-}
-
-function updateNavButtons() {
-    $('#btnPrev').disabled = state.historyPos <= 0;
-    $('#btnNext').disabled = state.pool.length === 0;
-}
-
-function nextCard() {
-
-    if (!state.pool.length) return;
-
-    // 👉 Wenn wir in der History zurückgegangen sind → vorwärts gehen
-    if (state.historyPos < state.history.length - 1) {
-        state.historyPos++;
-        setCard(state.history[state.historyPos], true);
-        return;
-    }
-
-    // 👉 Normal neue Karte erzeugen
-    let next;
-
-    if (state.order === 'seq') {
-        if (state.idx == null) state.idx = 0;
-        else state.idx = (state.idx + 1) % state.pool.length;
-
-        next = state.pool[state.idx];
-
-    } else {
-        next = state.pool[Math.floor(Math.random() * state.pool.length)];
-    }
-
-    setCard(next);
-	syncCardHeights();
-}
-
-function prevCard() {
-
-    if (state.historyPos > 0) {
-        state.historyPos--;
-        setCard(state.history[state.historyPos], true);
-    }
-
-    updateNavButtons();
-	syncCardHeights();
-}
-
-
-/* ============================ FORMATTING ================================= */
+/* ============================ UTILS =============================== */
 
 function formatZh(hz, py) {
-    const h = (hz || "").trim();
-    const p = (py || "").trim();
-    return p ? `${h}<br>${p}` : (h || "—");
+    hz = (hz || "").trim();
+    py = (py || "").trim();
+    return py
+        ? `${hz}<br><span class="zh-pinyin">${py}</span>`
+        : hz || "—";
 }
 
-function formatPinyinAndPos(py, pos) {
-    const a = (py || "").trim();
-    const b = (pos || "").trim();
+/* ========================================================================== */
+/*                                ENDE TEIL 1                                 */
+/* ========================================================================== */
 
-    if (a && b) return `${a}\n${b}`;
-    if (a) return a;
-    if (b) return b;
-
-    return "";
-}
+/* ========================================================================== */
+/*                           TEIL 2 – CARD LOGIC                              */
+/*                Rendering · Navigation · Rating · Training                  */
+/* ========================================================================== */
 
 
-/* ============================ REVEAL / RATING ============================= */
-
-function doReveal() {
-    $('#solBox').classList.remove('masked');
-	syncCardHeights();
-
-    state.revealedAt = Date.now();
-    const ttr = state.revealedAt - (state.startedAt || state.revealedAt);
-
-    if (ttr > 0) {
-        state.session.ttrSum += ttr;
-        state.session.ttrCount++;
-    }
-
-    enableRating();
-    renderSessionStats();
-}
-
-function enableRating() {
-    $('#btnRateKnown').disabled = false;
-    $('#btnRateUnsure').disabled = false;
-    $('#btnRateUnknown').disabled = false;
-}
-
-function disableRating() {
-    $('#btnRateKnown').disabled = true;
-    $('#btnRateUnsure').disabled = true;
-    $('#btnRateUnknown').disabled = true;
-}
-
-function rate(mark) {
-    if (!state.current) return;
-
-    state.session.done++;
-    if (mark === 'known') state.session.known++;
-    else if (mark === 'unsure') state.session.unsure++;
-    else state.session.unknown++;
-
-    renderSessionStats();
-
-    // Fortschritt pro Lektion
-    const lesson = state.current.lesson;
-
-    if (lesson) {
-        if (!state.progress.byLesson[lesson]) {
-            state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
-        }
-
-        if (mark === 'known') state.progress.byLesson[lesson].known++;
-        if (mark === 'unknown') state.progress.byLesson[lesson].unknown++;
-
-        saveProgress();
-    }
-
-    disableRating();
-    nextCard();
-}
-
-
-/* ============================ SESSION STATS =============================== */
-
-function renderSessionStats() {
-    const s = state.session;
-
-    const avg = s.ttrCount
-        ? (s.ttrSum / s.ttrCount / 1000).toFixed(1)
-        : "—";
-
-    const acc = s.done
-        ? `${Math.round(100 * s.known / s.done)}%`
-        : "—";
-
-    $('#sessionStats').textContent =
-        `Karten: ${s.done}/${s.total} · Korrekt: ${acc} · Ø Aufdeck‑Zeit: ${avg}s`;
-}
-
-
-/* ============================ TRAINING FLOW =============================== */
-
-function startTraining() {
-    if (!state.trainingOn) {
-
-        // History zurücksetzen
-        state.history = [];
-        state.historyPos = -1;
-
-        const sel = $('#lessonSelect');
-        state.selectedLessons.clear();
-
-        const picked = [];
-        for (const opt of sel.selectedOptions) {
-            picked.push(opt.value);
-            state.selectedLessons.add(opt.value);
-        }
-
-        state.settings.lessons = picked;
-        saveSettings();
-
-        gatherPool();
-
-        if (!state.pool.length) {
-            alert("Bitte zuerst Lektionen auswählen.");
-            return;
-        }
-
-        // ✅ WICHTIGER FIX: Sequenziellen Index korrekt setzen!
-        if (state.order === 'seq') {
-            state.idx = 0;
-            setCard(state.pool[state.idx]);   // erste Karte zeigen
-			scrollToBottom();
-        } else {
-            state.idx = null;
-            setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
-        }
-
-        state.trainingOn = true;
-        updateTrainingBtn();
-
-    } else {
-        stopTraining();
-    }
-}
-
-function stopTraining() {
-    state.trainingOn = false;
-    updateTrainingBtn();
-
-    $('#btnPrev').disabled = true;
-    $('#btnReveal').disabled = true;
-    $('#btnNext').disabled = true;
-    $('#btnPlayQ').disabled = true;
-    $('#btnPlayA').disabled = true;
-
-    disableRating();
-
-    $('#solBox').classList.add('masked');
-    $('#promptWord').textContent = "—";
-    $('#promptWordSub').innerHTML = " ";
-    $('#promptSent').textContent = "—";
-    $('#solWord').textContent = "—";
-    $('#solSent').textContent = "—";
-}
-
-function updateTrainingBtn() {
-    $('#btnStart').textContent = state.trainingOn
-        ? "Training stoppen ■"
-        : "Training starten ▶";
-}
-
-
-/* -------------------------------------------------------------------------- */
-/*                                ENDE TEIL 2                                 */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/*                               TEIL 3 von 4                                 */
-/*                   TTS · Stimmen · Autoplay · Wake Lock                     */
-/* -------------------------------------------------------------------------- */
-
-
-/* ============================ NEW FUNCTIONS ================================ */
+/* ============================ sync & scroll ============================ */
 
 function syncCardHeights() {
     const q = document.querySelector("#promptBox");
@@ -652,11 +297,337 @@ function scrollToBottom() {
             top: document.body.scrollHeight,
             behavior: "smooth"
         });
-    }, 50);
+    }, 40);
 }
 
 
-/* ============================ VOICE TESTING ================================ */
+/* ============================ CARD RENDERING ============================ */
+
+function setCard(entry, fromHistory = false) {
+
+    if (!fromHistory) pushToHistory(entry);
+
+    state.current = entry;
+    state.startedAt = Date.now();
+    state.revealedAt = null;
+
+    /* -------- Fortschrittsbalken -------- */
+    const stats = document.querySelector("#lessonStats");
+    if (stats) {
+        const cards = state.lessons.get(entry.lesson) || [];
+        const total = cards.length;
+        const prog = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
+
+        const green = total > 0 ? (prog.known / total) * 100 : 0;
+        const red   = total > 0 ? (prog.unknown / total) * 100 : 0;
+
+        stats.innerHTML = `
+            <div class="lesson-bar-large">
+                <div class="lesson-bar-red"   style="width:${red}%"></div>
+                <div class="lesson-bar-green" style="left:${red}%; width:${green}%"></div>
+            </div>
+        `;
+    }
+
+    /* -------- Karte anzeigen -------- */
+    const sol = $("#solBox");
+    sol.classList.add("masked");
+
+    if (state.mode === "zh2de") {
+        /* ---- CH → DE (mit Pinyin in Fragekarte) ---- */
+
+        $("#promptWord").innerHTML = entry.word.zh || "—";
+
+        $("#promptWordSub").innerHTML = entry.word.py
+            ? `<span class="pinyin-word">${entry.word.py}</span>`
+            : "";
+
+        $("#promptPOS").textContent = entry.pos || "";
+
+        $("#promptSent").innerHTML =
+            `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
+
+        $("#solWord").textContent = entry.word.de;
+        $("#solSent").textContent = entry.sent.de;
+
+    } else {
+        /* ---- DE → CH (kein Pinyin in Fragekarte!) ---- */
+
+        $("#promptWord").textContent = entry.word.de || "—";
+        $("#promptWordSub").innerHTML = "";
+        $("#promptPOS").textContent = entry.pos || "";
+        $("#promptSent").textContent = entry.sent.de || "—";
+
+        /* Lösung IMMER CH + Pinyin */
+        $("#solWord").innerHTML =
+            `${entry.word.zh}<br><span class="zh-pinyin">${entry.word.py}</span>`;
+        $("#solSent").innerHTML =
+            `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
+    }
+
+    /* -------- Buttons setzen -------- */
+    $("#btnReveal").disabled = false;
+
+    hideRatingButtons();
+    showNavButtons();
+    updateNavButtons();
+
+    syncCardHeights();
+}
+
+
+/* ============================ HISTORY / NAV ============================ */
+
+function pushToHistory(entry) {
+    if (state.historyPos < state.history.length - 1) {
+        state.history = state.history.slice(0, state.historyPos + 1);
+    }
+    state.history.push(entry);
+    state.historyPos = state.history.length - 1;
+}
+
+function updateNavButtons() {
+    $("#btnPrev").disabled = state.historyPos <= 0;
+    $("#btnNext").disabled = state.pool.length === 0;
+}
+
+function nextCard() {
+
+    if (!state.pool.length) return;
+
+    if (state.historyPos < state.history.length - 1) {
+        state.historyPos++;
+        setCard(state.history[state.historyPos], true);
+        syncCardHeights();
+        return;
+    }
+
+    let next;
+
+    if (state.order === "seq") {
+        if (state.idx == null) state.idx = 0;
+        else state.idx = (state.idx + 1) % state.pool.length;
+        next = state.pool[state.idx];
+    } else {
+        next = state.pool[Math.floor(Math.random() * state.pool.length)];
+    }
+
+    setCard(next);
+    syncCardHeights();
+}
+
+function prevCard() {
+    if (state.historyPos > 0) {
+        state.historyPos--;
+        setCard(state.history[state.historyPos], true);
+    }
+    updateNavButtons();
+    syncCardHeights();
+}
+
+
+/* ============================ NAV SHOW/HIDE ============================ */
+
+function hideNavButtons() {
+    if (state.autoplay.on) return;   // Autoplay braucht Navigation!
+    $("#btnPrev").style.display = "none";
+    $("#btnReveal").style.display = "none";
+    $("#btnNext").style.display = "none";
+}
+
+function showNavButtons() {
+    $("#btnPrev").style.display = "";
+    $("#btnReveal").style.display = "";
+    $("#btnNext").style.display = "";
+}
+
+
+/* ============================ REVEAL / RATING ============================ */
+
+function doReveal() {
+    $("#solBox").classList.remove("masked");
+    state.revealedAt = Date.now();
+
+    if (!state.autoplay.on) hideNavButtons();
+
+    showRatingButtons();
+    enableRating();
+    syncCardHeights();
+}
+
+function showRatingButtons() {
+    $("#rateBar").style.display = "flex";
+}
+
+function hideRatingButtons() {
+    $("#rateBar").style.display = "none";
+}
+
+function enableRating() {
+    $("#btnRateKnown").disabled = false;
+    $("#btnRateUnsure").disabled = false;
+    $("#btnRateUnknown").disabled = false;
+}
+
+function disableRating() {
+    $("#btnRateKnown").disabled = true;
+    $("#btnRateUnsure").disabled = true;
+    $("#btnRateUnknown").disabled = true;
+}
+
+function rate(mark) {
+
+    if (!state.current) return;
+
+    state.session.done++;
+
+    if (mark === "known") state.session.known++;
+    else if (mark === "unsure") state.session.unsure++;
+    else state.session.unknown++;
+
+    const lesson = state.current.lesson;
+
+    if (lesson) {
+        if (!state.progress.byLesson[lesson])
+            state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
+
+        if (mark === "known")   state.progress.byLesson[lesson].known++;
+        if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
+
+        saveProgress();
+    }
+
+    disableRating();
+    hideRatingButtons();
+    showNavButtons();
+
+    nextCard();
+}
+
+
+/* ============================ SESSION STATS ============================ */
+
+function renderSessionStats() {
+    const s = state.session;
+
+    const avg = s.ttrCount
+        ? (s.ttrSum / s.ttrCount / 1000).toFixed(1)
+        : "—";
+
+    const acc = s.done
+        ? `${Math.round((s.known / s.done) * 100)}%`
+        : "—";
+
+    $("#sessionStats").textContent =
+        `Karten: ${s.done}/${s.total} · Korrekt: ${acc} · Aufdeck-Zeit: ${avg}s`;
+}
+
+
+/* ============================ TRAINING ============================ */
+
+function startTraining() {
+
+    if (!state.trainingOn) {
+
+        state.history = [];
+        state.historyPos = -1;
+
+        state.selectedLessons.clear();
+        const sel = $("#lessonSelect");
+
+        const picked = [];
+        for (const o of sel.selectedOptions) {
+            state.selectedLessons.add(o.value);
+            picked.push(o.value);
+        }
+
+        state.settings.lessons = picked;
+        saveSettings();
+
+        gatherPool();
+
+        if (!state.pool.length) {
+            alert("Bitte zuerst Lektionen auswählen.");
+            return;
+        }
+
+        if (state.order === "seq") {
+            state.idx = 0;
+            setCard(state.pool[state.idx]);
+        } else {
+            const first = state.pool[Math.floor(Math.random() * state.pool.length)];
+            setCard(first);
+        }
+
+        state.trainingOn = true;
+        updateTrainingBtn();
+
+        scrollToBottom();
+
+    } else {
+        stopTraining();
+    }
+}
+
+function stopTraining() {
+    state.trainingOn = false;
+    updateTrainingBtn();
+
+    $("#btnPrev").disabled = true;
+    $("#btnReveal").disabled = true;
+    $("#btnNext").disabled = true;
+
+    disableRating();
+    hideRatingButtons();
+
+    $("#solBox").classList.add("masked");
+}
+
+function updateTrainingBtn() {
+    $("#btnStart").textContent =
+        state.trainingOn ? "Training stoppen ■" : "Training starten ▶";
+}
+
+
+/* ========================================================================== */
+/*                                ENDE TEIL 2                                 */
+/* ========================================================================== */
+
+/* ========================================================================== */
+/*                           TEIL 3 – TTS & AUTOPLAY                          */
+/* ========================================================================== */
+
+
+/* ============================ TTS PRIME DELAY ============================ */
+
+function ttsPrime(cb) {
+    setTimeout(cb, 120);
+}
+
+
+/* ============================ BUILD UTTERANCE ============================ */
+
+function buildUtterance(text, langKey) {
+
+    const u = new SpeechSynthesisUtterance(text || "");
+    u.lang = (langKey === "zh") ? "zh-CN" : "de-DE";
+
+    if (langKey === "zh") {
+        u.rate  = state.rateZh;
+        u.pitch = state.pitchZh;
+    } else {
+        u.rate  = state.rateDe;
+        u.pitch = state.pitchDe;
+    }
+
+    const chosen = (langKey === "zh") ? state.browserVoice.zh : state.browserVoice.de;
+    if (chosen) u.voice = chosen;
+
+    return u;
+}
+
+
+/* ============================ DETECT VOICES ============================ */
 
 function isZhVoice(v) {
     const L = (v.lang || "").toLowerCase();
@@ -673,23 +644,83 @@ function isDeVoice(v) {
     return L.startsWith("de");
 }
 
+
+/* ============================ REFRESH VOICES ============================ */
+
+function refreshVoices() {
+
+    state.voices = window.speechSynthesis.getVoices() || [];
+
+    if (state.settings.browserVoiceZh) {
+        const vz = state.voices.find(v =>
+            v.name === state.settings.browserVoiceZh ||
+            v.voiceURI === state.settings.browserVoiceZh
+        );
+        if (vz) state.browserVoice.zh = vz;
+    }
+
+    if (state.settings.browserVoiceDe) {
+        const vd = state.voices.find(v =>
+            v.name === state.settings.browserVoiceDe ||
+            v.voiceURI === state.settings.browserVoiceDe
+        );
+        if (vd) state.browserVoice.de = vd;
+    }
+
+    updateVoiceList();
+}
+
+
+/* ============================ VOICE PANEL ============================ */
+
+let voiceRetryTimer = null;
+
+function openVoicesPanelFor(target) {
+    state.voicePanelTarget = target;
+    refreshVoices();
+
+    if (!state.voices.length) {
+        clearTimeout(voiceRetryTimer);
+        let tries = 0;
+
+        const attempt = () => {
+            tries++;
+            refreshVoices();
+            if (state.voices.length || tries >= 10) return;
+            voiceRetryTimer = setTimeout(attempt, 200);
+        };
+
+        voiceRetryTimer = setTimeout(attempt, 200);
+    }
+
+    $("#voicePanel").classList.remove("hidden");
+}
+
+function closeVoices() {
+    $("#voicePanel").classList.add("hidden");
+}
+
+
+/* ============================ UPDATE VOICE LIST ============================ */
+
 function updateVoiceList() {
-    const box = $('#dbgVoices');
+    const box = $("#dbgVoices");
     if (!box) return;
 
     box.innerHTML = "";
 
     const list = (state.voices || []).filter(v =>
-        state.voicePanelTarget === 'zh' ? isZhVoice(v) : isDeVoice(v)
+        state.voicePanelTarget === "zh" ? isZhVoice(v) : isDeVoice(v)
     );
 
-    if (list.length === 0) {
+    if (!list.length) {
         box.innerHTML = "<div>Keine passenden Stimmen gefunden.</div>";
         return;
     }
 
     list.forEach(v => {
-        const row = document.createElement("div");
+
+        const row  = document.createElement("div");
         row.className = "voice";
 
         const name = document.createElement("div");
@@ -698,33 +729,36 @@ function updateVoiceList() {
 
         const meta = document.createElement("div");
         meta.className = "meta";
-        meta.textContent = `${v.lang || ""}${v.default ? " · default" : ""}`;
+        meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
 
         const actions = document.createElement("div");
-        actions.style.marginLeft = "auto";
         actions.style.display = "flex";
         actions.style.gap = "6px";
+        actions.style.marginLeft = "auto";
 
-        const pick = document.createElement("button");
-        pick.className = "btn";
-        pick.textContent = "Diese Stimme wählen";
+        const btnPick = document.createElement("button");
+        btnPick.className = "btn";
+        btnPick.textContent = "Diese Stimme wählen";
 
-        pick.onclick = () => {
+        btnPick.onclick = () => {
             if (state.voicePanelTarget === "zh") {
                 state.browserVoice.zh = v;
-                state.settings.browserVoiceZh = v.name || v.voiceURI;
+                state.settings.browserVoiceZh =
+                    v.name || v.voiceURI;
             } else {
                 state.browserVoice.de = v;
-                state.settings.browserVoiceDe = v.name || v.voiceURI;
+                state.settings.browserVoiceDe =
+                    v.name || v.voiceURI;
             }
             saveSettings();
-            updateVoiceList();
+            closeVoices();
         };
 
-        const test = document.createElement("button");
-        test.className = "btn ghost";
-        test.textContent = "Probehören";
-        test.onclick = () => {
+        const btnTest = document.createElement("button");
+        btnTest.className = "btn ghost";
+        btnTest.textContent = "Probehören";
+
+        btnTest.onclick = () => {
             const u = new SpeechSynthesisUtterance(
                 state.voicePanelTarget === "zh"
                     ? "这是一个测试。"
@@ -732,21 +766,21 @@ function updateVoiceList() {
             );
             u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
             u.voice = v;
-
-            try { speechSynthesis.cancel(); } catch (e) {}
+            speechSynthesis.cancel();
             speechSynthesis.speak(u);
         };
 
-        const active =
-            state.voicePanelTarget === "zh"
-                ? state.browserVoice.zh
-                : state.browserVoice.de;
+        const active = state.voicePanelTarget === "zh"
+            ? state.browserVoice.zh
+            : state.browserVoice.de;
 
-        if (active && (active.name === v.name || active.voiceURI === v.voiceURI))
+        if (active &&
+            (active.name === v.name || active.voiceURI === v.voiceURI)) {
             name.textContent += " • [Aktiv]";
+        }
 
-        actions.appendChild(pick);
-        actions.appendChild(test);
+        actions.appendChild(btnPick);
+        actions.appendChild(btnTest);
 
         row.appendChild(name);
         row.appendChild(meta);
@@ -757,187 +791,22 @@ function updateVoiceList() {
 }
 
 
-function refreshVoices() {
-    state.voices = window.speechSynthesis?.getVoices?.() || [];
-
-    if (state.settings.browserVoiceZh) {
-        const vz = state.voices.find(
-            x =>
-                x.name === state.settings.browserVoiceZh ||
-                x.voiceURI === state.settings.browserVoiceZh
-        );
-        if (vz) state.browserVoice.zh = vz;
-    }
-
-    if (state.settings.browserVoiceDe) {
-        const vd = state.voices.find(
-            x =>
-                x.name === state.settings.browserVoiceDe ||
-                x.voiceURI === state.settings.browserVoiceDe
-        );
-        if (vd) state.browserVoice.de = vd;
-    }
-
-    updateVoiceList();
-}
-
-
-/* ============================ VOICE PANEL ================================= */
-
-let _voicesRetryT = null;
-
-function openVoicesPanelFor(target) {
-    state.voicePanelTarget = target;
-    refreshVoices();
-
-    if (!state.voices || state.voices.length === 0) {
-        clearTimeout(_voicesRetryT);
-        let tries = 0;
-
-        const tick = () => {
-            tries++;
-            refreshVoices();
-
-            if (state.voices.length > 0 || tries >= 10) return;
-            _voicesRetryT = setTimeout(tick, 200);
-        };
-
-        _voicesRetryT = setTimeout(tick, 200);
-    }
-
-    $('#voicePanel').classList.remove('hidden');
-}
-
-function closeVoices() {
-    $('#voicePanel').classList.add('hidden');
-}
-
-
-/* ============================ TTS BUILDER ================================= */
-
-function ttsPrime(cb) {
-    setTimeout(cb, 150);
-}
-
-function buildUtterance(text, langKey) {
-    const lang = langKey === "zh" ? "zh-CN" : "de-DE";
-    const u = new SpeechSynthesisUtterance(text || "");
-    u.lang = lang;
-
-    if (langKey === "zh") {
-        u.rate = state.rateZh;
-        u.pitch = state.pitchZh;
-    } else {
-        u.rate = state.rateDe;
-        u.pitch = state.pitchDe;
-    }
-
-    const chosen =
-        langKey === "zh" ? state.browserVoice.zh : state.browserVoice.de;
-
-    if (chosen) {
-        u.voice = chosen;
-    } else {
-        const cand = (state.voices || []).filter(v =>
-            (v.lang || "").toLowerCase().startsWith(langKey)
-        );
-        u.voice = cand.find(v => v.default) || cand[0] || null;
-    }
-
-    return u;
-}
-
-
-/* ============================ NATIVE MANDARIN PACK ======================== */
-
-const VOICE_PACK = {
-    female1: "zh-CN-XiaoxiaoNeural",
-    female2: "zh-CN-XiaochenNeural",
-    male1: "zh-CN-YunxiNeural",
-    male2: "zh-CN-YunyangNeural"
-};
-
-let NATIVE_TTS_ENDPOINT = "";
-let nativeVoiceChoice = "female1";
-const nativeAudioCache = new Map();
-
-async function nativeMandarinSpeak(text) {
-    if (!text) return;
-
-    if (!NATIVE_TTS_ENDPOINT) {
-        const u = buildUtterance(text, "zh");
-        speechSynthesis.speak(u);
-        return;
-    }
-
-    const cacheKey = nativeVoiceChoice + "\n" + text;
-    if (nativeAudioCache.has(cacheKey)) {
-        const audio = new Audio(nativeAudioCache.get(cacheKey));
-        audio.play();
-        return;
-    }
-
-    try {
-        const res = await fetch(NATIVE_TTS_ENDPOINT, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                text: text,
-                voice: VOICE_PACK[nativeVoiceChoice]
-            })
-        });
-
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-
-        nativeAudioCache.set(cacheKey, url);
-
-        const audio = new Audio(url);
-        audio.play();
-
-    } catch (e) {
-        const u = buildUtterance(text, "zh");
-        speechSynthesis.speak(u);
-    }
-}
-
-
-/* ============================ TTS PLAYBACK ================================ */
-
-function ttsSpeak(text, langKey) {
-    const u = buildUtterance(text, langKey);
-    speechSynthesis.speak(u);
-    return u;
-}
-
-function playSequence(firstText, firstLangKey, secondText, secondLangKey) {
-    ttsPrime(() => {
-        try { speechSynthesis.cancel(); } catch (e) {}
-
-        ttsSpeak(firstText, firstLangKey);
-
-        setTimeout(() => {
-            ttsSpeak(secondText, secondLangKey);
-        }, 800);
-    });
-}
+/* ============================ PLAY QUESTION / ANSWER ============================ */
 
 function playQuestion() {
     if (!state.current) return;
 
     if (state.mode === "de2zh") {
         playSequence(
-            state.current.word.de,
-            "de",
-            state.current.sent.de,
-            "de"
+            state.current.word.de, "de",
+            state.current.sent.de, "de"
         );
     } else {
-        nativeMandarinSpeak(state.current.word.zh);
-        setTimeout(
-            () => nativeMandarinSpeak(state.current.sent.zh),
-            700
-        );
+        speechSynthesis.cancel();
+        ttsSpeak(state.current.word.zh, "zh");
+        setTimeout(() =>
+            ttsSpeak(state.current.sent.zh, "zh"),
+        600);
     }
 }
 
@@ -945,33 +814,46 @@ function playAnswer() {
     if (!state.current) return;
 
     if (state.mode === "de2zh") {
-        nativeMandarinSpeak(state.current.word.zh);
-        setTimeout(
-            () => nativeMandarinSpeak(state.current.sent.zh),
-            700
-        );
+        ttsSpeak(state.current.word.zh, "zh");
+        setTimeout(() =>
+            ttsSpeak(state.current.sent.zh, "zh"),
+        600);
     } else {
         playSequence(
-            state.current.word.de,
-            "de",
-            state.current.sent.de,
-            "de"
+            state.current.word.de, "de",
+            state.current.sent.de, "de"
         );
     }
 }
 
 
-/* ============================ AUTOPLAY =================================== */
+/* ============================ SEQUENCED PLAYBACK ============================ */
+
+function ttsSpeak(text, langKey) {
+    const u = buildUtterance(text, langKey);
+    speechSynthesis.speak(u);
+    return u;
+}
+
+function playSequence(a, aLang, b, bLang) {
+    ttsPrime(() => {
+        speechSynthesis.cancel();
+        ttsSpeak(a, aLang);
+        setTimeout(() => ttsSpeak(b, bLang), 700);
+    });
+}
+
+
+/* ============================ AUTOPLAY ============================ */
 
 function setAutoplay(on) {
+
     state.autoplay.on = on;
 
     if (!on) {
-        try { speechSynthesis.cancel(); } catch (e) {}
-
-        state.autoplay.timers.forEach(id => clearTimeout(id));
+        speechSynthesis.cancel();
+        state.autoplay.timers.forEach(x => clearTimeout(x));
         state.autoplay.timers = [];
-
         releaseWakeLock();
     }
 
@@ -979,33 +861,69 @@ function setAutoplay(on) {
 }
 
 function updateAutoplayBtn() {
-    const b = $('#btnAutoplay');
-    if (!b) return;
-
-    b.textContent = state.autoplay.on
-        ? "Autoplay ■ Stop"
-        : "Autoplay ▶︎";
+    $("#btnAutoplay").textContent =
+        state.autoplay.on ? "Autoplay ■ Stop" : "Autoplay ▶︎";
 }
 
+
+function ensurePoolForAutoplay() {
+
+    if (state.pool.length) return true;
+
+    if (!state.settings.lessons.length) {
+
+        const sel = $("#lessonSelect");
+        const picked = [];
+
+        for (const o of sel.selectedOptions) picked.push(o.value);
+
+        state.settings.lessons = picked;
+        saveSettings();
+    }
+
+    gatherPoolFromSettings();
+
+    if (!state.pool.length) {
+        alert("Bitte Lektionen wählen.");
+        return false;
+    }
+
+    if (state.order === "seq") {
+        state.idx = 0;
+        setCard(state.pool[state.idx]);
+    } else {
+        const r = state.pool[Math.floor(Math.random() * state.pool.length)];
+        setCard(r);
+    }
+
+    return true;
+}
+
+
 function speakPair(word, sent, langKey, done) {
+
     if (!state.autoplay.on) return;
 
     const u1 = buildUtterance(word, langKey);
 
     u1.onend = () => {
+
         if (!state.autoplay.on) return;
 
         const t = setTimeout(() => {
+
             if (!state.autoplay.on) return;
 
             const u2 = buildUtterance(sent, langKey);
+
             u2.onend = () => {
                 if (!state.autoplay.on) return;
                 done && done();
             };
 
             speechSynthesis.speak(u2);
-        }, 800);
+
+        }, 650);
 
         state.autoplay.timers.push(t);
     };
@@ -1013,73 +931,48 @@ function speakPair(word, sent, langKey, done) {
     speechSynthesis.speak(u1);
 }
 
-function ensurePoolForAutoplay() {
-    if (state.pool.length > 0) return true;
-
-    if (!state.settings.lessons || state.settings.lessons.length === 0) {
-        const sel = $('#lessonSelect');
-        const picked = [];
-
-        for (const o of sel?.selectedOptions || []) picked.push(o.value);
-
-        if (picked.length > 0) {
-            state.settings.lessons = picked;
-            saveSettings();
-        }
-    }
-
-    gatherPoolFromSettings();
-
-    if (!state.pool.length) {
-        alert("Bitte Lektionen wählen, bevor Autoplay startet.");
-        return false;
-    }
-
-    if (state.order === "seq") {
-        state.idx = 0;
-        setCard(state.pool[state.idx]);
-        syncCardHeights();
-    } else {
-        setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
-        syncCardHeights();
-    }
-
-    return true;
-}
 
 function autoplayStep() {
+
     if (!state.autoplay.on) return;
+
     if (!ensurePoolForAutoplay()) {
         setAutoplay(false);
         return;
     }
 
-    $('#solBox').classList.add('masked');
+    $("#solBox").classList.add("masked");
     disableRating();
 
-    const qLang = state.mode === "de2zh" ? "de" : "zh";
-    const aLang = state.mode === "de2zh" ? "zh" : "de";
+    const qLang = (state.mode === "de2zh") ? "de" : "zh";
+    const aLang = (state.mode === "de2zh") ? "zh" : "de";
 
     ttsPrime(() => {
-        try { speechSynthesis.cancel(); } catch (e) {}
+
+        speechSynthesis.cancel();
 
         speakPair(
             state.current.word[qLang],
             state.current.sent[qLang],
             qLang,
+
             () => {
+
                 if (!state.autoplay.on) return;
 
-                $('#solBox').classList.remove('masked');
+                $("#solBox").classList.remove("masked");
 
                 speakPair(
                     state.current.word[aLang],
                     state.current.sent[aLang],
                     aLang,
+
                     () => {
+
                         if (!state.autoplay.on) return;
 
                         const t = setTimeout(() => {
+
                             if (!state.autoplay.on) return;
 
                             if (state.order === "seq") {
@@ -1087,11 +980,10 @@ function autoplayStep() {
                                 else state.idx = (state.idx + 1) % state.pool.length;
 
                                 setCard(state.pool[state.idx]);
-                                syncCardHeights();
-
                             } else {
-                                setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
-                                syncCardHeights();
+                                setCard(
+                                    state.pool[Math.floor(Math.random() * state.pool.length)]
+                                );
                             }
 
                             autoplayStep();
@@ -1103,19 +995,20 @@ function autoplayStep() {
                 );
             }
         );
+
     });
 }
 
+
 function toggleAutoplay() {
+
     if (!state.autoplay.on) {
 
-        // Pool sicherstellen
         if (!ensurePoolForAutoplay()) return;
 
         setAutoplay(true);
         requestWakeLock();
 
-        // ✅ AUTOPLAY-FIX: erste Karte laden, falls noch keine angezeigt wurde
         if (!state.current) {
             if (state.order === "seq") {
                 state.idx = 0;
@@ -1124,9 +1017,6 @@ function toggleAutoplay() {
                 const first = state.pool[Math.floor(Math.random() * state.pool.length)];
                 setCard(first);
             }
-
-            syncCardHeights();
-            scrollToBottom();
         }
 
         scrollToBottom();
@@ -1138,17 +1028,15 @@ function toggleAutoplay() {
 }
 
 
-/* ============================ WAKE LOCK ================================== */
+/* ============================ WAKE LOCK ============================ */
 
 async function requestWakeLock() {
     try {
         if ('wakeLock' in navigator && !state.wakeLock) {
             state.wakeLock = await navigator.wakeLock.request("screen");
-
             state.wakeLock.addEventListener?.("release", () => {
                 state.wakeLock = null;
             });
-
             document.addEventListener("visibilitychange", onVisibilityChange, {
                 passive: true
             });
@@ -1183,74 +1071,69 @@ function stopAutoplayOnUserAction() {
 }
 
 
-/* -------------------------------------------------------------------------- */
+/* ========================================================================== */
 /*                                ENDE TEIL 3                                 */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                               TEIL 4 von 4                                 */
-/*                 Event Listener · Mode Switch · Init Routine                */
-/* -------------------------------------------------------------------------- */
-
-
-/* ============================ MODE + UI ================================== */
+/* ========================================================================== */
+``
+/* ========================================================================== */
+/*                           TEIL 4 – INIT & EVENTS                           */
+/* ========================================================================== */
 
 function renderModeUI() {
-    const left = $('#modeLeft');
-    const right = $('#modeRight');
+    const left  = $("#modeLeft");
+    const right = $("#modeRight");
 
-    if (!left || !right) return;
-
-    if (state.mode === 'de2zh') {
-        left.textContent = "🇩🇪 DE";
+    if (state.mode === "de2zh") {
+        left.textContent  = "🇩🇪 DE";
         right.textContent = "🇨🇳 ZH";
     } else {
-        left.textContent = "🇨🇳 ZH";
+        left.textContent  = "🇨🇳 ZH";
         right.textContent = "🇩🇪 DE";
     }
 
-    $('#btnOrderToggle').textContent =
-        "Reihenfolge: " + (state.order === 'seq' ? "Sequenziell" : "Zufällig");
+    $("#btnOrderToggle").textContent =
+        "Reihenfolge: " +
+        (state.order === "seq" ? "Sequenziell" : "Zufällig");
 
     updateTrainingBtn();
 }
 
 
-/* ============================ DOM INIT =================================== */
+/* ========================================================================== */
+/*                                INIT HANDLER                                */
+/* ========================================================================== */
 
 window.addEventListener("DOMContentLoaded", () => {
-    console.log("[INIT] DOM geladen – Initialisierung startet…");
 
+    console.log("[INIT] Start");
+
+    /* SETTINGS + PROGRESS LADEN */
     loadSettings();
     loadProgress();
 
-    state.mode = state.settings.mode || 'de2zh';
-    state.order = state.settings.order || 'random';
+    state.mode  = state.settings.mode  || "de2zh";
+    state.order = state.settings.order || "random";
+    state.autoplay.gapMs = state.settings.autoplayGap || 800;
 
-    state.autoplay.gapMs =
-        typeof state.settings.autoplayGap === 'number'
-            ? state.settings.autoplayGap
-            : 800;
-
-    state.rateDe = state.settings.rateDe;
+    state.rateDe  = state.settings.rateDe;
     state.pitchDe = state.settings.pitchDe;
-    state.rateZh = state.settings.rateZh;
+    state.rateZh  = state.settings.rateZh;
     state.pitchZh = state.settings.pitchZh;
 
     renderModeUI();
 
-    console.log("[INIT] CSV-Import wird gestartet…");
+    /* CSV LADEN */
+    console.log("[INIT] CSV laden…");
     loadCSV();
 
 
-    /* === Autoplay-Button stabil neben Training-Button platzieren === */
-
+    /* AUTOPLAY-BUTTON neben Training-Button einfügen */
     (function placeAutoplayButton() {
         const trainingBtn = document.querySelector("#btnStart");
         const autoplayBtn = document.querySelector("#btnAutoplay");
 
         if (!trainingBtn || !autoplayBtn) {
-            console.warn("[UI] Training oder Autoplay Button nicht gefunden.");
+            console.warn("[UI] Training/Autoplay Button fehlt.");
             return;
         }
 
@@ -1260,187 +1143,211 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!group) {
             group = document.createElement("div");
             group.className = "training-group";
-
             parent.insertBefore(group, trainingBtn);
             group.appendChild(trainingBtn);
         }
 
         group.appendChild(autoplayBtn);
         autoplayBtn.classList.add("primary");
-
-        console.log("[UI] Autoplay-Button stabil neben Training-Button platziert.");
     })();
 
 
-    /* ============================ BUTTON EVENTS =========================== */
+    /* ====================================================================== */
+    /*                              EVENT LISTENER                             */
+    /* ====================================================================== */
 
-    // Richtungswechsel
-    $('#btnSwapMode').addEventListener("click", () => {
+    /* —— Moduswechsel —— */
+    $("#btnSwapMode").addEventListener("click", () => {
         stopAutoplayOnUserAction();
-        state.mode = state.mode === 'de2zh' ? 'zh2de' : 'de2zh';
+
+        state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
         state.settings.mode = state.mode;
         saveSettings();
+
         renderModeUI();
+
         if (state.current) setCard(state.current);
     });
 
-    // Reihenfolge
-    $('#btnOrderToggle').addEventListener("click", () => {
+    /* —— Reihenfolge —— */
+    $("#btnOrderToggle").addEventListener("click", () => {
         stopAutoplayOnUserAction();
+
         state.order = state.order === "random" ? "seq" : "random";
         state.settings.order = state.order;
         saveSettings();
+
         renderModeUI();
     });
 
-    // Autoplay
-    $('#btnAutoplay').addEventListener("click", () => {
+    /* —— Autoplay —— */
+    $("#btnAutoplay").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
         toggleAutoplay();
     });
 
-    // Gap Slider
-    $('#gapRange').addEventListener("input", e => {
+    /* —— Pausen-Slider —— */
+    $("#gapRange").addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
         state.settings.autoplayGap = state.autoplay.gapMs;
-        $('#gapVal').textContent = `(${s.toFixed(1)} s)`;
+
+        $("#gapVal").textContent = `(${s.toFixed(1)} s)`;
         saveSettings();
     });
 
 
-    /* ---- Voice Controls ---- */
+    /* ====================================================================== */
+    /*                            VOICE PANEL & SLIDER                         */
+    /* ====================================================================== */
 
-    $('#btnVoiceDe').addEventListener("click", () => {
+    $("#btnVoiceDe").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         openVoicesPanelFor("de");
     });
-    $('#btnVoiceZh').addEventListener("click", () => {
+
+    $("#btnVoiceZh").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         openVoicesPanelFor("zh");
     });
-    $('#btnCloseVoices').addEventListener("click", closeVoices);
 
-    // Rate / Pitch German
-    $('#rateDeRange').addEventListener("input", e => {
+    $("#btnCloseVoices").addEventListener("click", closeVoices);
+
+    /* Rate/Pitch DE */
+    $("#rateDeRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.rateDe = parseFloat(e.target.value);
         state.settings.rateDe = state.rateDe;
-        $('#rateDeVal').textContent = `(${state.rateDe.toFixed(2)})`;
+        $("#rateDeVal").textContent = `(${state.rateDe.toFixed(2)})`;
         saveSettings();
     });
-    $('#pitchDeRange').addEventListener("input", e => {
+
+    $("#pitchDeRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.pitchDe = parseFloat(e.target.value);
         state.settings.pitchDe = state.pitchDe;
-        $('#pitchDeVal').textContent = `(${state.pitchDe.toFixed(2)})`;
+        $("#pitchDeVal").textContent = `(${state.pitchDe.toFixed(2)})`;
         saveSettings();
     });
 
-    // Rate / Pitch Chinese
-    $('#rateZhRange').addEventListener("input", e => {
+    /* Rate/Pitch ZH */
+    $("#rateZhRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.rateZh = parseFloat(e.target.value);
         state.settings.rateZh = state.rateZh;
-        $('#rateZhVal').textContent = `(${state.rateZh.toFixed(2)})`;
+        $("#rateZhVal").textContent = `(${state.rateZh.toFixed(2)})`;
         saveSettings();
     });
-    $('#pitchZhRange').addEventListener("input", e => {
+
+    $("#pitchZhRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.pitchZh = parseFloat(e.target.value);
         state.settings.pitchZh = state.pitchZh;
-        $('#pitchZhVal').textContent = `(${state.pitchZh.toFixed(2)})`;
+        $("#pitchZhVal").textContent = `(${state.pitchZh.toFixed(2)})`;
         saveSettings();
     });
 
 
-    /* ---- Training ---- */
+    /* ====================================================================== */
+    /*                                 TRAINING                                */
+    /* ====================================================================== */
 
-    $('#btnStart').addEventListener("click", () => {
+    $("#btnStart").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
     });
 
-    $('#btnNext').addEventListener("click", () => {
+    $("#btnNext").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         nextCard();
     });
 
-    $('#btnPrev').addEventListener("click", () => {
+    $("#btnPrev").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         prevCard();
     });
 
-    $('#btnReveal').addEventListener("click", () => {
+    $("#btnReveal").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         doReveal();
     });
 
-
-    /* ---- NEW SPEAKER ICONS ---- */
-
-    $('#speakerQuestion').addEventListener("click", () => {
+    /* Lautsprecher */
+    $("#speakerQuestion").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playQuestion();
     });
 
-    $('#speakerAnswer').addEventListener("click", () => {
+    $("#speakerAnswer").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playAnswer();
     });
 
 
-    /* ---- Rating ---- */
+    /* ====================================================================== */
+    /*                                 RATING                                  */
+    /* ====================================================================== */
 
-    $('#btnRateKnown').addEventListener("click", () => {
+    $("#btnRateKnown").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("known");
     });
-    $('#btnRateUnsure').addEventListener("click", () => {
+
+    $("#btnRateUnsure").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("unsure");
     });
-    $('#btnRateUnknown').addEventListener("click", () => {
+
+    $("#btnRateUnknown").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("unknown");
     });
 
 
-    /* ---- Lessons ---- */
+    /* ====================================================================== */
+    /*                                LESSON MGMT                              */
+    /* ====================================================================== */
 
-    $('#btnUseLessons').addEventListener("click", () => {
+    $("#btnUseLessons").addEventListener("click", () => {
         stopAutoplayOnUserAction();
 
-        const sel = $('#lessonSelect');
+        const sel = $("#lessonSelect");
         const picked = [];
 
         for (const o of sel.selectedOptions) picked.push(o.value);
 
         state.settings.lessons = picked;
         saveSettings();
+
         gatherPoolFromSettings();
     });
 
-    $('#btnClearLessons').addEventListener("click", () => {
+    $("#btnClearLessons").addEventListener("click", () => {
         stopAutoplayOnUserAction();
 
-        state.selectedLessons.clear();
         state.settings.lessons = [];
         saveSettings();
 
+        state.selectedLessons.clear();
         state.pool = [];
         state.idx = null;
+
         resetSessionStats();
 
-        const sel = $('#lessonSelect');
+        const sel = $("#lessonSelect");
         for (const o of sel.options) o.selected = false;
 
         if (state.trainingOn) stopTraining();
     });
 
 
-    /* ---- Export / Import ---- */
+    /* ====================================================================== */
+    /*                              IMPORT / EXPORT                            */
+    /* ====================================================================== */
 
-    $('#btnExport').addEventListener("click", () => {
+    $("#btnExport").addEventListener("click", () => {
         const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
             type: "application/json"
         });
@@ -1450,16 +1357,17 @@ window.addEventListener("DOMContentLoaded", () => {
         a.download = "progress.json";
         a.click();
 
-        setTimeout(() => URL.revokeObjectURL(a.href), 600);
+        setTimeout(() => URL.revokeObjectURL(a.href), 300);
     });
 
-    $('#fileImport').addEventListener("change", e => {
+    $("#fileImport").addEventListener("change", (e) => {
         stopAutoplayOnUserAction();
 
         const f = e.target.files?.[0];
         if (!f) return;
 
         const r = new FileReader();
+
         r.onload = () => {
             try {
                 const p = JSON.parse(r.result);
@@ -1472,7 +1380,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     alert("Ungültiges Format.");
                 }
             } catch (err) {
-                alert("Import fehlgeschlagen: " + err.message);
+                alert("Fehler beim Import: " + err.message);
             }
         };
 
@@ -1480,10 +1388,9 @@ window.addEventListener("DOMContentLoaded", () => {
         e.target.value = "";
     });
 
-    console.log("[INIT] Alle Event Listener aktiviert. App bereit.");
+    console.log("[INIT] Bereit ✅");
 });
 
-
-/* -------------------------------------------------------------------------- */
-/*                             ENDE TEIL 4 (FINAL)                             */
-/* -------------------------------------------------------------------------- */
+/* ========================================================================== */
+/*                                ENDE TEIL 4                                 */
+/* ========================================================================== */
