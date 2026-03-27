@@ -382,10 +382,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-        180px   /* Lektionstitel */
-        60px    /* total */
-        80px    /* known */
-        90px    /* unknown */
+        100px   /* Lektionstitel */
+        40px    /* total */
+        60px    /* known */
+        60px    /* unknown */
         60px;   /* percent */
     gap: 12px;
     padding: 4px 6px;
