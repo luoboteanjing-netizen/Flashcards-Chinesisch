@@ -598,6 +598,15 @@ function stopTraining() {
     $('#solBox').classList.add('masked');
 }
 
+function scrollToBottom() {
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
+    }, 50);
+}
+
 
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
