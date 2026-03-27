@@ -532,8 +532,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 .zh-pinyin {
-    font-size: 24px !important; /* vorher 20px → +2px */
+    font-size: 20px !important; /* vorher 20px → +2px */
     line-height: 2.0;           /* passender Zeilenabstand */
     display: inline-block;
 }
 
+.pinyin-word {
+    font-size: 24px !important;
+    line-height: 1.4;
+}
