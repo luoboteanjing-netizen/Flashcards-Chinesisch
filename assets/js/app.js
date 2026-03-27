@@ -209,14 +209,23 @@ function parseCSV(text) {
 
 function populateLessonSelect() {
     const sel = $("#lessonSelect");
-    if (!sel) return;
+    const table = $("#lessonTable");
 
     sel.innerHTML = "";
-    const keys = state.lessonOrder;
+    table.innerHTML = "";
 
-    for (const k of keys) {
-        const opt = document.createElement("option");
-        opt.value = k;
+    const header = `
+        <div class="lt-row lt-head">
+            <span class="lt-lesson">Lektion</span>
+            <span class="lt-total">Karten</span>
+            <span class="lt-known">✅ Gewusst</span>
+            <span class="lt-unknown">❌ Nicht</span>
+            <span class="lt-percent">%</span>
+        </div>
+    `;
+    table.insertAdjacentHTML("beforeend", header);
+
+    for (const k of state.lessonOrder) {
 
         const cards = state.lessons.get(k) || [];
         const total = cards.length;
@@ -224,26 +233,37 @@ function populateLessonSelect() {
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
         const known   = p.known   || 0;
         const unknown = p.unknown || 0;
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        // ✅ Prozentzahl berechnen
-        const percent = total > 0 
-            ? Math.round((known / total) * 100)
-            : 0;
+        // Unter der Haube weiter Optionen befüllen (für Training)
+        const opt = document.createElement("option");
+        opt.value = k;
+        sel.appendChild(opt);
 
-        // ✅ Neue 5‑Spalten Ausgabe
-        opt.innerHTML = `
-            <span class="col-lesson">${k}</span>
-            <span class="col-total">${total}</span>
-            <span class="col-known">${known}</span>
-            <span class="col-unknown">${unknown}</span>
-            <span class="col-percent">${percent}%</span>
+        const row = document.createElement("div");
+        row.className = "lt-row";
+        row.dataset.lesson = k;
+
+        row.innerHTML = `
+            <span class="lt-lesson">${k}</span>
+            <span class="lt-total">${total}</span>
+            <span class="lt-known">${known}</span>
+            <span class="lt-unknown">${unknown}</span>
+            <span class="lt-percent">${percent}%</span>
         `;
 
+        row.addEventListener("click", () => {
+            opt.selected = !opt.selected;
+            row.classList.toggle("selected", opt.selected);
+        });
+
+        table.appendChild(row);
+
+        // vorauswahl anzeigen
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
+            row.classList.add("selected");
         }
-
-        sel.appendChild(opt);
     }
 }
 
