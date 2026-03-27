@@ -602,36 +602,10 @@ function stopTraining() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
-``
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
 /* -------------------------------------------------------------------------- */
-
-
-/* ============================ NEW FUNCTIONS ================================ */
-
-function syncCardHeights() {
-    const q = document.querySelector("#promptBox");
-    const a = document.querySelector("#solBox");
-    if (!q || !a) return;
-
-    q.style.minHeight = "";
-    a.style.minHeight = "";
-
-    const h = Math.max(q.offsetHeight, a.offsetHeight);
-    q.style.minHeight = h + "px";
-    a.style.minHeight = h + "px";
-}
-
-function scrollToBottom() {
-    setTimeout(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth"
-        });
-    }, 50);
-}
 
 
 /* ============================ VOICE TESTING ================================ */
@@ -650,6 +624,33 @@ function isDeVoice(v) {
     const L = (v.lang || "").toLowerCase();
     return L.startsWith("de");
 }
+
+
+/* ============================ APPLY SAVED VOICES =========================== */
+
+function applySavedVoices() {
+
+    // ZH Stimme wiederherstellen
+    if (state.settings.browserVoiceZh) {
+        const vz = state.voices.find(v =>
+            v.name === state.settings.browserVoiceZh ||
+            v.voiceURI === state.settings.browserVoiceZh
+        );
+        if (vz) state.browserVoice.zh = vz;
+    }
+
+    // DE Stimme wiederherstellen
+    if (state.settings.browserVoiceDe) {
+        const vd = state.voices.find(v =>
+            v.name === state.settings.browserVoiceDe ||
+            v.voiceURI === state.settings.browserVoiceDe
+        );
+        if (vd) state.browserVoice.de = vd;
+    }
+}
+
+
+/* ============================ UPDATE VOICE LIST ============================ */
 
 function updateVoiceList() {
     const box = $('#dbgVoices');
@@ -687,6 +688,7 @@ function updateVoiceList() {
         pick.className = "btn";
         pick.textContent = "Diese Stimme wählen";
 
+        /* ✅ Stimme wird SOFORT gespeichert */
         pick.onclick = () => {
             if (state.voicePanelTarget === "zh") {
                 state.browserVoice.zh = v;
@@ -695,7 +697,9 @@ function updateVoiceList() {
                 state.browserVoice.de = v;
                 state.settings.browserVoiceDe = v.name || v.voiceURI;
             }
+
             saveSettings();
+            closeVoices();      // ✅ Panel automatisch schließen
             updateVoiceList();
         };
 
@@ -720,8 +724,9 @@ function updateVoiceList() {
                 ? state.browserVoice.zh
                 : state.browserVoice.de;
 
-        if (active && (active.name === v.name || active.voiceURI === v.voiceURI))
+        if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
             name.textContent += " • [Aktiv]";
+        }
 
         actions.appendChild(pick);
         actions.appendChild(test);
@@ -735,26 +740,13 @@ function updateVoiceList() {
 }
 
 
+/* ============================ REFRESH VOICES =============================== */
+
 function refreshVoices() {
     state.voices = window.speechSynthesis?.getVoices?.() || [];
 
-    if (state.settings.browserVoiceZh) {
-        const vz = state.voices.find(
-            x =>
-                x.name === state.settings.browserVoiceZh ||
-                x.voiceURI === state.settings.browserVoiceZh
-        );
-        if (vz) state.browserVoice.zh = vz;
-    }
-
-    if (state.settings.browserVoiceDe) {
-        const vd = state.voices.find(
-            x =>
-                x.name === state.settings.browserVoiceDe ||
-                x.voiceURI === state.settings.browserVoiceDe
-        );
-        if (vd) state.browserVoice.de = vd;
-    }
+    /* ✅ automatisch gespeicherte Stimme setzen */
+    applySavedVoices();
 
     updateVoiceList();
 }
@@ -791,17 +783,20 @@ function closeVoices() {
 }
 
 
-/* ============================ TTS BUILDER ================================= */
+/* ============================ TTS BUILDERS ================================ */
 
 function ttsPrime(cb) {
     setTimeout(cb, 150);
 }
 
 function buildUtterance(text, langKey) {
+
     const lang = langKey === "zh" ? "zh-CN" : "de-DE";
     const u = new SpeechSynthesisUtterance(text || "");
+
     u.lang = lang;
 
+    // ✅ Pitch & Speed automatisch übernommen (persistente Settings)
     if (langKey === "zh") {
         u.rate = state.rateZh;
         u.pitch = state.pitchZh;
@@ -810,12 +805,14 @@ function buildUtterance(text, langKey) {
         u.pitch = state.pitchDe;
     }
 
+    // ✅ gewählte Stimme verwenden
     const chosen =
         langKey === "zh" ? state.browserVoice.zh : state.browserVoice.de;
 
     if (chosen) {
         u.voice = chosen;
     } else {
+        // fallback
         const cand = (state.voices || []).filter(v =>
             (v.lang || "").toLowerCase().startsWith(langKey)
         );
@@ -826,7 +823,7 @@ function buildUtterance(text, langKey) {
 }
 
 
-/* ============================ NATIVE MANDARIN PACK ======================== */
+/* ============================ NATIVE MANDARIN ============================= */
 
 const VOICE_PACK = {
     female1: "zh-CN-XiaoxiaoNeural",
@@ -840,6 +837,7 @@ let nativeVoiceChoice = "female1";
 const nativeAudioCache = new Map();
 
 async function nativeMandarinSpeak(text) {
+
     if (!text) return;
 
     if (!NATIVE_TTS_ENDPOINT) {
@@ -849,9 +847,9 @@ async function nativeMandarinSpeak(text) {
     }
 
     const cacheKey = nativeVoiceChoice + "\n" + text;
+
     if (nativeAudioCache.has(cacheKey)) {
-        const audio = new Audio(nativeAudioCache.get(cacheKey));
-        audio.play();
+        new Audio(nativeAudioCache.get(cacheKey)).play();
         return;
     }
 
@@ -860,7 +858,7 @@ async function nativeMandarinSpeak(text) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                text: text,
+                text,
                 voice: VOICE_PACK[nativeVoiceChoice]
             })
         });
@@ -869,13 +867,11 @@ async function nativeMandarinSpeak(text) {
         const url = URL.createObjectURL(blob);
 
         nativeAudioCache.set(cacheKey, url);
-
-        const audio = new Audio(url);
-        audio.play();
+        new Audio(url).play();
 
     } catch (e) {
-        const u = buildUtterance(text, "zh");
-        speechSynthesis.speak(u);
+        // fallback → Browser TTS
+        speechSynthesis.speak(buildUtterance(text, "zh"));
     }
 }
 
@@ -912,10 +908,7 @@ function playQuestion() {
         );
     } else {
         nativeMandarinSpeak(state.current.word.zh);
-        setTimeout(
-            () => nativeMandarinSpeak(state.current.sent.zh),
-            700
-        );
+        setTimeout(() => nativeMandarinSpeak(state.current.sent.zh), 700);
     }
 }
 
@@ -924,10 +917,7 @@ function playAnswer() {
 
     if (state.mode === "de2zh") {
         nativeMandarinSpeak(state.current.word.zh);
-        setTimeout(
-            () => nativeMandarinSpeak(state.current.sent.zh),
-            700
-        );
+        setTimeout(() => nativeMandarinSpeak(state.current.sent.zh), 700);
     } else {
         playSequence(
             state.current.word.de,
@@ -946,10 +936,8 @@ function setAutoplay(on) {
 
     if (!on) {
         try { speechSynthesis.cancel(); } catch (e) {}
-
         state.autoplay.timers.forEach(id => clearTimeout(id));
         state.autoplay.timers = [];
-
         releaseWakeLock();
     }
 
@@ -966,23 +954,28 @@ function updateAutoplayBtn() {
 }
 
 function speakPair(word, sent, langKey, done) {
+
     if (!state.autoplay.on) return;
 
     const u1 = buildUtterance(word, langKey);
 
     u1.onend = () => {
+
         if (!state.autoplay.on) return;
 
         const t = setTimeout(() => {
+
             if (!state.autoplay.on) return;
 
             const u2 = buildUtterance(sent, langKey);
+
             u2.onend = () => {
                 if (!state.autoplay.on) return;
                 done && done();
             };
 
             speechSynthesis.speak(u2);
+
         }, 800);
 
         state.autoplay.timers.push(t);
@@ -992,9 +985,11 @@ function speakPair(word, sent, langKey, done) {
 }
 
 function ensurePoolForAutoplay() {
+
     if (state.pool.length > 0) return true;
 
     if (!state.settings.lessons || state.settings.lessons.length === 0) {
+
         const sel = $('#lessonSelect');
         const picked = [];
 
@@ -1016,16 +1011,15 @@ function ensurePoolForAutoplay() {
     if (state.order === "seq") {
         state.idx = 0;
         setCard(state.pool[state.idx]);
-        syncCardHeights();
     } else {
         setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
-        syncCardHeights();
     }
 
     return true;
 }
 
 function autoplayStep() {
+
     if (!state.autoplay.on) return;
     if (!ensurePoolForAutoplay()) {
         setAutoplay(false);
@@ -1039,6 +1033,7 @@ function autoplayStep() {
     const aLang = state.mode === "de2zh" ? "zh" : "de";
 
     ttsPrime(() => {
+
         try { speechSynthesis.cancel(); } catch (e) {}
 
         speakPair(
@@ -1046,6 +1041,7 @@ function autoplayStep() {
             state.current.sent[qLang],
             qLang,
             () => {
+
                 if (!state.autoplay.on) return;
 
                 $('#solBox').classList.remove('masked');
@@ -1055,9 +1051,11 @@ function autoplayStep() {
                     state.current.sent[aLang],
                     aLang,
                     () => {
+
                         if (!state.autoplay.on) return;
 
                         const t = setTimeout(() => {
+
                             if (!state.autoplay.on) return;
 
                             if (state.order === "seq") {
@@ -1065,11 +1063,10 @@ function autoplayStep() {
                                 else state.idx = (state.idx + 1) % state.pool.length;
 
                                 setCard(state.pool[state.idx]);
-                                syncCardHeights();
-
                             } else {
-                                setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
-                                syncCardHeights();
+                                setCard(
+                                    state.pool[Math.floor(Math.random() * state.pool.length)]
+                                );
                             }
 
                             autoplayStep();
@@ -1081,33 +1078,21 @@ function autoplayStep() {
                 );
             }
         );
+
     });
 }
 
 function toggleAutoplay() {
+
     if (!state.autoplay.on) {
 
-        // Pool sicherstellen
         if (!ensurePoolForAutoplay()) return;
 
         setAutoplay(true);
         requestWakeLock();
 
-        // ✅ AUTOPLAY-FIX: erste Karte laden, falls noch keine angezeigt wurde
-        if (!state.current) {
-            if (state.order === "seq") {
-                state.idx = 0;
-                setCard(state.pool[state.idx]);
-            } else {
-                const first = state.pool[Math.floor(Math.random() * state.pool.length)];
-                setCard(first);
-            }
-
-            syncCardHeights();
-            scrollToBottom();
-        }
-
         scrollToBottom();
+
         autoplayStep();
 
     } else {
@@ -1121,6 +1106,7 @@ function toggleAutoplay() {
 async function requestWakeLock() {
     try {
         if ('wakeLock' in navigator && !state.wakeLock) {
+
             state.wakeLock = await navigator.wakeLock.request("screen");
 
             state.wakeLock.addEventListener?.("release", () => {
@@ -1135,6 +1121,7 @@ async function requestWakeLock() {
 }
 
 function onVisibilityChange() {
+
     if (
         document.visibilityState === "visible" &&
         state.autoplay.on &&
