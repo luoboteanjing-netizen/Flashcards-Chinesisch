@@ -345,3 +345,30 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 4px;     /* Emoji + Zahl etwas trennen */
     font-variant-numeric: tabular-nums;  /* ✅ Zahlen monospaced → perfekt ausgerichtet */
 }
+/* ===============================
+   5‑Spalten‑Layout für Lektionen
+   =============================== */
+
+#lessonSelect option {
+    display: grid;
+    grid-template-columns:
+        160px   /* Lektionstitel */
+        60px    /* total */
+        80px    /* known */
+        100px   /* unknown */
+        60px;   /* percent */
+    gap: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 4px 6px;
+}
+
+/* Alignments + Farben */
+#lessonSelect .col-lesson  { text-align: left; }
+#lessonSelect .col-total   { text-align: right; }
+#lessonSelect .col-known   { text-align: right; color: var(--good); }
+#lessonSelect .col-unknown { text-align: right; color: var(--bad); }
+#lessonSelect .col-percent { 
+    text-align: right;
+    font-weight: 600;
+}
