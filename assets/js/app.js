@@ -1158,6 +1158,8 @@ function stopAutoplayOnUserAction() {
 
 window.addEventListener("DOMContentLoaded", () => {
 
+    /* ============================ SETTINGS LADEN =========================== */
+
     loadSettings();
     loadProgress();
     loadCSV();
@@ -1167,8 +1169,39 @@ window.addEventListener("DOMContentLoaded", () => {
 
     renderModeUI();
 
-    /* ============================ BUTTON EVENTS =========================== */
 
+    /* ======================== AUTOPLAY-BUTTON REPOSITION =================== */
+
+    (function placeAutoplayButton() {
+        const trainingBtn = document.querySelector("#btnStart");
+        const autoplayBtn = document.querySelector("#btnAutoplay");
+
+        if (!trainingBtn || !autoplayBtn) return;
+
+        const parent = trainingBtn.parentNode;
+
+        // Gruppe erzeugen falls nicht vorhanden
+        let group = parent.querySelector(".training-group");
+
+        if (!group) {
+            group = document.createElement("div");
+            group.className = "training-group";
+
+            // Training rein
+            parent.insertBefore(group, trainingBtn);
+            group.appendChild(trainingBtn);
+        }
+
+        // Autoplay rein
+        group.appendChild(autoplayBtn);
+
+        autoplayBtn.classList.add("primary");
+    })();
+
+
+    /* ============================== BUTTON EVENTS =========================== */
+
+    // Modus wechseln
     $('#btnSwapMode').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
@@ -1178,6 +1211,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (state.current) setCard(state.current);
     });
 
+    // Reihenfolge
     $('#btnOrderToggle').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.order = state.order === "random" ? "seq" : "random";
@@ -1186,10 +1220,10 @@ window.addEventListener("DOMContentLoaded", () => {
         renderModeUI();
     });
 
+    // Autoplay
     $('#btnAutoplay').addEventListener("click", toggleAutoplay);
 
-
-    /* ---- Slider ---- */
+    // Pause zwischen Karten
     $('#gapRange').addEventListener("input", e => {
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
@@ -1199,7 +1233,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ---- Lautsprecher ---- */
+    /* ============================== SPEAKER ================================ */
 
     $('#speakerQuestion').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1212,11 +1246,12 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ---- Training ---- */
+    /* ============================== TRAINING =============================== */
 
     $('#btnStart').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
+        updateTrainingBtn();
     });
 
     $('#btnNext').addEventListener("click", () => {
@@ -1235,7 +1270,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ---- Rating ---- */
+    /* ============================== RATING ================================= */
 
     $('#btnRateKnown').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1253,7 +1288,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ---- Lessons ---- */
+    /* ============================= LEKTIONEN =============================== */
 
     $('#btnUseLessons').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1265,6 +1300,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         state.settings.lessons = picked;
         saveSettings();
+
         gatherPoolFromSettings();
     });
 
@@ -1286,7 +1322,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ---- Export / Import ---- */
+    /* =========================== IMPORT / EXPORT =========================== */
 
     $('#btnExport').addEventListener("click", () => {
         const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
@@ -1305,6 +1341,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (!f) return;
 
         const r = new FileReader();
+
         r.onload = () => {
             try {
                 const p = JSON.parse(r.result);
@@ -1320,6 +1357,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 alert("Import Fehler: " + err.message);
             }
         };
+
         r.readAsText(f);
     });
 
