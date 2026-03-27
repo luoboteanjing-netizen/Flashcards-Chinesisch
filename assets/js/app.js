@@ -282,6 +282,28 @@ function gatherPoolFromSettings() {
 /* -------------------------------------------------------------------------- */
 
 
+/* ============================ MODE UI RENDERING =========================== */
+/* ✅ Wieder eingefügt, da TEIL 4 diese Funktion benötigt */
+
+function renderModeUI() {
+    const left = $('#modeLeft');
+    const right = $('#modeRight');
+
+    if (!left || !right) return;
+
+    if (state.mode === 'de2zh') {
+        left.textContent = "🇩🇪 DE";
+        right.textContent = "🇨🇳 ZH";
+    } else {
+        left.textContent = "🇨🇳 ZH";
+        right.textContent = "🇩🇪 DE";
+    }
+
+    $('#btnOrderToggle').textContent =
+        "Reihenfolge: " + (state.order === 'seq' ? "Sequenziell" : "Zufällig");
+}
+
+
 /* ============================ CARD RENDERING ============================== */
 
 function setCard(entry, fromHistory = false) {
@@ -290,17 +312,12 @@ function setCard(entry, fromHistory = false) {
         pushToHistory(entry);
     }
 
-    const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenz-Index aktualisieren
+    // Sequenz-Position setzen
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
-    }
-
-    if (cardLesson) {
-        cardLesson.textContent = `Lektion ${entry.lesson}`;
     }
 
     /* ✅ Zweifarbiger Fortschrittsbalken */
@@ -327,8 +344,8 @@ function setCard(entry, fromHistory = false) {
     /* === Karteninhalt ====================================== */
 
     state.current = entry;
-
     $('#solBox').classList.add('masked');
+
     state.startedAt = Date.now();
     state.revealedAt = null;
 
@@ -356,13 +373,14 @@ function setCard(entry, fromHistory = false) {
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
-    /* === Buttons initialisieren === */
+    /* === Buttons initial === */
 
     $('#btnReveal').disabled = false;
     hideRatingButtons();
     showNavButtons();
 
     updateNavButtons();
+
     syncCardHeights();
 }
 
@@ -371,7 +389,6 @@ function setCard(entry, fromHistory = false) {
 
 function pushToHistory(entry) {
 
-    // Vorwärts-History löschen
     if (state.historyPos < state.history.length - 1) {
         state.history = state.history.slice(0, state.historyPos + 1);
     }
@@ -389,7 +406,7 @@ function nextCard() {
 
     if (!state.pool.length) return;
 
-    // In History vorwärts
+    // Vorwärts in der History
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
@@ -434,8 +451,8 @@ function doReveal() {
 
     state.revealedAt = Date.now();
 
-    showRatingButtons();
     hideNavButtons();
+    showRatingButtons();
 
     enableRating();
     renderSessionStats();
@@ -476,6 +493,7 @@ function rate(mark) {
 
     if (!state.current) return;
 
+    // Statistik aktualisieren
     state.session.done++;
     if (mark === 'known') state.session.known++;
     else state.session.unknown++;
@@ -483,7 +501,6 @@ function rate(mark) {
     const lesson = state.current.lesson;
 
     if (lesson) {
-
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
@@ -504,6 +521,7 @@ function rate(mark) {
 /* ============================ SESSION STATS =============================== */
 
 function renderSessionStats() {
+
     const s = state.session;
 
     const avg = s.ttrCount
@@ -543,7 +561,7 @@ function startTraining() {
         gatherPool();
 
         if (!state.pool.length) {
-            alert("Bitte zuerst Lektionen auswählen.");
+            alert("Bitte Lektionen auswählen.");
             return;
         }
 
@@ -581,7 +599,6 @@ function stopTraining() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
-
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
