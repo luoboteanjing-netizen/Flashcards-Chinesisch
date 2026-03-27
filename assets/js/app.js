@@ -568,15 +568,18 @@ function startTraining() {
             return;
         }
 
-        if (state.order === 'seq') {
-            state.idx = 0;
-            setCard(state.pool[state.idx]);
-        } else {
-            const r = state.pool[Math.floor(Math.random() * state.pool.length)];
-            setCard(r);
-        }
+		if (state.order === 'seq') {
+    state.idx = 0;
+    setCard(state.pool[state.idx]);
+} else {
+    const r = state.pool[Math.floor(Math.random() * state.pool.length)];
+    setCard(r);
+}
 
-        state.trainingOn = true;
+state.trainingOn = true;
+
+// ✅ SCROLL-FIX (sauberer als vorher)
+setTimeout(scrollToBottom, 30);
         scrollToBottom();
 
     } else {
