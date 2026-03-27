@@ -276,7 +276,7 @@ function gatherPoolFromSettings() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- *
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 2 von 4                                 */
 /*      Card Rendering · Navigation · Rating · Session Stats · Training       */
@@ -312,14 +312,14 @@ function setCard(entry, fromHistory = false) {
 
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenzposition aktualisieren
+    // Sequenzposition setzen
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
     }
 
     /* ✅ Zweifarbiger Fortschrittsbalken */
-    if (lessonStats) {
+    {
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
 
@@ -341,7 +341,6 @@ function setCard(entry, fromHistory = false) {
     /* ===== Karteninhalt setzen ===== */
 
     state.current = entry;
-
     $('#solBox').classList.add('masked');
 
     state.startedAt = Date.now();
@@ -350,9 +349,14 @@ function setCard(entry, fromHistory = false) {
     if (state.mode === 'zh2de') {
 
         $('#promptWord').innerHTML = entry.word.zh || "—";
-        $('#promptWordSub').innerHTML = entry.word.py || "";
+
+        // ✅ Pinyin vom WORT → eigene Klasse .pinyin-word
+        $('#promptWordSub').innerHTML = `<span class="pinyin-word">${entry.word.py}</span>` || "";
+
+        // ✅ Wortart darunter
         $('#promptPOS').textContent = entry.pos || "";
 
+        // Satz bleibt unverändert
         $('#promptSent').innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
 
@@ -362,7 +366,10 @@ function setCard(entry, fromHistory = false) {
     } else {
 
         $('#promptWord').textContent = entry.word.de || "—";
-        $('#promptWordSub').innerHTML = entry.word.py || "";
+
+        // ✅ Pinyin vom Wort
+        $('#promptWordSub').innerHTML = `<span class="pinyin-word">${entry.word.py}</span>` || "";
+
         $('#promptPOS').textContent = entry.pos || "";
 
         $('#promptSent').textContent = entry.sent.de || "—";
@@ -373,7 +380,7 @@ function setCard(entry, fromHistory = false) {
 
     /* === Buttons initial === */
 
-    $('#btnReveal').disabled = false;          // ✅ Aufdecken-Button AKTIVIEREN!
+    $('#btnReveal').disabled = false;   // ✅ Aufdecken wieder aktiv
     hideRatingButtons();
     showNavButtons();
     updateNavButtons();
@@ -403,7 +410,7 @@ function nextCard() {
 
     if (!state.pool.length) return;
 
-    // In der History weiter
+    // In History weiter
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
@@ -448,9 +455,12 @@ function doReveal() {
 
     state.revealedAt = Date.now();
 
-    hideNavButtons();
-    showRatingButtons();
+    // ✅ Autoplay soll Navigation NICHT verstecken
+    if (!state.autoplay.on) {
+        hideNavButtons();
+    }
 
+    showRatingButtons();
     enableRating();
     syncCardHeights();
 }
@@ -476,6 +486,9 @@ function hideRatingButtons() {
 }
 
 function hideNavButtons() {
+    // ✅ Autoplay benötigt Navigation → nicht verstecken
+    if (state.autoplay.on) return;
+
     $('#btnPrev').style.display = 'none';
     $('#btnReveal').style.display = 'none';
     $('#btnNext').style.display = 'none';
@@ -494,15 +507,14 @@ function rate(mark) {
     // Statistik
     state.session.done++;
 
-    if (mark === 'known') state.session.known++;
+    if (mark === 'known')     state.session.known++;
     else if (mark === 'unknown') state.session.unknown++;
-    else if (mark === 'unsure') state.session.unsure++;
+    else if (mark === 'unsure')  state.session.unsure++;
 
-    // Fortschritt speichern (nur bei known/unknown)
+    // Fortschritt speichern (nur known/unknown)
     const lesson = state.current.lesson;
 
     if (lesson) {
-
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
@@ -512,7 +524,6 @@ function rate(mark) {
         saveProgress();
     }
 
-    // UI wiederherstellen
     hideRatingButtons();
     showNavButtons();
     disableRating();
@@ -568,19 +579,19 @@ function startTraining() {
             return;
         }
 
-		if (state.order === 'seq') {
-    state.idx = 0;
-    setCard(state.pool[state.idx]);
-} else {
-    const r = state.pool[Math.floor(Math.random() * state.pool.length)];
-    setCard(r);
-}
+        if (state.order === 'seq') {
+            state.idx = 0;
+            setCard(state.pool[state.idx]);
+        } else {
+            const r = state.pool[Math.floor(Math.random() * state.pool.length)];
+            setCard(r);
+        }
 
-state.trainingOn = true;
+        state.trainingOn = true;
+        updateTrainingBtn();
 
-// ✅ SCROLL-FIX (sauberer als vorher)
-setTimeout(scrollToBottom, 30);
-        scrollToBottom();
+        // ✅ Scroll-Fix
+        setTimeout(scrollToBottom, 30);
 
     } else {
         stopTraining();
@@ -590,6 +601,7 @@ setTimeout(scrollToBottom, 30);
 function stopTraining() {
 
     state.trainingOn = false;
+    updateTrainingBtn();
 
     $('#btnPrev').disabled = true;
     $('#btnReveal').disabled = true;
@@ -601,19 +613,16 @@ function stopTraining() {
     $('#solBox').classList.add('masked');
 }
 
-function scrollToBottom() {
-    setTimeout(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth"
-        });
-    }, 50);
+function updateTrainingBtn() {
+    $('#btnStart').textContent =
+        state.trainingOn ? "Training stoppen ■" : "Training starten ▶";
 }
 
 
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
