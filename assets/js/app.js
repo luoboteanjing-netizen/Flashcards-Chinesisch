@@ -222,23 +222,23 @@ function populateLessonSelect() {
         const total = cards.length;
 
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
-        const known = p.known || 0;
+        const known   = p.known   || 0;
         const unknown = p.unknown || 0;
 
-        // ✅ Prozentzahl wieder berechnen!
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+        // ✅ Prozentzahl berechnen
+        const percent = total > 0 
+            ? Math.round((known / total) * 100)
+            : 0;
 
-        // ✅ Verbessertes Layout mit Emoji-Spalten
+        // ✅ Neue 5‑Spalten Ausgabe
         opt.innerHTML = `
-            ${k} (${total}) · 
-            <span class="lesson-progress">
-                <span class="lp-known">🟩 ${known}</span>
-                <span class="lp-unknown">🟥 ${unknown}</span>
-            </span>
-            (${percent}%)
+            <span class="col-lesson">${k}</span>
+            <span class="col-total">${total}</span>
+            <span class="col-known">${known}</span>
+            <span class="col-unknown">${unknown}</span>
+            <span class="col-percent">${percent}%</span>
         `;
 
-        // ✅ vorausgewählte Lektionen markieren
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
         }
