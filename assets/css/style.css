@@ -530,3 +530,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: var(--muted);
     font-style: italic;
 }
+
+.zh-pinyin {
+    font-size: 22px !important; /* vorher 20px → +2px */
+    line-height: 1.9;           /* passender Zeilenabstand */
+    display: inline-block;
+}
+
+#promptSent .zh-pinyin,
+#solSent .zh-pinyin {
+    font-size: 22px !important;
+}
