@@ -277,7 +277,6 @@ function gatherPoolFromSettings() {
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- *
-
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 2 von 4                                 */
 /*      Card Rendering · Navigation · Rating · Session Stats · Training       */
@@ -309,13 +308,11 @@ function renderModeUI() {
 
 function setCard(entry, fromHistory = false) {
 
-    if (!fromHistory) {
-        pushToHistory(entry);
-    }
+    if (!fromHistory) pushToHistory(entry);
 
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenzposition setzen
+    // Sequenzposition aktualisieren
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
@@ -323,7 +320,6 @@ function setCard(entry, fromHistory = false) {
 
     /* ✅ Zweifarbiger Fortschrittsbalken */
     if (lessonStats) {
-
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
 
@@ -345,6 +341,7 @@ function setCard(entry, fromHistory = false) {
     /* ===== Karteninhalt setzen ===== */
 
     state.current = entry;
+
     $('#solBox').classList.add('masked');
 
     state.startedAt = Date.now();
@@ -374,10 +371,13 @@ function setCard(entry, fromHistory = false) {
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
-    // Buttons initialisieren
+    /* === Buttons initial === */
+
+    $('#btnReveal').disabled = false;          // ✅ Aufdecken-Button AKTIVIEREN!
     hideRatingButtons();
     showNavButtons();
     updateNavButtons();
+
     syncCardHeights();
 }
 
@@ -403,6 +403,7 @@ function nextCard() {
 
     if (!state.pool.length) return;
 
+    // In der History weiter
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
@@ -442,6 +443,7 @@ function formatZh(hz, py) {
 /* ============================ REVEAL / RATING ============================= */
 
 function doReveal() {
+
     $('#solBox').classList.remove('masked');
 
     state.revealedAt = Date.now();
@@ -489,7 +491,7 @@ function rate(mark) {
 
     if (!state.current) return;
 
-    // Session-Statistik
+    // Statistik
     state.session.done++;
 
     if (mark === 'known') state.session.known++;
@@ -500,16 +502,17 @@ function rate(mark) {
     const lesson = state.current.lesson;
 
     if (lesson) {
+
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
-        if (mark === "known") state.progress.byLesson[lesson].known++;
+        if (mark === "known")   state.progress.byLesson[lesson].known++;
         if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
     }
 
-    // UI zurücksetzen
+    // UI wiederherstellen
     hideRatingButtons();
     showNavButtons();
     disableRating();
@@ -561,7 +564,7 @@ function startTraining() {
         gatherPool();
 
         if (!state.pool.length) {
-            alert("Bitte Lektionen auswählen.");
+            alert("Bitte zuerst Lektionen auswählen.");
             return;
         }
 
@@ -599,7 +602,7 @@ function stopTraining() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
 /* -------------------------------------------------------------------------- */
-
+``
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
