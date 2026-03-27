@@ -276,50 +276,36 @@ function gatherPoolFromSettings() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
-
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 2 von 4                                 */
 /*      Card Rendering · Navigation · Rating · Session Stats · Training       */
 /* -------------------------------------------------------------------------- */
 
 
-/* ============================ MODE UI RENDERING =========================== */
-
-function renderModeUI() {
-    const left = $('#modeLeft');
-    const right = $('#modeRight');
-
-    if (!left || !right) return;
-
-    if (state.mode === 'de2zh') {
-        left.textContent = "🇩🇪 DE";
-        right.textContent = "🇨🇳 ZH";
-    } else {
-        left.textContent = "🇨🇳 ZH";
-        right.textContent = "🇩🇪 DE";
-    }
-
-    $('#btnOrderToggle').textContent =
-        "Reihenfolge: " + (state.order === 'seq' ? "Sequenziell" : "Zufällig");
-}
-
-
 /* ============================ CARD RENDERING ============================== */
 
 function setCard(entry, fromHistory = false) {
 
-    if (!fromHistory) pushToHistory(entry);
+    if (!fromHistory) {
+        pushToHistory(entry);
+    }
 
+    const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenzposition aktualisieren
+    // Sequenz-Index aktualisieren
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
     }
 
-    /* ✅ zweifarbiger Fortschrittsbalken */
-    {
+    if (cardLesson) {
+        cardLesson.textContent = `Lektion ${entry.lesson}`;
+    }
+
+    /* ✅ Zweifarbiger Fortschrittsbalken */
+    if (lessonStats) {
+
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
 
@@ -343,23 +329,17 @@ function setCard(entry, fromHistory = false) {
     state.current = entry;
 
     $('#solBox').classList.add('masked');
-
     state.startedAt = Date.now();
     state.revealedAt = null;
 
     if (state.mode === 'zh2de') {
-        /* ✅ CHINESISCH → DEUTSCH – Pinyin anzeigen */
 
         $('#promptWord').innerHTML = entry.word.zh || "—";
 
-        // Nur Pinyin vom Wort hier (größer)
-        $('#promptWordSub').innerHTML =
-            entry.word.py ? `<span class="pinyin-word">${entry.word.py}</span>` : "";
+        let wordInfo = entry.word.py || "";
+        if (entry.pos) wordInfo += ` (${entry.pos})`;
+        $('#promptWordSub').innerHTML = wordInfo;
 
-        // Wortart separat
-        $('#promptPOS').textContent = entry.pos || "";
-
-        // Satz + Pinyin
         $('#promptSent').innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
 
@@ -367,17 +347,11 @@ function setCard(entry, fromHistory = false) {
         $('#solSent').textContent = entry.sent.de || "—";
 
     } else {
-        /* ✅ DEUTSCH → CHINESISCH – KEIN PINYIN IN DER FRAGEKARTE! */
 
         $('#promptWord').textContent = entry.word.de || "—";
-
-        // DE-Fragekarte → KEIN Pinyin anzeigen
-        $('#promptWordSub').innerHTML = "";
-        $('#promptPOS').textContent = entry.pos || "";
-
+        $('#promptWordSub').innerHTML = entry.pos || "";
         $('#promptSent').textContent = entry.sent.de || "—";
 
-        /* ✅ Lösung (ZH) MIT Pinyin */
         $('#solWord').innerHTML = formatZh(entry.word.zh, entry.word.py);
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
@@ -387,8 +361,8 @@ function setCard(entry, fromHistory = false) {
     $('#btnReveal').disabled = false;
     hideRatingButtons();
     showNavButtons();
-    updateNavButtons();
 
+    updateNavButtons();
     syncCardHeights();
 }
 
@@ -396,29 +370,34 @@ function setCard(entry, fromHistory = false) {
 /* ============================ CARD NAVIGATION ============================= */
 
 function pushToHistory(entry) {
+
+    // Vorwärts-History löschen
     if (state.historyPos < state.history.length - 1) {
         state.history = state.history.slice(0, state.historyPos + 1);
     }
+
     state.history.push(entry);
     state.historyPos = state.history.length - 1;
 }
 
 function updateNavButtons() {
-    $('#btnPrev').disabled = (state.historyPos <= 0);
-    $('#btnNext').disabled = (state.pool.length === 0);
+    $('#btnPrev').disabled = state.historyPos <= 0;
+    $('#btnNext').disabled = !state.pool.length;
 }
 
 function nextCard() {
+
     if (!state.pool.length) return;
 
+    // In History vorwärts
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
         return;
     }
 
+    // Neue Karte
     let next;
-
     if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
@@ -431,6 +410,7 @@ function nextCard() {
 }
 
 function prevCard() {
+
     if (state.historyPos > 0) {
         state.historyPos--;
         setCard(state.history[state.historyPos], true);
@@ -443,49 +423,44 @@ function prevCard() {
 function formatZh(hz, py) {
     const h = (hz || "").trim();
     const p = (py || "").trim();
-    return p ? `${h}<br><span class="zh-pinyin">${p}</span>` : (h || "—");
+    return p ? `${h}<br>${p}` : (h || "—");
 }
 
 
 /* ============================ REVEAL / RATING ============================= */
 
 function doReveal() {
-
     $('#solBox').classList.remove('masked');
 
     state.revealedAt = Date.now();
 
-    if (!state.autoplay.on) {
-        hideNavButtons();
-    }
-
     showRatingButtons();
+    hideNavButtons();
+
     enableRating();
+    renderSessionStats();
     syncCardHeights();
 }
 
 function enableRating() {
     $('#btnRateKnown').disabled = false;
     $('#btnRateUnknown').disabled = false;
-    $('#btnRateUnsure').disabled = false;
 }
 
 function disableRating() {
     $('#btnRateKnown').disabled = true;
     $('#btnRateUnknown').disabled = true;
-    $('#btnRateUnsure').disabled = true;
 }
 
 function showRatingButtons() {
-    $('#ratingButtons').classList.add('visible');
+    document.getElementById('ratingButtons').classList.add('visible');
 }
 
 function hideRatingButtons() {
-    $('#ratingButtons').classList.remove('visible');
+    document.getElementById('ratingButtons').classList.remove('visible');
 }
 
 function hideNavButtons() {
-    if (state.autoplay.on) return;  // ✅ Autoplay braucht die Navigation
     $('#btnPrev').style.display = 'none';
     $('#btnReveal').style.display = 'none';
     $('#btnNext').style.display = 'none';
@@ -502,14 +477,13 @@ function rate(mark) {
     if (!state.current) return;
 
     state.session.done++;
-
     if (mark === 'known') state.session.known++;
-    else if (mark === 'unknown') state.session.unknown++;
-    else if (mark === 'unsure') state.session.unsure++;
+    else state.session.unknown++;
 
     const lesson = state.current.lesson;
 
     if (lesson) {
+
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
@@ -558,7 +532,10 @@ function startTraining() {
         state.selectedLessons.clear();
 
         const picked = [];
-        for (const opt of sel.selectedOptions) picked.push(opt.value);
+        for (const opt of sel.selectedOptions) {
+            picked.push(opt.value);
+            state.selectedLessons.add(opt.value);
+        }
 
         state.settings.lessons = picked;
         saveSettings();
@@ -579,10 +556,7 @@ function startTraining() {
         }
 
         state.trainingOn = true;
-        updateTrainingBtn();
-
-        // ✅ Scroll-Fix
-        setTimeout(scrollToBottom, 50);
+        scrollToBottom();
 
     } else {
         stopTraining();
@@ -592,7 +566,6 @@ function startTraining() {
 function stopTraining() {
 
     state.trainingOn = false;
-    updateTrainingBtn();
 
     $('#btnPrev').disabled = true;
     $('#btnReveal').disabled = true;
@@ -604,11 +577,6 @@ function stopTraining() {
     $('#solBox').classList.add('masked');
 }
 
-function updateTrainingBtn() {
-    $('#btnStart').textContent =
-        state.trainingOn ? "Training stoppen ■" : "Training starten ▶";
-}
-
 
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 2                                 */
@@ -618,6 +586,31 @@ function updateTrainingBtn() {
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
 /* -------------------------------------------------------------------------- */
+
+
+/* ============================ NEW FUNCTIONS ================================ */
+
+function syncCardHeights() {
+    const q = document.querySelector("#promptBox");
+    const a = document.querySelector("#solBox");
+    if (!q || !a) return;
+
+    q.style.minHeight = "";
+    a.style.minHeight = "";
+
+    const h = Math.max(q.offsetHeight, a.offsetHeight);
+    q.style.minHeight = h + "px";
+    a.style.minHeight = h + "px";
+}
+
+function scrollToBottom() {
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+        });
+    }, 50);
+}
 
 
 /* ============================ VOICE TESTING ================================ */
@@ -636,33 +629,6 @@ function isDeVoice(v) {
     const L = (v.lang || "").toLowerCase();
     return L.startsWith("de");
 }
-
-
-/* ============================ APPLY SAVED VOICES =========================== */
-
-function applySavedVoices() {
-
-    // ZH Stimme wiederherstellen
-    if (state.settings.browserVoiceZh) {
-        const vz = state.voices.find(v =>
-            v.name === state.settings.browserVoiceZh ||
-            v.voiceURI === state.settings.browserVoiceZh
-        );
-        if (vz) state.browserVoice.zh = vz;
-    }
-
-    // DE Stimme wiederherstellen
-    if (state.settings.browserVoiceDe) {
-        const vd = state.voices.find(v =>
-            v.name === state.settings.browserVoiceDe ||
-            v.voiceURI === state.settings.browserVoiceDe
-        );
-        if (vd) state.browserVoice.de = vd;
-    }
-}
-
-
-/* ============================ UPDATE VOICE LIST ============================ */
 
 function updateVoiceList() {
     const box = $('#dbgVoices');
@@ -700,7 +666,6 @@ function updateVoiceList() {
         pick.className = "btn";
         pick.textContent = "Diese Stimme wählen";
 
-        /* ✅ Stimme wird SOFORT gespeichert */
         pick.onclick = () => {
             if (state.voicePanelTarget === "zh") {
                 state.browserVoice.zh = v;
@@ -709,9 +674,7 @@ function updateVoiceList() {
                 state.browserVoice.de = v;
                 state.settings.browserVoiceDe = v.name || v.voiceURI;
             }
-
             saveSettings();
-            closeVoices();      // ✅ Panel automatisch schließen
             updateVoiceList();
         };
 
@@ -736,9 +699,8 @@ function updateVoiceList() {
                 ? state.browserVoice.zh
                 : state.browserVoice.de;
 
-        if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
+        if (active && (active.name === v.name || active.voiceURI === v.voiceURI))
             name.textContent += " • [Aktiv]";
-        }
 
         actions.appendChild(pick);
         actions.appendChild(test);
@@ -752,13 +714,26 @@ function updateVoiceList() {
 }
 
 
-/* ============================ REFRESH VOICES =============================== */
-
 function refreshVoices() {
     state.voices = window.speechSynthesis?.getVoices?.() || [];
 
-    /* ✅ automatisch gespeicherte Stimme setzen */
-    applySavedVoices();
+    if (state.settings.browserVoiceZh) {
+        const vz = state.voices.find(
+            x =>
+                x.name === state.settings.browserVoiceZh ||
+                x.voiceURI === state.settings.browserVoiceZh
+        );
+        if (vz) state.browserVoice.zh = vz;
+    }
+
+    if (state.settings.browserVoiceDe) {
+        const vd = state.voices.find(
+            x =>
+                x.name === state.settings.browserVoiceDe ||
+                x.voiceURI === state.settings.browserVoiceDe
+        );
+        if (vd) state.browserVoice.de = vd;
+    }
 
     updateVoiceList();
 }
@@ -795,20 +770,17 @@ function closeVoices() {
 }
 
 
-/* ============================ TTS BUILDERS ================================ */
+/* ============================ TTS BUILDER ================================= */
 
 function ttsPrime(cb) {
     setTimeout(cb, 150);
 }
 
 function buildUtterance(text, langKey) {
-
     const lang = langKey === "zh" ? "zh-CN" : "de-DE";
     const u = new SpeechSynthesisUtterance(text || "");
-
     u.lang = lang;
 
-    // ✅ Pitch & Speed automatisch übernommen (persistente Settings)
     if (langKey === "zh") {
         u.rate = state.rateZh;
         u.pitch = state.pitchZh;
@@ -817,14 +789,12 @@ function buildUtterance(text, langKey) {
         u.pitch = state.pitchDe;
     }
 
-    // ✅ gewählte Stimme verwenden
     const chosen =
         langKey === "zh" ? state.browserVoice.zh : state.browserVoice.de;
 
     if (chosen) {
         u.voice = chosen;
     } else {
-        // fallback
         const cand = (state.voices || []).filter(v =>
             (v.lang || "").toLowerCase().startsWith(langKey)
         );
@@ -835,7 +805,7 @@ function buildUtterance(text, langKey) {
 }
 
 
-/* ============================ NATIVE MANDARIN ============================= */
+/* ============================ NATIVE MANDARIN PACK ======================== */
 
 const VOICE_PACK = {
     female1: "zh-CN-XiaoxiaoNeural",
@@ -849,7 +819,6 @@ let nativeVoiceChoice = "female1";
 const nativeAudioCache = new Map();
 
 async function nativeMandarinSpeak(text) {
-
     if (!text) return;
 
     if (!NATIVE_TTS_ENDPOINT) {
@@ -859,9 +828,9 @@ async function nativeMandarinSpeak(text) {
     }
 
     const cacheKey = nativeVoiceChoice + "\n" + text;
-
     if (nativeAudioCache.has(cacheKey)) {
-        new Audio(nativeAudioCache.get(cacheKey)).play();
+        const audio = new Audio(nativeAudioCache.get(cacheKey));
+        audio.play();
         return;
     }
 
@@ -870,7 +839,7 @@ async function nativeMandarinSpeak(text) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                text,
+                text: text,
                 voice: VOICE_PACK[nativeVoiceChoice]
             })
         });
@@ -879,11 +848,13 @@ async function nativeMandarinSpeak(text) {
         const url = URL.createObjectURL(blob);
 
         nativeAudioCache.set(cacheKey, url);
-        new Audio(url).play();
+
+        const audio = new Audio(url);
+        audio.play();
 
     } catch (e) {
-        // fallback → Browser TTS
-        speechSynthesis.speak(buildUtterance(text, "zh"));
+        const u = buildUtterance(text, "zh");
+        speechSynthesis.speak(u);
     }
 }
 
@@ -920,7 +891,10 @@ function playQuestion() {
         );
     } else {
         nativeMandarinSpeak(state.current.word.zh);
-        setTimeout(() => nativeMandarinSpeak(state.current.sent.zh), 700);
+        setTimeout(
+            () => nativeMandarinSpeak(state.current.sent.zh),
+            700
+        );
     }
 }
 
@@ -929,7 +903,10 @@ function playAnswer() {
 
     if (state.mode === "de2zh") {
         nativeMandarinSpeak(state.current.word.zh);
-        setTimeout(() => nativeMandarinSpeak(state.current.sent.zh), 700);
+        setTimeout(
+            () => nativeMandarinSpeak(state.current.sent.zh),
+            700
+        );
     } else {
         playSequence(
             state.current.word.de,
@@ -948,8 +925,10 @@ function setAutoplay(on) {
 
     if (!on) {
         try { speechSynthesis.cancel(); } catch (e) {}
+
         state.autoplay.timers.forEach(id => clearTimeout(id));
         state.autoplay.timers = [];
+
         releaseWakeLock();
     }
 
@@ -966,28 +945,23 @@ function updateAutoplayBtn() {
 }
 
 function speakPair(word, sent, langKey, done) {
-
     if (!state.autoplay.on) return;
 
     const u1 = buildUtterance(word, langKey);
 
     u1.onend = () => {
-
         if (!state.autoplay.on) return;
 
         const t = setTimeout(() => {
-
             if (!state.autoplay.on) return;
 
             const u2 = buildUtterance(sent, langKey);
-
             u2.onend = () => {
                 if (!state.autoplay.on) return;
                 done && done();
             };
 
             speechSynthesis.speak(u2);
-
         }, 800);
 
         state.autoplay.timers.push(t);
@@ -997,11 +971,9 @@ function speakPair(word, sent, langKey, done) {
 }
 
 function ensurePoolForAutoplay() {
-
     if (state.pool.length > 0) return true;
 
     if (!state.settings.lessons || state.settings.lessons.length === 0) {
-
         const sel = $('#lessonSelect');
         const picked = [];
 
@@ -1023,15 +995,16 @@ function ensurePoolForAutoplay() {
     if (state.order === "seq") {
         state.idx = 0;
         setCard(state.pool[state.idx]);
+        syncCardHeights();
     } else {
         setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+        syncCardHeights();
     }
 
     return true;
 }
 
 function autoplayStep() {
-
     if (!state.autoplay.on) return;
     if (!ensurePoolForAutoplay()) {
         setAutoplay(false);
@@ -1045,7 +1018,6 @@ function autoplayStep() {
     const aLang = state.mode === "de2zh" ? "zh" : "de";
 
     ttsPrime(() => {
-
         try { speechSynthesis.cancel(); } catch (e) {}
 
         speakPair(
@@ -1053,7 +1025,6 @@ function autoplayStep() {
             state.current.sent[qLang],
             qLang,
             () => {
-
                 if (!state.autoplay.on) return;
 
                 $('#solBox').classList.remove('masked');
@@ -1063,11 +1034,9 @@ function autoplayStep() {
                     state.current.sent[aLang],
                     aLang,
                     () => {
-
                         if (!state.autoplay.on) return;
 
                         const t = setTimeout(() => {
-
                             if (!state.autoplay.on) return;
 
                             if (state.order === "seq") {
@@ -1075,10 +1044,11 @@ function autoplayStep() {
                                 else state.idx = (state.idx + 1) % state.pool.length;
 
                                 setCard(state.pool[state.idx]);
+                                syncCardHeights();
+
                             } else {
-                                setCard(
-                                    state.pool[Math.floor(Math.random() * state.pool.length)]
-                                );
+                                setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+                                syncCardHeights();
                             }
 
                             autoplayStep();
@@ -1090,21 +1060,33 @@ function autoplayStep() {
                 );
             }
         );
-
     });
 }
 
 function toggleAutoplay() {
-
     if (!state.autoplay.on) {
 
+        // Pool sicherstellen
         if (!ensurePoolForAutoplay()) return;
 
         setAutoplay(true);
         requestWakeLock();
 
-        scrollToBottom();
+        // ✅ AUTOPLAY-FIX: erste Karte laden, falls noch keine angezeigt wurde
+        if (!state.current) {
+            if (state.order === "seq") {
+                state.idx = 0;
+                setCard(state.pool[state.idx]);
+            } else {
+                const first = state.pool[Math.floor(Math.random() * state.pool.length)];
+                setCard(first);
+            }
 
+            syncCardHeights();
+            scrollToBottom();
+        }
+
+        scrollToBottom();
         autoplayStep();
 
     } else {
@@ -1118,7 +1100,6 @@ function toggleAutoplay() {
 async function requestWakeLock() {
     try {
         if ('wakeLock' in navigator && !state.wakeLock) {
-
             state.wakeLock = await navigator.wakeLock.request("screen");
 
             state.wakeLock.addEventListener?.("release", () => {
@@ -1133,7 +1114,6 @@ async function requestWakeLock() {
 }
 
 function onVisibilityChange() {
-
     if (
         document.visibilityState === "visible" &&
         state.autoplay.on &&
@@ -1163,7 +1143,6 @@ function stopAutoplayOnUserAction() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 3                                 */
 /* -------------------------------------------------------------------------- */
-
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 4 von 4                                 */
 /*                 Event Listener · Mode Switch · Init Routine                */
@@ -1171,66 +1150,28 @@ function stopAutoplayOnUserAction() {
 
 window.addEventListener("DOMContentLoaded", () => {
 
-    /* ============================ SETTINGS LADEN =========================== */
-
     loadSettings();
     loadProgress();
     loadCSV();
 
-    state.mode  = state.settings.mode  || "de2zh";
+    state.mode = state.settings.mode || "de2zh";
     state.order = state.settings.order || "random";
 
     renderModeUI();
 
+    /* ============================ BUTTON EVENTS =========================== */
 
-    /* ====================================================================== */
-    /*      AUTOPLAY-BUTTON neben Training platzieren (stabile Version)       */
-    /* ====================================================================== */
-
-    (function placeAutoplayButton() {
-
-        const trainingBtn = document.querySelector("#btnStart");
-        const autoplayBtn = document.querySelector("#btnAutoplay");
-
-        if (!trainingBtn || !autoplayBtn) return;
-
-        const parent = trainingBtn.parentNode;
-
-        // Falls die Gruppe fehlt: neu erzeugen
-        let group = parent.querySelector(".training-group");
-
-        if (!group) {
-            group = document.createElement("div");
-            group.className = "training-group";
-
-            parent.insertBefore(group, trainingBtn);
-            group.appendChild(trainingBtn);
-        }
-
-        // Autoplay einfügen
-        group.appendChild(autoplayBtn);
-
-        autoplayBtn.classList.add("primary");
-    })();
-
-
-    /* ====================================================================== */
-    /*                          BUTTON EVENT LISTENER                          */
-    /* ====================================================================== */
-
-    /* ---------- Modus wechseln ---------- */
+    // Modus wechseln
     $('#btnSwapMode').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
         state.settings.mode = state.mode;
         saveSettings();
         renderModeUI();
-
         if (state.current) setCard(state.current);
     });
 
-
-    /* ---------- Reihenfolge ---------- */
+    // Reihenfolge
     $('#btnOrderToggle').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.order = state.order === "random" ? "seq" : "random";
@@ -1239,16 +1180,11 @@ window.addEventListener("DOMContentLoaded", () => {
         renderModeUI();
     });
 
+    // Autoplay
+    $('#btnAutoplay').addEventListener("click", toggleAutoplay);
 
-    /* ---------- Autoplay ---------- */
-    $('#btnAutoplay').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        toggleAutoplay();
-    });
-
-
-    /* ---------- Slider ---------- */
-    $('#gapRange').addEventListener("input", (e) => {
+    // Gap Slider
+    $('#gapRange').addEventListener("input", e => {
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
         state.settings.autoplayGap = state.autoplay.gapMs;
@@ -1256,10 +1192,7 @@ window.addEventListener("DOMContentLoaded", () => {
         saveSettings();
     });
 
-
-    /* ====================================================================== */
-    /*                           LAUTSPRECHER ICONS                            */
-    /* ====================================================================== */
+    /* ---- Lautsprecher ---- */
 
     $('#speakerQuestion').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1271,15 +1204,11 @@ window.addEventListener("DOMContentLoaded", () => {
         playAnswer();
     });
 
-
-    /* ====================================================================== */
-    /*                               TRAINING                                  */
-    /* ====================================================================== */
+    /* ---- Training ---- */
 
     $('#btnStart').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
-        updateTrainingBtn();    // ✅ Buttontext aktualisieren
     });
 
     $('#btnNext').addEventListener("click", () => {
@@ -1297,10 +1226,7 @@ window.addEventListener("DOMContentLoaded", () => {
         doReveal();
     });
 
-
-    /* ====================================================================== */
-    /*                                RATING                                   */
-    /* ====================================================================== */
+    /* ---- Rating ---- */
 
     $('#btnRateKnown').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1312,15 +1238,7 @@ window.addEventListener("DOMContentLoaded", () => {
         rate("unknown");
     });
 
-    $('#btnRateUnsure').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unsure");
-    });
-
-
-    /* ====================================================================== */
-    /*                                LEKTIONEN                                */
-    /* ====================================================================== */
+    /* ---- Lessons ---- */
 
     $('#btnUseLessons').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1332,7 +1250,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
         state.settings.lessons = picked;
         saveSettings();
-
         gatherPoolFromSettings();
     });
 
@@ -1353,14 +1270,11 @@ window.addEventListener("DOMContentLoaded", () => {
         if (state.trainingOn) stopTraining();
     });
 
-
-    /* ====================================================================== */
-    /*                             IMPORT / EXPORT                             */
-    /* ====================================================================== */
+    /* ---- Import / Export ---- */
 
     $('#btnExport').addEventListener("click", () => {
         const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
-            type: "application/json",
+            type: "application/json"
         });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -1368,14 +1282,13 @@ window.addEventListener("DOMContentLoaded", () => {
         a.click();
     });
 
-    $('#fileImport').addEventListener("change", (e) => {
+    $('#fileImport').addEventListener("change", e => {
         stopAutoplayOnUserAction();
 
         const f = e.target.files?.[0];
         if (!f) return;
 
         const r = new FileReader();
-
         r.onload = () => {
             try {
                 const p = JSON.parse(r.result);
@@ -1391,9 +1304,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 alert("Import Fehler: " + err.message);
             }
         };
-
         r.readAsText(f);
     });
+
 });
 
 /* -------------------------------------------------------------------------- */
