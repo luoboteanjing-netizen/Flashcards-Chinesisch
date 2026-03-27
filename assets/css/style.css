@@ -426,10 +426,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-        140px   /* Lektion */
-        50px    /* Karten */
+        60px   /* Lektion */
+        60px    /* Karten */
         50px    /* ✅ */
-        60px    /* ❌ */
+        50px    /* ❌ */
         50px;   /* % */
     gap: 8px;
     padding: 4px 6px;
