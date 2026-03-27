@@ -226,7 +226,14 @@ function populateLessonSelect() {
 
         const pct = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        opt.textContent = `${k} (${total}) · 🟩 ${known} 🟥 ${unknown} (${pct}%)`;
+        opt.innerHTML = `
+		${k} (${total}) · 
+		<span class="lesson-progress">
+			<span class="lp-known">🟩 ${known}</span>
+			<span class="lp-unknown">🟥 ${unknown}</span>
+		</span>
+		(${percent}%)
+`;
 
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
