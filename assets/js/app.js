@@ -312,13 +312,13 @@ function setCard(entry, fromHistory = false) {
 
     const lessonStats = document.querySelector("#lessonStats");
 
-    // Sequenzposition setzen
+    // Sequenzposition aktualisieren
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
     }
 
-    /* ✅ Zweifarbiger Fortschrittsbalken */
+    /* ✅ zweifarbiger Fortschrittsbalken */
     {
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
@@ -338,25 +338,28 @@ function setCard(entry, fromHistory = false) {
         `;
     }
 
-    /* ===== Karteninhalt setzen ===== */
+    /* === Karteninhalt ====================================== */
 
     state.current = entry;
+
     $('#solBox').classList.add('masked');
 
     state.startedAt = Date.now();
     state.revealedAt = null;
 
     if (state.mode === 'zh2de') {
+        /* ✅ CHINESISCH → DEUTSCH – Pinyin anzeigen */
 
         $('#promptWord').innerHTML = entry.word.zh || "—";
 
-        // ✅ Pinyin vom WORT → eigene Klasse .pinyin-word
-        $('#promptWordSub').innerHTML = `<span class="pinyin-word">${entry.word.py}</span>` || "";
+        // Nur Pinyin vom Wort hier (größer)
+        $('#promptWordSub').innerHTML =
+            entry.word.py ? `<span class="pinyin-word">${entry.word.py}</span>` : "";
 
-        // ✅ Wortart darunter
+        // Wortart separat
         $('#promptPOS').textContent = entry.pos || "";
 
-        // Satz bleibt unverändert
+        // Satz + Pinyin
         $('#promptSent').innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
 
@@ -364,23 +367,24 @@ function setCard(entry, fromHistory = false) {
         $('#solSent').textContent = entry.sent.de || "—";
 
     } else {
+        /* ✅ DEUTSCH → CHINESISCH – KEIN PINYIN IN DER FRAGEKARTE! */
 
         $('#promptWord').textContent = entry.word.de || "—";
 
-        // ✅ Pinyin vom Wort
-        $('#promptWordSub').innerHTML = `<span class="pinyin-word">${entry.word.py}</span>` || "";
-
+        // DE-Fragekarte → KEIN Pinyin anzeigen
+        $('#promptWordSub').innerHTML = "";
         $('#promptPOS').textContent = entry.pos || "";
 
         $('#promptSent').textContent = entry.sent.de || "—";
 
+        /* ✅ Lösung (ZH) MIT Pinyin */
         $('#solWord').innerHTML = formatZh(entry.word.zh, entry.word.py);
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
-    /* === Buttons initial === */
+    /* === Buttons initialisieren === */
 
-    $('#btnReveal').disabled = false;   // ✅ Aufdecken wieder aktiv
+    $('#btnReveal').disabled = false;
     hideRatingButtons();
     showNavButtons();
     updateNavButtons();
@@ -392,25 +396,21 @@ function setCard(entry, fromHistory = false) {
 /* ============================ CARD NAVIGATION ============================= */
 
 function pushToHistory(entry) {
-
     if (state.historyPos < state.history.length - 1) {
         state.history = state.history.slice(0, state.historyPos + 1);
     }
-
     state.history.push(entry);
     state.historyPos = state.history.length - 1;
 }
 
 function updateNavButtons() {
-    $('#btnPrev').disabled = state.historyPos <= 0;
-    $('#btnNext').disabled = !state.pool.length;
+    $('#btnPrev').disabled = (state.historyPos <= 0);
+    $('#btnNext').disabled = (state.pool.length === 0);
 }
 
 function nextCard() {
-
     if (!state.pool.length) return;
 
-    // In History weiter
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
@@ -418,6 +418,7 @@ function nextCard() {
     }
 
     let next;
+
     if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
@@ -430,7 +431,6 @@ function nextCard() {
 }
 
 function prevCard() {
-
     if (state.historyPos > 0) {
         state.historyPos--;
         setCard(state.history[state.historyPos], true);
@@ -443,7 +443,7 @@ function prevCard() {
 function formatZh(hz, py) {
     const h = (hz || "").trim();
     const p = (py || "").trim();
-    return p ? `${h}<br>${p}` : (h || "—");
+    return p ? `${h}<br><span class="zh-pinyin">${p}</span>` : (h || "—");
 }
 
 
@@ -455,7 +455,6 @@ function doReveal() {
 
     state.revealedAt = Date.now();
 
-    // ✅ Autoplay soll Navigation NICHT verstecken
     if (!state.autoplay.on) {
         hideNavButtons();
     }
@@ -478,17 +477,15 @@ function disableRating() {
 }
 
 function showRatingButtons() {
-    document.getElementById('ratingButtons').classList.add('visible');
+    $('#ratingButtons').classList.add('visible');
 }
 
 function hideRatingButtons() {
-    document.getElementById('ratingButtons').classList.remove('visible');
+    $('#ratingButtons').classList.remove('visible');
 }
 
 function hideNavButtons() {
-    // ✅ Autoplay benötigt Navigation → nicht verstecken
-    if (state.autoplay.on) return;
-
+    if (state.autoplay.on) return;  // ✅ Autoplay braucht die Navigation
     $('#btnPrev').style.display = 'none';
     $('#btnReveal').style.display = 'none';
     $('#btnNext').style.display = 'none';
@@ -504,21 +501,19 @@ function rate(mark) {
 
     if (!state.current) return;
 
-    // Statistik
     state.session.done++;
 
-    if (mark === 'known')     state.session.known++;
+    if (mark === 'known') state.session.known++;
     else if (mark === 'unknown') state.session.unknown++;
-    else if (mark === 'unsure')  state.session.unsure++;
+    else if (mark === 'unsure') state.session.unsure++;
 
-    // Fortschritt speichern (nur known/unknown)
     const lesson = state.current.lesson;
 
     if (lesson) {
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
-        if (mark === "known")   state.progress.byLesson[lesson].known++;
+        if (mark === "known") state.progress.byLesson[lesson].known++;
         if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
@@ -535,7 +530,6 @@ function rate(mark) {
 /* ============================ SESSION STATS =============================== */
 
 function renderSessionStats() {
-
     const s = state.session;
 
     const avg = s.ttrCount
@@ -564,10 +558,7 @@ function startTraining() {
         state.selectedLessons.clear();
 
         const picked = [];
-        for (const opt of sel.selectedOptions) {
-            picked.push(opt.value);
-            state.selectedLessons.add(opt.value);
-        }
+        for (const opt of sel.selectedOptions) picked.push(opt.value);
 
         state.settings.lessons = picked;
         saveSettings();
@@ -591,7 +582,7 @@ function startTraining() {
         updateTrainingBtn();
 
         // ✅ Scroll-Fix
-        setTimeout(scrollToBottom, 30);
+        setTimeout(scrollToBottom, 50);
 
     } else {
         stopTraining();
@@ -1172,6 +1163,7 @@ function stopAutoplayOnUserAction() {
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 3                                 */
 /* -------------------------------------------------------------------------- */
+
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 4 von 4                                 */
 /*                 Event Listener · Mode Switch · Init Routine                */
@@ -1185,15 +1177,18 @@ window.addEventListener("DOMContentLoaded", () => {
     loadProgress();
     loadCSV();
 
-    state.mode = state.settings.mode || "de2zh";
+    state.mode  = state.settings.mode  || "de2zh";
     state.order = state.settings.order || "random";
 
     renderModeUI();
 
 
-    /* ======================== AUTOPLAY-BUTTON REPOSITION =================== */
+    /* ====================================================================== */
+    /*      AUTOPLAY-BUTTON neben Training platzieren (stabile Version)       */
+    /* ====================================================================== */
 
     (function placeAutoplayButton() {
+
         const trainingBtn = document.querySelector("#btnStart");
         const autoplayBtn = document.querySelector("#btnAutoplay");
 
@@ -1201,38 +1196,41 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const parent = trainingBtn.parentNode;
 
-        // Gruppe erzeugen falls nicht vorhanden
+        // Falls die Gruppe fehlt: neu erzeugen
         let group = parent.querySelector(".training-group");
 
         if (!group) {
             group = document.createElement("div");
             group.className = "training-group";
 
-            // Training rein
             parent.insertBefore(group, trainingBtn);
             group.appendChild(trainingBtn);
         }
 
-        // Autoplay rein
+        // Autoplay einfügen
         group.appendChild(autoplayBtn);
 
         autoplayBtn.classList.add("primary");
     })();
 
 
-    /* ============================== BUTTON EVENTS =========================== */
+    /* ====================================================================== */
+    /*                          BUTTON EVENT LISTENER                          */
+    /* ====================================================================== */
 
-    // Modus wechseln
+    /* ---------- Modus wechseln ---------- */
     $('#btnSwapMode').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
         state.settings.mode = state.mode;
         saveSettings();
         renderModeUI();
+
         if (state.current) setCard(state.current);
     });
 
-    // Reihenfolge
+
+    /* ---------- Reihenfolge ---------- */
     $('#btnOrderToggle').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.order = state.order === "random" ? "seq" : "random";
@@ -1241,11 +1239,16 @@ window.addEventListener("DOMContentLoaded", () => {
         renderModeUI();
     });
 
-    // Autoplay
-    $('#btnAutoplay').addEventListener("click", toggleAutoplay);
 
-    // Pause zwischen Karten
-    $('#gapRange').addEventListener("input", e => {
+    /* ---------- Autoplay ---------- */
+    $('#btnAutoplay').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        toggleAutoplay();
+    });
+
+
+    /* ---------- Slider ---------- */
+    $('#gapRange').addEventListener("input", (e) => {
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
         state.settings.autoplayGap = state.autoplay.gapMs;
@@ -1254,7 +1257,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ============================== SPEAKER ================================ */
+    /* ====================================================================== */
+    /*                           LAUTSPRECHER ICONS                            */
+    /* ====================================================================== */
 
     $('#speakerQuestion').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1267,12 +1272,14 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ============================== TRAINING =============================== */
+    /* ====================================================================== */
+    /*                               TRAINING                                  */
+    /* ====================================================================== */
 
     $('#btnStart').addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
-        updateTrainingBtn();
+        updateTrainingBtn();    // ✅ Buttontext aktualisieren
     });
 
     $('#btnNext').addEventListener("click", () => {
@@ -1291,7 +1298,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ============================== RATING ================================= */
+    /* ====================================================================== */
+    /*                                RATING                                   */
+    /* ====================================================================== */
 
     $('#btnRateKnown').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1309,7 +1318,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* ============================= LEKTIONEN =============================== */
+    /* ====================================================================== */
+    /*                                LEKTIONEN                                */
+    /* ====================================================================== */
 
     $('#btnUseLessons').addEventListener("click", () => {
         stopAutoplayOnUserAction();
@@ -1343,11 +1354,13 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* =========================== IMPORT / EXPORT =========================== */
+    /* ====================================================================== */
+    /*                             IMPORT / EXPORT                             */
+    /* ====================================================================== */
 
     $('#btnExport').addEventListener("click", () => {
         const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
-            type: "application/json"
+            type: "application/json",
         });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -1355,7 +1368,7 @@ window.addEventListener("DOMContentLoaded", () => {
         a.click();
     });
 
-    $('#fileImport').addEventListener("change", e => {
+    $('#fileImport').addEventListener("change", (e) => {
         stopAutoplayOnUserAction();
 
         const f = e.target.files?.[0];
@@ -1381,8 +1394,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         r.readAsText(f);
     });
-
 });
+
 /* -------------------------------------------------------------------------- */
 /*                             ENDE TEIL 4 (FINAL)                             */
 /* -------------------------------------------------------------------------- */
