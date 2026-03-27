@@ -214,15 +214,15 @@ function populateLessonSelect() {
     sel.innerHTML = "";
     table.innerHTML = "";
 
-    const header = `
-        <div class="lt-row lt-head">
-            <span class="lt-lesson">Lektion</span>
-            <span class="lt-total">Karten</span>
-            <span class="lt-known">✅ Gewusst</span>
-            <span class="lt-unknown">❌ Nicht</span>
-            <span class="lt-percent">%</span>
-        </div>
-    `;
+ const header = `
+    <div class="lt-row lt-head">
+        <span class="lt-lesson">Lektion</span>
+        <span class="lt-total">Karten</span>
+        <span class="lt-known">✅</span>
+        <span class="lt-unknown">❌</span>
+        <span class="lt-percent">%</span>
+    </div>
+`;
     table.insertAdjacentHTML("beforeend", header);
 
     for (const k of state.lessonOrder) {
