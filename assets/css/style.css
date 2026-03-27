@@ -216,7 +216,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  width: 100%;
  height: 12px;
  background: #283344;
- border-radius: 2px;
+ border-radius: 5px;
  position: relative;
  overflow: hidden;
 }
@@ -328,4 +328,20 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 .section-title .left  { text-align: left;  }
 .section-title .right { text-align: right; }
-``
+
+/* Fortschrittszahlen in Lektionenliste sauber ausrichten */
+.lesson-progress {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;   /* ✅ Abstand zwischen 🟩 und 🟥 erhöhen */
+    min-width: 120px; /* ✅ sorgt für vertikale Ausrichtung aller Zeilen */
+}
+
+/* Spalten mit Emoji + Zahl */
+.lesson-progress span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;     /* Emoji + Zahl etwas trennen */
+    font-variant-numeric: tabular-nums;  /* ✅ Zahlen monospaced → perfekt ausgerichtet */
+}
