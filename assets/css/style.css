@@ -483,3 +483,40 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #speakerAnswer {
     color: #333;  /* gleiche Farbe */
 }
+#promptBox, #solBox {
+    text-align: center;
+}
+
+#promptWord, 
+#promptWordSub,
+#promptSent,
+#solWord,
+#solSent {
+    text-align: center;
+    width: 100%;
+}
+#btnRateUnsure {
+    display: none !important;
+}
+/* Bewertung erst anzeigen nach Reveal */
+.rate-buttons {
+    display: none;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.rate-buttons.visible {
+    display: flex;
+}
+
+/* Bewertungsbuttons gleich groß */
+#btnRateKnown, #btnRateUnknown {
+    min-width: 140px;
+}
+
+/* Zentrierter Text */
+#promptWord, #promptWordSub, #promptSent,
+#solWord, #solSent {
+    text-align: center;
+}
