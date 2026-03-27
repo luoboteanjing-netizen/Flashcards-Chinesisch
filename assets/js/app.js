@@ -1167,6 +1167,14 @@ window.addEventListener("DOMContentLoaded", () => {
     /* CSV LADEN */
     console.log("[INIT] CSV laden…");
     loadCSV();
+	
+	// ✅ Stimmen wiederherstellen (DE & ZH)
+		speechSynthesis.onvoiceschanged = () => {
+		refreshVoices();
+};
+
+// ✅ Fallback, falls Browser das Event nicht sendet
+setTimeout(refreshVoices, 300);
 
 
     /* AUTOPLAY-BUTTON neben Training-Button einfügen */
