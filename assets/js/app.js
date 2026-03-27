@@ -277,8 +277,8 @@ function gatherPoolFromSettings() {
 /*                                ENDE TEIL 1                                 */
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
-/*                     TEIL 2 + TEIL 4 (Komplett integriert)                 */
-/*      Card Rendering · Navigation · Rating · Session · Training · UI       */
+/*                               TEIL 2 von 4                                 */
+/*      Card Rendering · Navigation · Rating · Session Stats · Training       */
 /* -------------------------------------------------------------------------- */
 
 
@@ -290,23 +290,22 @@ function setCard(entry, fromHistory = false) {
         pushToHistory(entry);
     }
 
-    const cardTitle = document.querySelector("#cardTitle");
     const cardLesson = document.querySelector("#cardLesson");
     const lessonStats = document.querySelector("#lessonStats");
 
+    // Sequenz-Index aktualisieren
     if (state.order === "seq") {
         const pos = state.pool.indexOf(entry);
         if (pos >= 0) state.idx = pos;
     }
 
-    if (cardTitle)
-        cardTitle.textContent = `Karte (ID ${entry.id})`;
-
-    if (cardLesson)
+    if (cardLesson) {
         cardLesson.textContent = `Lektion ${entry.lesson}`;
+    }
 
-    /* ✅ Neuer zweifarbiger Fortschrittsbalken */
+    /* ✅ Zweifarbiger Fortschrittsbalken */
     if (lessonStats) {
+
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
 
@@ -325,7 +324,7 @@ function setCard(entry, fromHistory = false) {
         `;
     }
 
-    /* ============ Karteninhalt setzen =============== */
+    /* === Karteninhalt ====================================== */
 
     state.current = entry;
 
@@ -337,9 +336,9 @@ function setCard(entry, fromHistory = false) {
 
         $('#promptWord').innerHTML = entry.word.zh || "—";
 
-        let wi = entry.word.py || "";
-        if (entry.pos) wi += ` (${entry.pos})`;
-        $('#promptWordSub').innerHTML = wi;
+        let wordInfo = entry.word.py || "";
+        if (entry.pos) wordInfo += ` (${entry.pos})`;
+        $('#promptWordSub').innerHTML = wordInfo;
 
         $('#promptSent').innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
@@ -357,13 +356,13 @@ function setCard(entry, fromHistory = false) {
         $('#solSent').innerHTML = formatZh(entry.sent.zh, entry.sent.py);
     }
 
-    /* Buttons initial */
+    /* === Buttons initialisieren === */
+
     $('#btnReveal').disabled = false;
     hideRatingButtons();
     showNavButtons();
 
     updateNavButtons();
-    renderModeUI();
     syncCardHeights();
 }
 
@@ -371,14 +370,14 @@ function setCard(entry, fromHistory = false) {
 /* ============================ CARD NAVIGATION ============================= */
 
 function pushToHistory(entry) {
+
+    // Vorwärts-History löschen
     if (state.historyPos < state.history.length - 1) {
         state.history = state.history.slice(0, state.historyPos + 1);
     }
 
     state.history.push(entry);
     state.historyPos = state.history.length - 1;
-
-    updateNavButtons();
 }
 
 function updateNavButtons() {
@@ -387,15 +386,17 @@ function updateNavButtons() {
 }
 
 function nextCard() {
+
     if (!state.pool.length) return;
 
+    // In History vorwärts
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
         setCard(state.history[state.historyPos], true);
-        syncCardHeights();
         return;
     }
 
+    // Neue Karte
     let next;
     if (state.order === 'seq') {
         if (state.idx == null) state.idx = 0;
@@ -406,17 +407,14 @@ function nextCard() {
     }
 
     setCard(next);
-    syncCardHeights();
 }
 
 function prevCard() {
+
     if (state.historyPos > 0) {
         state.historyPos--;
         setCard(state.history[state.historyPos], true);
     }
-
-    syncCardHeights();
-    updateNavButtons();
 }
 
 
@@ -435,15 +433,9 @@ function doReveal() {
     $('#solBox').classList.remove('masked');
 
     state.revealedAt = Date.now();
-    const ttr = state.revealedAt - (state.startedAt || state.revealedAt);
 
-    if (ttr > 0) {
-        state.session.ttrSum += ttr;
-        state.session.ttrCount++;
-    }
-
-    hideNavButtons();
     showRatingButtons();
+    hideNavButtons();
 
     enableRating();
     renderSessionStats();
@@ -481,21 +473,22 @@ function showNavButtons() {
 }
 
 function rate(mark) {
+
     if (!state.current) return;
 
     state.session.done++;
     if (mark === 'known') state.session.known++;
     else state.session.unknown++;
 
-    renderSessionStats();
-
     const lesson = state.current.lesson;
+
     if (lesson) {
+
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
-        if (mark === 'known') state.progress.byLesson[lesson].known++;
-        if (mark === 'unknown') state.progress.byLesson[lesson].unknown++;
+        if (mark === "known") state.progress.byLesson[lesson].known++;
+        if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
     }
@@ -522,13 +515,14 @@ function renderSessionStats() {
         : "—";
 
     $('#sessionStats').textContent =
-        `Karten: ${s.done}/${s.total} · Korrekt: ${acc} · Ø ${avg}s`;
+        `Karten: ${s.done}/${s.total} · Richtig: ${acc} · Ø ${avg}s`;
 }
 
 
 /* ============================ TRAINING FLOW =============================== */
 
 function startTraining() {
+
     if (!state.trainingOn) {
 
         state.history = [];
@@ -557,13 +551,11 @@ function startTraining() {
             state.idx = 0;
             setCard(state.pool[state.idx]);
         } else {
-            state.idx = null;
             const r = state.pool[Math.floor(Math.random() * state.pool.length)];
             setCard(r);
         }
 
         state.trainingOn = true;
-        updateTrainingBtn();
         scrollToBottom();
 
     } else {
@@ -572,209 +564,24 @@ function startTraining() {
 }
 
 function stopTraining() {
+
     state.trainingOn = false;
-    updateTrainingBtn();
 
     $('#btnPrev').disabled = true;
     $('#btnReveal').disabled = true;
     $('#btnNext').disabled = true;
 
+    hideRatingButtons();
     disableRating();
 
     $('#solBox').classList.add('masked');
-    $('#promptWord').textContent = "—";
-    $('#promptWordSub').innerHTML = " ";
-    $('#promptSent').textContent = "—";
-    $('#solWord').textContent = "—";
-    $('#solSent').textContent = "—";
-}
-
-function updateTrainingBtn() {
-    $('#btnStart').textContent = state.trainingOn
-        ? "Training stoppen ■"
-        : "Training starten ▶";
 }
 
 
-/* ============================ DOM INIT (TEIL 4) ============================ */
+/* -------------------------------------------------------------------------- */
+/*                                ENDE TEIL 2                                 */
+/* -------------------------------------------------------------------------- */
 
-window.addEventListener("DOMContentLoaded", () => {
-
-    loadSettings();
-    loadProgress();
-
-    state.mode = state.settings.mode || 'de2zh';
-    state.order = state.settings.order || 'random';
-
-    state.autoplay.gapMs =
-        typeof state.settings.autoplayGap === 'number'
-            ? state.settings.autoplayGap
-            : 800;
-
-    state.rateDe = state.settings.rateDe;
-    state.pitchDe = state.settings.pitchDe;
-    state.rateZh = state.settings.rateZh;
-    state.pitchZh = state.settings.pitchZh;
-
-    renderModeUI();
-    loadCSV();
-
-
-    /* ---------- EVENT LISTENER ---------- */
-
-    $('#btnSwapMode').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        state.mode = state.mode === 'de2zh' ? 'zh2de' : 'de2zh';
-        state.settings.mode = state.mode;
-        saveSettings();
-        renderModeUI();
-        if (state.current) setCard(state.current);
-    });
-
-    $('#btnOrderToggle').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        state.order = state.order === "random" ? "seq" : "random";
-        state.settings.order = state.order;
-        saveSettings();
-        renderModeUI();
-    });
-
-    $('#btnAutoplay').addEventListener("click", toggleAutoplay);
-
-    $('#gapRange').addEventListener("input", e => {
-        const s = parseFloat(e.target.value) || 0.8;
-        state.autoplay.gapMs = Math.round(s * 1000);
-        state.settings.autoplayGap = state.autoplay.gapMs;
-        $('#gapVal').textContent = `(${s.toFixed(1)} s)`;
-        saveSettings();
-    });
-
-
-    /* ---- Neue Lautsprecher-Icons ---- */
-
-    $('#speakerQuestion').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        playQuestion();
-    });
-
-    $('#speakerAnswer').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        playAnswer();
-    });
-
-
-    /* ---- Training ---- */
-
-    $('#btnStart').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        startTraining();
-    });
-
-    $('#btnNext').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        nextCard();
-    });
-
-    $('#btnPrev').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        prevCard();
-    });
-
-    $('#btnReveal').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        doReveal();
-    });
-
-
-    /* ---- Rating ---- */
-
-    $('#btnRateKnown').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("known");
-    });
-
-    $('#btnRateUnknown').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unknown");
-    });
-
-
-    /* ---- Lessons ---- */
-
-    $('#btnUseLessons').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        const sel = $('#lessonSelect');
-        const picked = [];
-
-        for (const o of sel.selectedOptions) picked.push(o.value);
-
-        state.settings.lessons = picked;
-        saveSettings();
-        gatherPoolFromSettings();
-    });
-
-    $('#btnClearLessons').addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        state.selectedLessons.clear();
-        state.settings.lessons = [];
-        saveSettings();
-
-        state.pool = [];
-        state.idx = null;
-        resetSessionStats();
-
-        const sel = $('#lessonSelect');
-        for (const o of sel.options) o.selected = false;
-
-        if (state.trainingOn) stopTraining();
-    });
-
-
-    /* ---- Export / Import ---- */
-
-    $('#btnExport').addEventListener("click", () => {
-        const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
-            type: "application/json"
-        });
-
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "progress.json";
-        a.click();
-
-        setTimeout(() => URL.revokeObjectURL(a.href), 600);
-    });
-
-    $('#fileImport').addEventListener("change", e => {
-        stopAutoplayOnUserAction();
-
-        const f = e.target.files?.[0];
-        if (!f) return;
-
-        const r = new FileReader();
-        r.onload = () => {
-            try {
-                const p = JSON.parse(r.result);
-                if (p && p.version === "v1") {
-                    state.progress = p;
-                    saveProgress();
-                    populateLessonSelect();
-                    alert("Fortschritt importiert.");
-                } else {
-                    alert("Ungültiges Format.");
-                }
-            } catch (err) {
-                alert("Import fehlgeschlagen: " + err.message);
-            }
-        };
-
-        r.readAsText(f);
-        e.target.value = "";
-    });
-
-});
 /* -------------------------------------------------------------------------- */
 /*                               TEIL 3 von 4                                 */
 /*                   TTS · Stimmen · Autoplay · Wake Lock                     */
@@ -1335,4 +1142,173 @@ function stopAutoplayOnUserAction() {
 
 /* -------------------------------------------------------------------------- */
 /*                                ENDE TEIL 3                                 */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                               TEIL 4 von 4                                 */
+/*                 Event Listener · Mode Switch · Init Routine                */
+/* -------------------------------------------------------------------------- */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    loadSettings();
+    loadProgress();
+    loadCSV();
+
+    state.mode = state.settings.mode || "de2zh";
+    state.order = state.settings.order || "random";
+
+    renderModeUI();
+
+    /* ============================ BUTTON EVENTS =========================== */
+
+    // Modus wechseln
+    $('#btnSwapMode').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
+        state.settings.mode = state.mode;
+        saveSettings();
+        renderModeUI();
+        if (state.current) setCard(state.current);
+    });
+
+    // Reihenfolge
+    $('#btnOrderToggle').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.order = state.order === "random" ? "seq" : "random";
+        state.settings.order = state.order;
+        saveSettings();
+        renderModeUI();
+    });
+
+    // Autoplay
+    $('#btnAutoplay').addEventListener("click", toggleAutoplay);
+
+    // Gap Slider
+    $('#gapRange').addEventListener("input", e => {
+        const s = parseFloat(e.target.value) || 0.8;
+        state.autoplay.gapMs = Math.round(s * 1000);
+        state.settings.autoplayGap = state.autoplay.gapMs;
+        $('#gapVal').textContent = `(${s}s)`;
+        saveSettings();
+    });
+
+    /* ---- Lautsprecher ---- */
+
+    $('#speakerQuestion').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        playQuestion();
+    });
+
+    $('#speakerAnswer').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        playAnswer();
+    });
+
+    /* ---- Training ---- */
+
+    $('#btnStart').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        startTraining();
+    });
+
+    $('#btnNext').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        nextCard();
+    });
+
+    $('#btnPrev').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        prevCard();
+    });
+
+    $('#btnReveal').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        doReveal();
+    });
+
+    /* ---- Rating ---- */
+
+    $('#btnRateKnown').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("known");
+    });
+
+    $('#btnRateUnknown').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unknown");
+    });
+
+    /* ---- Lessons ---- */
+
+    $('#btnUseLessons').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+
+        const sel = $('#lessonSelect');
+        const picked = [];
+
+        for (const o of sel.selectedOptions) picked.push(o.value);
+
+        state.settings.lessons = picked;
+        saveSettings();
+        gatherPoolFromSettings();
+    });
+
+    $('#btnClearLessons').addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+
+        state.selectedLessons.clear();
+        state.settings.lessons = [];
+        saveSettings();
+
+        state.pool = [];
+        state.idx = null;
+        resetSessionStats();
+
+        const sel = $('#lessonSelect');
+        for (const o of sel.options) o.selected = false;
+
+        if (state.trainingOn) stopTraining();
+    });
+
+    /* ---- Import / Export ---- */
+
+    $('#btnExport').addEventListener("click", () => {
+        const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
+            type: "application/json"
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "progress.json";
+        a.click();
+    });
+
+    $('#fileImport').addEventListener("change", e => {
+        stopAutoplayOnUserAction();
+
+        const f = e.target.files?.[0];
+        if (!f) return;
+
+        const r = new FileReader();
+        r.onload = () => {
+            try {
+                const p = JSON.parse(r.result);
+                if (p && p.version === "v1") {
+                    state.progress = p;
+                    saveProgress();
+                    populateLessonSelect();
+                    alert("Fortschritt importiert.");
+                } else {
+                    alert("Ungültiges Format.");
+                }
+            } catch (err) {
+                alert("Import Fehler: " + err.message);
+            }
+        };
+        r.readAsText(f);
+    });
+
+});
+
+/* -------------------------------------------------------------------------- */
+/*                             ENDE TEIL 4 (FINAL)                             */
 /* -------------------------------------------------------------------------- */
