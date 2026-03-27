@@ -316,5 +316,16 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* ✅ Zeilenabstand 2x für bessere Lesbarkeit */
 #promptBox .prompt,
 #solBox .sol-text {
-    line-height: 2.0;
+    line-height: 1.6;
 }
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.section-title .left  { text-align: left;  }
+.section-title .right { text-align: right; }
+``
