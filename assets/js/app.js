@@ -1258,7 +1258,7 @@ function renderModeUI() {
 
 window.addEventListener("DOMContentLoaded", () => {
 
-    console.log("[INIT] DOM geladen – Initialisierung startet…");
+    console.log("[INIT] Starte Initialisierung …");
 
     /* ============================================================
        SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
@@ -1270,17 +1270,22 @@ window.addEventListener("DOMContentLoaded", () => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.classList.toggle("light", savedTheme === "light");
 
-    // Satz-Delay laden (Fallback = 5000 ms)
+    // Satz-Delay (ms)
     if (state.settings.sentenceDelay !== undefined) {
         state.sentenceDelay = state.settings.sentenceDelay;
     }
-    const delayInput = document.querySelector("#delayInput");
-    if (delayInput) delayInput.value = (state.sentenceDelay / 1000);
 
+    const delayInput = document.querySelector("#delayInput");
+    if (delayInput) delayInput.value = state.sentenceDelay / 1000;
+
+    // MODE & ORDER
     state.mode  = state.settings.mode  || "de2zh";
     state.order = state.settings.order || "random";
+
+    // AUTOPLAY GAP
     state.autoplay.gapMs = state.settings.autoplayGap || 800;
 
+    // TTS-Werte übernehmen
     state.rateDe  = state.settings.rateDe;
     state.pitchDe = state.settings.pitchDe;
     state.rateZh  = state.settings.rateZh;
@@ -1291,7 +1296,6 @@ window.addEventListener("DOMContentLoaded", () => {
     /* ============================================================
        CSV LADEN
        ============================================================ */
-    console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
 
     /* ============================================================
@@ -1302,20 +1306,35 @@ window.addEventListener("DOMContentLoaded", () => {
     };
     setTimeout(refreshVoices, 300); // Fallback
 
+    /* Slider auf gespeicherte Werte setzen */
+    const rateDeRange  = document.querySelector("#rateDeRange");
+    const pitchDeRange = document.querySelector("#pitchDeRange");
+    const rateZhRange  = document.querySelector("#rateZhRange");
+    const pitchZhRange = document.querySelector("#pitchZhRange");
+
+    const rateDeVal  = document.querySelector("#rateDeVal");
+    const pitchDeVal = document.querySelector("#pitchDeVal");
+    const rateZhVal  = document.querySelector("#rateZhVal");
+    const pitchZhVal = document.querySelector("#pitchZhVal");
+
+    if (rateDeRange)  rateDeRange.value  = state.rateDe;
+    if (pitchDeRange) pitchDeRange.value = state.pitchDe;
+    if (rateZhRange)  rateZhRange.value  = state.rateZh;
+    if (pitchZhRange) pitchZhRange.value = state.pitchZh;
+
+    if (rateDeVal)  rateDeVal.textContent  = `(${state.rateDe.toFixed(2)})`;
+    if (pitchDeVal) pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
+    if (rateZhVal)  rateZhVal.textContent  = `(${state.rateZh.toFixed(2)})`;
+    if (pitchZhVal) pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
 
     /* ============================================================
-       UI ELEMENTE INITIALISIEREN
+       AUTOPLAY BUTTON In TRAINING-GRUPPE SETZEN
        ============================================================ */
-
-    // Autoplay neben Training platzieren
     (function placeAutoplayButton() {
         const trainingBtn = document.querySelector("#btnStart");
         const autoplayBtn = document.querySelector("#btnAutoplay");
 
-        if (!trainingBtn || !autoplayBtn) {
-            console.warn("[UI] Training oder Autoplay Button nicht gefunden.");
-            return;
-        }
+        if (!trainingBtn || !autoplayBtn) return;
 
         const parent = trainingBtn.parentNode;
         let group = parent.querySelector(".training-group");
@@ -1331,9 +1350,8 @@ window.addEventListener("DOMContentLoaded", () => {
         autoplayBtn.classList.add("primary");
     })();
 
-
     /* ============================================================
-       HAMBURGER (⋮) MENÜ
+       SLIDE-DRAWER (⋮)
        ============================================================ */
     const toggleBtn = document.querySelector("#menuToggle");
     const sideMenu  = document.querySelector("#sideMenu");
@@ -1355,7 +1373,7 @@ window.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("theme", "dark");
     });
 
-    /* DELAY-EINSTELLUNG */
+    /* DELAY INPUT */
     if (delayInput) {
         delayInput.addEventListener("input", (e) => {
             const seconds = parseFloat(e.target.value) || 0;
@@ -1365,11 +1383,58 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /* ============================================================
+       STIMMEN-EINSTELLUNG
+       ============================================================ */
+    rateDeRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.rateDe = parseFloat(e.target.value);
+        state.settings.rateDe = state.rateDe;
+        rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
+        saveSettings();
+    });
+
+    pitchDeRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.pitchDe = parseFloat(e.target.value);
+        state.settings.pitchDe = state.pitchDe;
+        pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
+        saveSettings();
+    });
+
+    rateZhRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.rateZh = parseFloat(e.target.value);
+        state.settings.rateZh = state.rateZh;
+        rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
+        saveSettings();
+    });
+
+    pitchZhRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.pitchZh = parseFloat(e.target.value);
+        state.settings.pitchZh = state.pitchZh;
+        pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
+        saveSettings();
+    });
+
+    document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        openVoicesPanelFor("de");
+    });
+
+    document.querySelector("#btnVoiceZh")?.addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        openVoicesPanelFor("zh");
+    });
+
+    document.querySelector("#btnCloseVoices")?.addEventListener("click", () => {
+        closeVoices();
+    });
 
     /* ============================================================
-       EVENT LISTENER – MODUS, REIHENFOLGE, AUTOPLAY
+       MODUS, REIHENFOLGE, AUTOPLAY
        ============================================================ */
-
     $("#btnSwapMode").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
@@ -1400,58 +1465,8 @@ window.addEventListener("DOMContentLoaded", () => {
         saveSettings();
     });
 
-
     /* ============================================================
-       STIMMEN-EINSTELLUNG
-       ============================================================ */
-
-    $("#btnVoiceDe").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        openVoicesPanelFor("de");
-    });
-
-    $("#btnVoiceZh").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        openVoicesPanelFor("zh");
-    });
-
-    $("#btnCloseVoices").addEventListener("click", closeVoices);
-
-    $("#rateDeRange").addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.rateDe = parseFloat(e.target.value);
-        state.settings.rateDe = state.rateDe;
-        $("#rateDeVal").textContent = `(${state.rateDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    $("#pitchDeRange").addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.pitchDe = parseFloat(e.target.value);
-        state.settings.pitchDe = state.pitchDe;
-        $("#pitchDeVal").textContent = `(${state.pitchDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    $("#rateZhRange").addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.rateZh = parseFloat(e.target.value);
-        state.settings.rateZh = state.rateZh;
-        $("#rateZhVal").textContent = `(${state.rateZh.toFixed(2)})`;
-        saveSettings();
-    });
-
-    $("#pitchZhRange").addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.pitchZh = parseFloat(e.target.value);
-        state.settings.pitchZh = state.pitchZh;
-        $("#pitchZhVal").textContent = `(${state.pitchZh.toFixed(2)})`;
-        saveSettings();
-    });
-
-
-    /* ============================================================
-       TRAINING, NAVIGATION, AUFDECKEN
+       TRAINING + NAVIGATION
        ============================================================ */
 
     $("#btnStart").addEventListener("click", () => {
@@ -1474,10 +1489,9 @@ window.addEventListener("DOMContentLoaded", () => {
         doReveal();
     });
 
-
-    /* ======================================================================
-       AUDIO (SPRECHER)
-       ====================================================================== */
+    /* ============================================================
+       AUDIO SPRECHER
+       ============================================================ */
     $("#speakerQuestion").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playQuestion();
@@ -1488,10 +1502,10 @@ window.addEventListener("DOMContentLoaded", () => {
         playAnswer();
     });
 
-
     /* ============================================================
        RATING
        ============================================================ */
+
     $("#btnRateKnown").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("known");
@@ -1506,7 +1520,6 @@ window.addEventListener("DOMContentLoaded", () => {
         stopAutoplayOnUserAction();
         rate("unknown");
     });
-
 
     /* ============================================================
        LEKTIONEN
@@ -1535,23 +1548,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
         state.pool = [];
         state.idx = null;
+
         resetSessionStats();
 
         const sel = $('#lessonSelect');
         for (const o of sel.options) o.selected = false;
 
-        document.querySelectorAll(".lt-row.selected").forEach(row =>
-            row.classList.remove("selected")
-        );
+        document.querySelectorAll(".lt-row.selected")
+            .forEach(row => row.classList.remove("selected"));
 
         if (state.trainingOn) stopTraining();
     });
 
-
     /* ============================================================
-       IMPORT / EXPORT
+       IMPORT/EXPORT → jetzt im Seitenmenü
        ============================================================ */
-    $("#btnExport").addEventListener("click", () => {
+
+    document.querySelector("#btnMenuExport")?.addEventListener("click", () => {
         const blob = new Blob(
             [JSON.stringify(state.progress, null, 2)],
             { type: "application/json" }
@@ -1563,36 +1576,39 @@ window.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => URL.revokeObjectURL(a.href), 300);
     });
 
-    $("#fileImport").addEventListener("change", (e) => {
-        stopAutoplayOnUserAction();
+    document.querySelector("#btnMenuImport")?.addEventListener("click", () => {
+        const inp = document.createElement("input");
+        inp.type = "file";
+        inp.accept = "application/json";
 
-        const f = e.target.files?.[0];
-        if (!f) return;
-
-        const r = new FileReader();
-
-        r.onload = () => {
-            try {
-                const p = JSON.parse(r.result);
-                if (p && p.version === "v1") {
-                    state.progress = p;
-                    saveProgress();
-                    populateLessonSelect();
-                    alert("Fortschritt importiert.");
-                } else {
-                    alert("Ungültiges Format.");
+        inp.onchange = (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = () => {
+                try {
+                    const p = JSON.parse(r.result);
+                    if (p && p.version === "v1") {
+                        state.progress = p;
+                        saveProgress();
+                        populateLessonSelect();
+                        alert("Fortschritt importiert.");
+                    } else {
+                        alert("Ungültiges Format.");
+                    }
+                } catch (err) {
+                    alert("Fehler beim Import.");
                 }
-            } catch (err) {
-                alert("Fehler beim Import: " + err.message);
-            }
+            };
+            r.readAsText(f);
         };
 
-        r.readAsText(f);
-        e.target.value = "";
+        inp.click();
     });
 
-    console.log("[INIT] Bereit ✅");
+    console.log("[INIT] Alles bereit ✅");
 });
+
 
 /* ========================================================================== */
 /*                                ENDE TEIL 4                                 */
