@@ -764,3 +764,15 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     color: var(--muted);
     text-align: center;
 }
+
+/* ===========================================================
+   DRAG-TO-CLOSE (glatte Bewegung beim Ziehen)
+   =========================================================== */
+.side-menu {
+    touch-action: pan-y;
+    transition: right 0.25s ease-out;
+}
+
+.side-menu.dragging {
+    transition: none !important; /* kein Snap während des Ziehens */
+}
