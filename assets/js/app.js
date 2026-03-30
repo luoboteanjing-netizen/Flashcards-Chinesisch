@@ -1629,6 +1629,9 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 /* ============================================================
    DRAG-TO-CLOSE – professionell wie in Mobile-Apps
    ============================================================ */
+/* ============================================================
+   DRAG-TO-CLOSE – richtig für Menü auf der rechten Seite
+   ============================================================ */
 (function enableDragToClose() {
     const menu = document.querySelector("#sideMenu");
     if (!menu) return;
@@ -1636,14 +1639,13 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     let startX = 0;
     let currentX = 0;
     let dragging = false;
-    let menuWidth = menu.offsetWidth;
 
     function onStart(e) {
-        // Nur reagieren wenn Menü offen ist
         if (!menu.classList.contains("open")) return;
 
         dragging = true;
         menu.classList.add("dragging");
+
         startX = e.touches ? e.touches[0].clientX : e.clientX;
         currentX = startX;
     }
@@ -1654,25 +1656,27 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
         currentX = e.touches ? e.touches[0].clientX : e.clientX;
         let diff = currentX - startX;
 
-        // diff ist negativ = nach links ziehen
-        if (diff < 0) {
-            menu.style.right = `${Math.min(0, diff)}px`;
+        // ✅ Nur rechts wischen erlaubt diff > 0
+        if (diff > 0) {
+            // Ziehe das Menü entsprechend nach rechts hinaus
+            menu.style.right = `${-diff}px`;
         }
     }
 
     function onEnd() {
         if (!dragging) return;
+
         dragging = false;
         menu.classList.remove("dragging");
 
         let diff = currentX - startX;
 
-        // Wenn mehr als 40px nach links gezogen → schließen
-        if (diff < -40) {
+        // ✅ Wenn genug nach rechts gewischt → Menü schließen
+        if (diff > 40) {
             menu.classList.remove("open");
         }
 
-        // Menü wieder einrasten auf die Standardposition
+        // Menü resetten
         menu.style.right = "";
     }
 
@@ -1681,12 +1685,11 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     menu.addEventListener("touchmove", onMove);
     menu.addEventListener("touchend", onEnd);
 
-    // Maus Events (optional für Desktop)
+    // Maus (für Desktop)
     menu.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
 })();
-
 
 
     console.log("[INIT] Alles bereit ✅");
