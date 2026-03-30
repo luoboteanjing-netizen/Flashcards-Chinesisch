@@ -303,3 +303,25 @@ h1 {
     color: var(--text);
     border-radius: 6px;
 }
+
+/* ====================================== */
+/* ✅ Fix: Stimmenpanel korrekt über UI   */
+/* ====================================== */
+
+#voicePanel {
+    z-index: 500 !important;       /* unterhalb MenüToggle */
+}
+
+#menuToggle {
+    z-index: 1000 !important;      /* immer ganz oben */
+}
+
+.side-menu {
+    z-index: 900 !important;       /* oberhalb App, unter menuToggle */
+}
+
+.card,
+.lesson-table,
+#learnSection {
+    z-index: 1;                    /* ganz normale UI-Ebene */
+}
