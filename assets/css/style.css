@@ -755,3 +755,30 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 :root.light .pinyin-word {
     color: #444;             /* Light-Mode: besser lesbar */
 }
+
+/* SVG Speaker Icon */
+.icon-speaker {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+/* Dark Mode – hell sichtbar */
+.card-speaker {
+    color: var(--text) !important;
+}
+
+/* Light Mode – dezent */
+:root.light .card-speaker {
+    color: #444 !important;
+}
+
+/* Position fixieren */
+.card-speaker {
+    position: absolute !important;
+    bottom: 8px !important;
+    right: 8px !important;
+    cursor: pointer;
+    z-index: 10;
+}
