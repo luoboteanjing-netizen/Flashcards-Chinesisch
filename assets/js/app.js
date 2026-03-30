@@ -1626,6 +1626,69 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 	const verElem = document.querySelector("#appVersion");
 	if (verElem) verElem.textContent = APP_VERSION;
 
+/* ============================================================
+   DRAG-TO-CLOSE – professionell wie in Mobile-Apps
+   ============================================================ */
+(function enableDragToClose() {
+    const menu = document.querySelector("#sideMenu");
+    if (!menu) return;
+
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+    let menuWidth = menu.offsetWidth;
+
+    function onStart(e) {
+        // Nur reagieren wenn Menü offen ist
+        if (!menu.classList.contains("open")) return;
+
+        dragging = true;
+        menu.classList.add("dragging");
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
+        currentX = startX;
+    }
+
+    function onMove(e) {
+        if (!dragging) return;
+
+        currentX = e.touches ? e.touches[0].clientX : e.clientX;
+        let diff = currentX - startX;
+
+        // diff ist negativ = nach links ziehen
+        if (diff < 0) {
+            menu.style.right = `${Math.min(0, diff)}px`;
+        }
+    }
+
+    function onEnd() {
+        if (!dragging) return;
+        dragging = false;
+        menu.classList.remove("dragging");
+
+        let diff = currentX - startX;
+
+        // Wenn mehr als 40px nach links gezogen → schließen
+        if (diff < -40) {
+            menu.classList.remove("open");
+        }
+
+        // Menü wieder einrasten auf die Standardposition
+        menu.style.right = "";
+    }
+
+    // Touch Events
+    menu.addEventListener("touchstart", onStart);
+    menu.addEventListener("touchmove", onMove);
+    menu.addEventListener("touchend", onEnd);
+
+    // Maus Events (optional für Desktop)
+    menu.addEventListener("mousedown", onStart);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+})();
+
+
+
     console.log("[INIT] Alles bereit ✅");
 });
 
