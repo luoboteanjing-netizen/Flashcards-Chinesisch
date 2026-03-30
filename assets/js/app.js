@@ -214,15 +214,17 @@ function populateLessonSelect() {
     sel.innerHTML = "";
     table.innerHTML = "";
 
- const header = `
+
+const header = `
     <div class="lt-row lt-head">
-        <span class="lt-lesson">Lektion</span>
-        <span class="lt-total">Karten</span>
-        <span class="lt-known">✅</span>
-        <span class="lt-unknown">❌</span>
-        <span class="lt-percent">%</span>
+        <span class="lt-lesson" data-sort="lesson">Lektion</span>
+        <span class="lt-total" data-sort="total">Karten</span>
+        <span class="lt-known" data-sort="known">✅</span>
+        <span class="lt-unknown" data-sort="unknown">❌</span>
+        <span class="lt-percent" data-sort="percent">%</span>
     </div>
 `;
+
     table.insertAdjacentHTML("beforeend", header);
 
     for (const k of state.lessonOrder) {
@@ -265,6 +267,57 @@ function populateLessonSelect() {
             row.classList.add("selected");
         }
     }
+}
+
+function sortLessons() {
+    const key = lessonSort.key;
+    if (!key) return;
+
+    state.lessonOrder.sort((a, b) => {
+        const A = getLessonStats(a);
+        const B = getLessonStats(b);
+
+        let vA = A[key];
+        let vB = B[key];
+
+        if (typeof vA === "string") vA = vA.toLowerCase();
+        if (typeof vB === "string") vB = vB.toLowerCase();
+
+        if (vA < vB) return lessonSort.asc ? -1 : 1;
+        if (vA > vB) return lessonSort.asc ? 1 : -1;
+        return 0;
+    });
+}
+
+let lessonSort = { key: null, asc: true };
+
+document.addEventListener("click", (ev) => {
+    const sortKey = ev.target.dataset.sort;
+    if (!sortKey) return;
+
+    lessonSort.asc = lessonSort.key === sortKey ? !lessonSort.asc : true;
+    lessonSort.key = sortKey;
+
+    sortLessons();
+    populateLessonSelect();
+});
+
+function getLessonStats(lessonName) {
+    const cards = state.lessons.get(lessonName) || [];
+    const total = cards.length;
+
+    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0 };
+    const known = p.known || 0;
+    const unknown = p.unknown || 0;
+    const percent = total ? Math.round((known / total) * 100) : 0;
+
+    return {
+        lesson: lessonName,
+        total,
+        known,
+        unknown,
+        percent
+    };
 }
 
 /* ============================ POOL HANDLING =============================== */
@@ -1175,14 +1228,21 @@ function renderModeUI() {
 /* ========================================================================== */
 /*                                INIT HANDLER                                */
 /* ========================================================================== */
+/* ========================================================================== */
+/*                                INIT ROUTINE                                */
+/* ========================================================================== */
 
 window.addEventListener("DOMContentLoaded", () => {
 
-    console.log("[INIT] Start");
+    console.log("[INIT] DOM geladen – Initialisierung startet…");
 
     /* SETTINGS + PROGRESS LADEN */
     loadSettings();
     loadProgress();
+
+    // Theme laden
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.classList.toggle("light", savedTheme === "light");
 
     state.mode  = state.settings.mode  || "de2zh";
     state.order = state.settings.order || "random";
@@ -1196,25 +1256,27 @@ window.addEventListener("DOMContentLoaded", () => {
     renderModeUI();
 
     /* CSV LADEN */
-    console.log("[INIT] CSV laden…");
+    console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
-	
-	// ✅ Stimmen wiederherstellen (DE & ZH)
-		speechSynthesis.onvoiceschanged = () => {
-		refreshVoices();
-};
 
-// ✅ Fallback, falls Browser das Event nicht sendet
-setTimeout(refreshVoices, 300);
+    /* Stimmen nach Laden des Browsers initialisieren */
+    speechSynthesis.onvoiceschanged = () => {
+        refreshVoices();
+    };
+    setTimeout(refreshVoices, 300); // Fallback
 
 
-    /* AUTOPLAY-BUTTON neben Training-Button einfügen */
+    /* ====================================================================== */
+    /*                              UI ELEMENTE                               */
+    /* ====================================================================== */
+
+    // Autoplay neben Training platzieren
     (function placeAutoplayButton() {
         const trainingBtn = document.querySelector("#btnStart");
         const autoplayBtn = document.querySelector("#btnAutoplay");
 
         if (!trainingBtn || !autoplayBtn) {
-            console.warn("[UI] Training/Autoplay Button fehlt.");
+            console.warn("[UI] Training oder Autoplay Button nicht gefunden.");
             return;
         }
 
@@ -1233,57 +1295,62 @@ setTimeout(refreshVoices, 300);
     })();
 
 
+    /* HAMBUGER-MENÜ */
+    document.querySelector("#menuToggle")?.addEventListener("click", () => {
+        document.querySelector("#sideMenu").classList.toggle("open");
+    });
+
+    /* THEME-SWITCH */
+    document.querySelector("#btnLight")?.addEventListener("click", () => {
+        document.documentElement.classList.add("light");
+        localStorage.setItem("theme", "light");
+    });
+
+    document.querySelector("#btnDark")?.addEventListener("click", () => {
+        document.documentElement.classList.remove("light");
+        localStorage.setItem("theme", "dark");
+    });
+
+
     /* ====================================================================== */
     /*                              EVENT LISTENER                             */
     /* ====================================================================== */
 
-    /* —— Moduswechsel —— */
+    // Modus wechseln (DE→ZH / ZH→DE)
     $("#btnSwapMode").addEventListener("click", () => {
         stopAutoplayOnUserAction();
-
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
         state.settings.mode = state.mode;
         saveSettings();
-
         renderModeUI();
-
         if (state.current) setCard(state.current);
     });
 
-    /* —— Reihenfolge —— */
+    // Reihenfolge wechseln
     $("#btnOrderToggle").addEventListener("click", () => {
         stopAutoplayOnUserAction();
-
         state.order = state.order === "random" ? "seq" : "random";
         state.settings.order = state.order;
         saveSettings();
-
         renderModeUI();
     });
 
-    /* —— Autoplay —— */
+    // Autoplay
     $("#btnAutoplay").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
         toggleAutoplay();
     });
 
-    /* —— Pausen-Slider —— */
+    // Autoplay-Abstand
     $("#gapRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
-
         const s = parseFloat(e.target.value) || 0.8;
         state.autoplay.gapMs = Math.round(s * 1000);
         state.settings.autoplayGap = state.autoplay.gapMs;
-
         $("#gapVal").textContent = `(${s.toFixed(1)} s)`;
         saveSettings();
     });
 
-
-    /* ====================================================================== */
-    /*                            VOICE PANEL & SLIDER                         */
-    /* ====================================================================== */
-
+    // Stimmen
     $("#btnVoiceDe").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         openVoicesPanelFor("de");
@@ -1296,7 +1363,8 @@ setTimeout(refreshVoices, 300);
 
     $("#btnCloseVoices").addEventListener("click", closeVoices);
 
-    /* Rate/Pitch DE */
+
+    /* RATE/PITCH SLIDER */
     $("#rateDeRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.rateDe = parseFloat(e.target.value);
@@ -1313,7 +1381,6 @@ setTimeout(refreshVoices, 300);
         saveSettings();
     });
 
-    /* Rate/Pitch ZH */
     $("#rateZhRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.rateZh = parseFloat(e.target.value);
@@ -1331,10 +1398,7 @@ setTimeout(refreshVoices, 300);
     });
 
 
-    /* ====================================================================== */
-    /*                                 TRAINING                                */
-    /* ====================================================================== */
-
+    /* TRAINING */
     $("#btnStart").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
@@ -1355,7 +1419,8 @@ setTimeout(refreshVoices, 300);
         doReveal();
     });
 
-    /* Lautsprecher */
+
+    /* SPRECHER */
     $("#speakerQuestion").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playQuestion();
@@ -1367,10 +1432,7 @@ setTimeout(refreshVoices, 300);
     });
 
 
-    /* ====================================================================== */
-    /*                                 RATING                                  */
-    /* ====================================================================== */
-
+    /* RATING */
     $("#btnRateKnown").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("known");
@@ -1387,50 +1449,55 @@ setTimeout(refreshVoices, 300);
     });
 
 
-    /* ====================================================================== */
-    /*                                LESSON MGMT                              */
-    /* ====================================================================== */
+    /* LEKTIONEN */
+    $("#btnUseLessons").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
 
-   $('#btnClearLessons').addEventListener("click", () => {
-    stopAutoplayOnUserAction();
+        const sel = $("#lessonSelect");
+        const picked = [];
 
-    // Daten leeren
-    state.selectedLessons.clear();
-    state.settings.lessons = [];
-    saveSettings();
+        for (const o of sel.selectedOptions) picked.push(o.value);
 
-    // Kartenpool zurücksetzen
-    state.pool = [];
-    state.idx = null;
-    resetSessionStats();
+        state.settings.lessons = picked;
+        saveSettings();
 
-    // Auswahl im <select> entfernen
-    const sel = $('#lessonSelect');
-    for (const o of sel.options) o.selected = false;
-
-    // ✅ visuelle Auswahl in der Tabelle entfernen
-    document.querySelectorAll(".lt-row.selected").forEach(row => {
-        row.classList.remove("selected");
+        gatherPoolFromSettings();
+        populateLessonSelect();
     });
 
-    // Training ggf. stoppen
-    if (state.trainingOn) stopTraining();
-});
+    $("#btnClearLessons").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
 
-    /* ====================================================================== */
-    /*                              IMPORT / EXPORT                            */
-    /* ====================================================================== */
+        state.selectedLessons.clear();
+        state.settings.lessons = [];
+        saveSettings();
 
+        state.pool = [];
+        state.idx = null;
+        resetSessionStats();
+
+        const sel = $('#lessonSelect');
+        for (const o of sel.options) o.selected = false;
+
+        // ✅ visuelle Auswahl in Tabelle entfernen
+        document.querySelectorAll(".lt-row.selected").forEach(row =>
+            row.classList.remove("selected")
+        );
+
+        if (state.trainingOn) stopTraining();
+    });
+
+
+    /* IMPORT / EXPORT */
     $("#btnExport").addEventListener("click", () => {
-        const blob = new Blob([JSON.stringify(state.progress, null, 2)], {
-            type: "application/json"
-        });
-
+        const blob = new Blob(
+            [JSON.stringify(state.progress, null, 2)],
+            { type: "application/json" }
+        );
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = "progress.json";
         a.click();
-
         setTimeout(() => URL.revokeObjectURL(a.href), 300);
     });
 
