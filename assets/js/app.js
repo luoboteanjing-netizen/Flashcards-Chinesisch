@@ -39,6 +39,7 @@ const state = {
     historyPos: -1,
 
     current: null,
+	delayedSentenceTimer: null,
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -398,9 +399,14 @@ function scrollToBottom() {
 
 /* ============================ CARD RENDERING ============================ */
 
-/* ============================ CARD RENDERING ============================ */
 
 function setCard(entry, fromHistory = false) {
+
+    /* ---- Timer für verzögerten Satz abbrechen ---- */
+    if (state.delayedSentenceTimer) {
+        clearTimeout(state.delayedSentenceTimer);
+        state.delayedSentenceTimer = null;
+    }
 
     if (!fromHistory) pushToHistory(entry);
 
@@ -408,7 +414,7 @@ function setCard(entry, fromHistory = false) {
     state.startedAt = Date.now();
     state.revealedAt = null;
 
-    /* ------ Titel für Lektion & Karte (ID) setzen ------ */
+    /* -------- Titel (Lektion / ID) -------- */
     const cardTitle  = document.querySelector("#cardTitle");
     const cardLesson = document.querySelector("#cardLesson");
 
@@ -437,8 +443,9 @@ function setCard(entry, fromHistory = false) {
     const sol = $("#solBox");
     sol.classList.add("masked");
 
+    /* Wort, Pinyin & POS werden immer sofort angezeigt */
     if (state.mode === "zh2de") {
-        /* ---- CH → DE (mit Pinyin in Fragekarte) ---- */
+        /* ---- CH → DE ---- */
 
         $("#promptWord").innerHTML = entry.word.zh || "—";
 
@@ -448,25 +455,41 @@ function setCard(entry, fromHistory = false) {
 
         $("#promptPOS").textContent = entry.pos || "";
 
-        $("#promptSent").innerHTML =
-            `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
+        /* ✅ Satz NICHT sofort anzeigen */
+        $("#promptSent").innerHTML = "";
 
+        /* ✅ Lösungskarte sofort setzen */
         $("#solWord").textContent = entry.word.de;
         $("#solSent").textContent = entry.sent.de;
 
+        /* ✅ Verzögertes Einblenden des Satzes (CH+Pinyin) */
+        state.delayedSentenceTimer = setTimeout(() => {
+            $("#promptSent").innerHTML =
+                `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
+            syncCardHeights();
+        }, 5000);
+
     } else {
-        /* ---- DE → CH (kein Pinyin in Fragekarte!) ---- */
+        /* ---- DE → CH ---- */
 
         $("#promptWord").textContent = entry.word.de || "—";
         $("#promptWordSub").innerHTML = "";
         $("#promptPOS").textContent = entry.pos || "";
-        $("#promptSent").textContent = entry.sent.de || "—";
 
-        /* Lösung IMMER CH + Pinyin */
+        /* ✅ Satz NICHT sofort anzeigen */
+        $("#promptSent").textContent = "";
+
+        /* ✅ Lösungskarte: CH + Pinyin */
         $("#solWord").innerHTML =
             `${entry.word.zh}<br><span class="zh-pinyin">${entry.word.py}</span>`;
         $("#solSent").innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
+
+        /* ✅ Verzögertes Einblenden des Satzes (Deutsch) */
+        state.delayedSentenceTimer = setTimeout(() => {
+            $("#promptSent").textContent = entry.sent.de || "—";
+            syncCardHeights();
+        }, 5000);
     }
 
     /* -------- Buttons setzen -------- */
@@ -552,6 +575,10 @@ function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
 
+	if (state.delayedSentenceTimer) {
+    clearTimeout(state.delayedSentenceTimer);
+    state.delayedSentenceTimer = null;
+}	
     if (!state.autoplay.on) hideNavButtons();
 
     showRatingButtons();
