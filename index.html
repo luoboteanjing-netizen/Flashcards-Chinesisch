@@ -20,11 +20,19 @@
     <div id="menuToggle">⋮</div>
 
     <!-- ✅ Seitenmenü für Einstellungen -->
-    <div id="sideMenu" class="side-menu">
-        <h3>Einstellungen</h3>
+ <div id="sideMenu" class="side-menu">
+    <h3>Einstellungen</h3>
+
+    <div class="menu-block">
         <button id="btnLight" class="btn">Light Mode</button>
         <button id="btnDark" class="btn">Dark Mode</button>
     </div>
+
+    <div class="menu-block">
+        <label class="lbl">Satz‑Delay (Sekunden):</label>
+        <input id="delayInput" type="number" min="0" max="15" step="0.5" value="5" class="menu-input">
+    </div>
+</div>
 
     <main class="container">
 
