@@ -498,7 +498,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .side-menu {
     position: fixed;
     top: 0;
-    right: 180px;
+    right: -180px;
     width: 180px;
     height: 100vh;
     background: var(--card);
@@ -734,5 +734,12 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* ✅ Mehr Abstand zwischen Umschalten & Reihenfolge */
 /* ================================================= */
 .mode-inline {
-    margin-bottom: 14px !important;   /* vorher 8px → jetzt größer */
+    margin-bottom: 12px !important;   /* vorher 8px → jetzt größer */
+}
+
+/* ============================================
+   ✅ Mehr Abstand unterhalb des „Reihenfolge“-Buttons
+   ============================================ */
+.actions-inline {
+    margin-bottom: 14px !important;   /* vorher effektiv ~8px */
 }
