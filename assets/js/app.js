@@ -47,7 +47,7 @@ const state = {
 
     current: null,
 	delayedSentenceTimer: null,
-	sentenceDelay: 5000,  // in Millisekunden
+	sentenceDelay: 3000,  // in Millisekunden
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -1629,9 +1629,7 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 /* ============================================================
    DRAG-TO-CLOSE – professionell wie in Mobile-Apps
    ============================================================ */
-/* ============================================================
-   DRAG-TO-CLOSE – richtig für Menü auf der rechten Seite
-   ============================================================ */
+
 (function enableDragToClose() {
     const menu = document.querySelector("#sideMenu");
     if (!menu) return;
@@ -1691,6 +1689,16 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     window.addEventListener("mouseup", onEnd);
 })();
 
+/* ============================================
+   Overlay tap-to-close
+   ============================================ */
+const overlay = document.querySelector("#sideOverlay");
+
+if (overlay) {
+    overlay.addEventListener("click", () => {
+        sideMenu.classList.remove("open");
+    });
+}
 
     console.log("[INIT] Alles bereit ✅");
 });
