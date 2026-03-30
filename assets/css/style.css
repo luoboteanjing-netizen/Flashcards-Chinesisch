@@ -602,12 +602,6 @@ html.light .btn {
     border-color: var(--border);
 }
 
-html.light .btn.primary {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-}
-
 /* ✅ Mode-Buttons (DE/ZH) */
 html.light .mode-item {
     background: #f0f0f0;
@@ -674,4 +668,25 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     color: var(--text);
     border-radius: 6px;
     font-size: 14px;
+}
+
+/* ============================================= */
+/* ✅ Light Mode – Auswahl sichtbar machen       */
+/* ============================================= */
+
+:root.light .lt-row.selected {
+    background: #dce8ff !important;    /* helles Blau */
+    border-left: 3px solid #3366cc;     /* schöner „Markierungsstreifen“ */
+}
+
+/* ========================================= */
+/* ✅ Training + Autoplay IMMER in gleicher Farbe */
+/* ========================================= */
+
+.btn.primary,
+#btnAutoplay.primary {
+    background: #7aa2f7 !important;
+    border: 1px solid #7aa2f7 !important;
+    color: #081018 !important;
+    font-weight: 700 !important;
 }
