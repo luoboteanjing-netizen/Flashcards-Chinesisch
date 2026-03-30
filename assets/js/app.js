@@ -11,19 +11,8 @@
    AUTOMATISCHE VERSIONIERUNG
    =========================== */
 
-function generateVersionStamp() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2, "0");
-    const da = String(d.getDate()).padStart(2, "0");
-    const h = String(d.getHours()).padStart(2, "0");
-    const mi = String(d.getMinutes()).padStart(2, "0");
-
-    return `${y}${m}${da}-${h}${mi}`;
-}
-
-const APP_VERSION = generateVersionStamp();
-
+/* === Version manuell definieren === */
+const APP_VERSION = "1.0.1";   // beim nächsten Release erhöhen
 
 const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
 
