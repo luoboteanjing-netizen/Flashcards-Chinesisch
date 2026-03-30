@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,7 +14,20 @@
     <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
-	
+<body>
+
+    <!-- ✅ Hamburger-Menü Icon (oben rechts) -->
+    <div id="menuToggle">☰</div>
+
+    <!-- ✅ Seitenmenü für Einstellungen -->
+    <div id="sideMenu" class="side-menu">
+        <h3>Einstellungen</h3>
+        <button id="btnLight" class="btn">Light Mode</button>
+        <button id="btnDark" class="btn">Dark Mode</button>
+    </div>
+
+    <main class="container">
+
 <header>
     <h1>Flashcards <span class="muted">Deutsch ↔ 中文</span></h1>
     <p class="subtitle">Lektion, Richtung und Reihenfolge wählen · Karte lernen</p>
@@ -32,9 +44,8 @@
     </div>
 </header>
 
-
 <!-- ====================================================================== -->
-<!--                               KONFIG-BLOCK                             -->
+<!-- KONFIG-BLOCK -->
 <!-- ====================================================================== -->
 
 <section class="card cfg">
@@ -43,11 +54,12 @@
         <!-- Lektionen -->
         <div class="pane">
             <div class="lbl">Lektion(en)</div>
+
             <select id="lessonSelect" class="select" multiple size="10"></select>
-			
-			<!-- ✅ Neue Tabelle für die Lektionen-Auswahl -->
-			<div id="lessonTable" class="lesson-table"></div>
-			
+
+            <!-- ✅ Neue Tabelle für die Lektionen-Auswahl -->
+            <div id="lessonTable" class="lesson-table"></div>
+
             <div class="controls mt8">
                 <button id="btnUseLessons" class="btn">Übernehmen</button>
                 <button id="btnClearLessons" class="btn ghost">Leeren</button>
@@ -67,7 +79,6 @@
 
             <div class="actions-inline mt8">
                 <button id="btnOrderToggle" class="btn ghost">Reihenfolge: Zufällig</button>
-
             </div>
 
             <div class="mt8 gap-row">
@@ -113,17 +124,16 @@
     </div>
 </section>
 
-
 <!-- ====================================================================== -->
-<!--                                LERN-KARTE                               -->
+<!-- LERN-KARTE -->
 <!-- ====================================================================== -->
 
 <section class="card learn" id="learnSection">
 
-	<div class="section-title">
-		<span id="cardLesson" class="left"></span>
-		<span id="cardTitle" class="right"></span>
-	</div>
+    <div class="section-title">
+        <span id="cardLesson" class="left"></span>
+        <span id="cardTitle" class="right"></span>
+    </div>
 
     <div id="lessonStats" class="stats-bar"></div>
 
@@ -137,7 +147,7 @@
                 <!-- Pinyin vom WORT -->
                 <div id="promptWordSub" class="prompt sub small"></div>
 
-                <!-- ✅ POS (NEU EINGEBAUT) -->
+                <!-- ✅ POS -->
                 <div id="promptPOS" class="prompt pos small"></div>
             </div>
         </div>
@@ -146,7 +156,6 @@
             <div class="prompt-col">
                 <div id="promptSent" class="prompt">—</div>
 
-                <!-- Speaker -->
                 <div id="speakerQuestion" class="card-speaker">🔊</div>
             </div>
         </div>
@@ -170,10 +179,7 @@
     <!-- Navigation -->
     <div class="card-controls">
         <button id="btnPrev" class="btn">◀ Zurück</button>
-
-        <!-- ✅ OHNE AUGE -->
         <button id="btnReveal" class="btn ghost" disabled>Aufdecken</button>
-
         <button id="btnNext" class="btn" disabled>Nächste ▶</button>
     </div>
 
@@ -185,12 +191,10 @@
     </div>
 
     <div id="sessionStats" class="stats-bar">—</div>
-
 </section>
 
-
 <!-- ====================================================================== -->
-<!--                               VOICE PANEL                               -->
+<!-- VOICE PANEL -->
 <!-- ====================================================================== -->
 
 <div id="voicePanel" class="debug hidden">
@@ -213,5 +217,7 @@
 </div>
 
 <script src="assets/js/app.js"></script>
+
+</main>
 </body>
 </html>
