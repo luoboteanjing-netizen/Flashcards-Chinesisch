@@ -452,8 +452,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-        60px   /* Lektion */
-        60px    /* Karten */
+        80px   /* Lektion */
+        40px    /* Karten */
         30px    /* ✅ */
         30px    /* ❌ */
         40px;   /* % */
@@ -718,4 +718,21 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     position: absolute !important;
     bottom: 8px !important;
     right: 8px !important;
+}
+
+/* ======================================== */
+/* ✅ Größeres Umschalt-Symbol (⇄)          */
+/* ======================================== */
+#btnSwapMode {
+    font-size: 26px !important;     /* größer */
+    font-weight: 700 !important;    /* kräftiger */
+    line-height: 1 !important;
+    padding: 6px 14px !important;
+}
+
+/* ================================================= */
+/* ✅ Mehr Abstand zwischen Umschalten & Reihenfolge */
+/* ================================================= */
+.mode-inline {
+    margin-bottom: 14px !important;   /* vorher 8px → jetzt größer */
 }
