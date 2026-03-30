@@ -296,24 +296,26 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  justify-content:flex-start;
  position:relative;
 }
-/* Speaker Icon */
-.card-speaker {
- position:absolute;
- bottom:8px;
- right:8px;
- font-size:1.6rem;
- color: var(--text);
- cursor:pointer;
- opacity:1;
- z-index:10;
- 
-}
-:root.light .card-speaker {
-    color: #444;
-}
+
+
 #btnPlayQ, #btnPlayA { display:none !important; }
 #promptBox .card-speaker { opacity:1 !important; }
 #speakerQuestion, #speakerAnswer { color:#333; }
+
+/* ============================================= */
+/* ✅ Lautsprecher – sichtbar in Dark & Light    */
+/* ============================================= */
+
+.card-speaker {
+    font-size: 1.6rem;
+    color: var(--text);       /* nutzt das helle Theme-Text-Weiß im Dark-Mode */
+    opacity: 0.95;
+}
+
+/* Light Mode: leicht abdunkeln */
+:root.light .card-speaker {
+    color: #444;
+}
 
 /*  ✅ FEHLEND GEWESEN: Größeres WORT‑PINYIN */
 .pinyin-word {
@@ -450,9 +452,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     grid-template-columns:
         60px   /* Lektion */
         60px    /* Karten */
-        40px    /* ✅ */
-        40px    /* ❌ */
-        40px;   /* % */
+        30px    /* ✅ */
+        30px    /* ❌ */
+        30px;   /* % */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
@@ -494,8 +496,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .side-menu {
     position: fixed;
     top: 0;
-    right: -240px;
-    width: 240px;
+    right: -170px;
+    width: 170px;
     height: 100vh;
     background: var(--card);
     border-left: 2px solid var(--border);
@@ -690,3 +692,16 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     color: #081018 !important;
     font-weight: 700 !important;
 }
+
+/* ============================================= */
+/* ✅ Lektionsliste – Zahlen rechtsbündig        */
+/* ============================================= */
+
+.lt-total,
+.lt-known,
+.lt-unknown,
+.lt-percent {
+    text-align: right;
+    font-variant-numeric: tabular-nums;   /* monospaced Zahlen für perfekte Ausrichtung */
+}
+
