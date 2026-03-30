@@ -40,6 +40,7 @@ const state = {
 
     current: null,
 	delayedSentenceTimer: null,
+	sentenceDelay: 5000,  // in Millisekunden
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -467,7 +468,7 @@ function setCard(entry, fromHistory = false) {
             $("#promptSent").innerHTML =
                 `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
             syncCardHeights();
-        }, 5000);
+        }, state.sentenceDelay);
 
     } else {
         /* ---- DE → CH ---- */
@@ -489,7 +490,7 @@ function setCard(entry, fromHistory = false) {
         state.delayedSentenceTimer = setTimeout(() => {
             $("#promptSent").textContent = entry.sent.de || "—";
             syncCardHeights();
-        }, 5000);
+        }, state.sentenceDelay);
     }
 
     /* -------- Buttons setzen -------- */
@@ -1251,10 +1252,6 @@ function renderModeUI() {
     updateTrainingBtn();
 }
 
-
-/* ========================================================================== */
-/*                                INIT HANDLER                                */
-/* ========================================================================== */
 /* ========================================================================== */
 /*                                INIT ROUTINE                                */
 /* ========================================================================== */
@@ -1263,13 +1260,22 @@ window.addEventListener("DOMContentLoaded", () => {
 
     console.log("[INIT] DOM geladen – Initialisierung startet…");
 
-    /* SETTINGS + PROGRESS LADEN */
+    /* ============================================================
+       SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
+       ============================================================ */
     loadSettings();
     loadProgress();
 
     // Theme laden
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.classList.toggle("light", savedTheme === "light");
+
+    // Satz-Delay laden (Fallback = 5000 ms)
+    if (state.settings.sentenceDelay !== undefined) {
+        state.sentenceDelay = state.settings.sentenceDelay;
+    }
+    const delayInput = document.querySelector("#delayInput");
+    if (delayInput) delayInput.value = (state.sentenceDelay / 1000);
 
     state.mode  = state.settings.mode  || "de2zh";
     state.order = state.settings.order || "random";
@@ -1282,20 +1288,24 @@ window.addEventListener("DOMContentLoaded", () => {
 
     renderModeUI();
 
-    /* CSV LADEN */
+    /* ============================================================
+       CSV LADEN
+       ============================================================ */
     console.log("[INIT] CSV-Import wird gestartet…");
     loadCSV();
 
-    /* Stimmen nach Laden des Browsers initialisieren */
+    /* ============================================================
+       STIMMEN LADEN
+       ============================================================ */
     speechSynthesis.onvoiceschanged = () => {
         refreshVoices();
     };
     setTimeout(refreshVoices, 300); // Fallback
 
 
-    /* ====================================================================== */
-    /*                              UI ELEMENTE                               */
-    /* ====================================================================== */
+    /* ============================================================
+       UI ELEMENTE INITIALISIEREN
+       ============================================================ */
 
     // Autoplay neben Training platzieren
     (function placeAutoplayButton() {
@@ -1322,10 +1332,17 @@ window.addEventListener("DOMContentLoaded", () => {
     })();
 
 
-    /* HAMBUGER-MENÜ */
-    document.querySelector("#menuToggle")?.addEventListener("click", () => {
-        document.querySelector("#sideMenu").classList.toggle("open");
-    });
+    /* ============================================================
+       HAMBURGER (⋮) MENÜ
+       ============================================================ */
+    const toggleBtn = document.querySelector("#menuToggle");
+    const sideMenu  = document.querySelector("#sideMenu");
+
+    if (toggleBtn && sideMenu) {
+        toggleBtn.addEventListener("click", () => {
+            sideMenu.classList.toggle("open");
+        });
+    }
 
     /* THEME-SWITCH */
     document.querySelector("#btnLight")?.addEventListener("click", () => {
@@ -1338,12 +1355,21 @@ window.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("theme", "dark");
     });
 
+    /* DELAY-EINSTELLUNG */
+    if (delayInput) {
+        delayInput.addEventListener("input", (e) => {
+            const seconds = parseFloat(e.target.value) || 0;
+            state.sentenceDelay = seconds * 1000;
+            state.settings.sentenceDelay = state.sentenceDelay;
+            saveSettings();
+        });
+    }
 
-    /* ====================================================================== */
-    /*                              EVENT LISTENER                             */
-    /* ====================================================================== */
 
-    // Modus wechseln (DE→ZH / ZH→DE)
+    /* ============================================================
+       EVENT LISTENER – MODUS, REIHENFOLGE, AUTOPLAY
+       ============================================================ */
+
     $("#btnSwapMode").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
@@ -1353,7 +1379,6 @@ window.addEventListener("DOMContentLoaded", () => {
         if (state.current) setCard(state.current);
     });
 
-    // Reihenfolge wechseln
     $("#btnOrderToggle").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         state.order = state.order === "random" ? "seq" : "random";
@@ -1362,12 +1387,10 @@ window.addEventListener("DOMContentLoaded", () => {
         renderModeUI();
     });
 
-    // Autoplay
     $("#btnAutoplay").addEventListener("click", () => {
         toggleAutoplay();
     });
 
-    // Autoplay-Abstand
     $("#gapRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         const s = parseFloat(e.target.value) || 0.8;
@@ -1377,7 +1400,11 @@ window.addEventListener("DOMContentLoaded", () => {
         saveSettings();
     });
 
-    // Stimmen
+
+    /* ============================================================
+       STIMMEN-EINSTELLUNG
+       ============================================================ */
+
     $("#btnVoiceDe").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         openVoicesPanelFor("de");
@@ -1390,8 +1417,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     $("#btnCloseVoices").addEventListener("click", closeVoices);
 
-
-    /* RATE/PITCH SLIDER */
     $("#rateDeRange").addEventListener("input", (e) => {
         stopAutoplayOnUserAction();
         state.rateDe = parseFloat(e.target.value);
@@ -1425,7 +1450,10 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* TRAINING */
+    /* ============================================================
+       TRAINING, NAVIGATION, AUFDECKEN
+       ============================================================ */
+
     $("#btnStart").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         startTraining();
@@ -1447,7 +1475,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* SPRECHER */
+    /* ======================================================================
+       AUDIO (SPRECHER)
+       ====================================================================== */
     $("#speakerQuestion").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         playQuestion();
@@ -1459,7 +1489,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* RATING */
+    /* ============================================================
+       RATING
+       ============================================================ */
     $("#btnRateKnown").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("known");
@@ -1476,7 +1508,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* LEKTIONEN */
+    /* ============================================================
+       LEKTIONEN
+       ============================================================ */
     $("#btnUseLessons").addEventListener("click", () => {
         stopAutoplayOnUserAction();
 
@@ -1506,7 +1540,6 @@ window.addEventListener("DOMContentLoaded", () => {
         const sel = $('#lessonSelect');
         for (const o of sel.options) o.selected = false;
 
-        // ✅ visuelle Auswahl in Tabelle entfernen
         document.querySelectorAll(".lt-row.selected").forEach(row =>
             row.classList.remove("selected")
         );
@@ -1515,7 +1548,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* IMPORT / EXPORT */
+    /* ============================================================
+       IMPORT / EXPORT
+       ============================================================ */
     $("#btnExport").addEventListener("click", () => {
         const blob = new Blob(
             [JSON.stringify(state.progress, null, 2)],
