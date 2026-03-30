@@ -741,5 +741,17 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
    ✅ Mehr Abstand unterhalb des „Reihenfolge“-Buttons
    ============================================ */
 .actions-inline {
-    margin-bottom: 14px !important;   /* vorher effektiv ~8px */
+    margin-bottom: 12px !important;   /* vorher effektiv ~8px */
+}
+
+/* =========================================== */
+/* ✅ Wort-Pinyin Farben (für DE→ZH & ZH→DE)  */
+/* =========================================== */
+
+.pinyin-word {
+    color: var(--text);      /* Dark-Mode: schön hell */
+}
+
+:root.light .pinyin-word {
+    color: #444;             /* Light-Mode: besser lesbar */
 }
