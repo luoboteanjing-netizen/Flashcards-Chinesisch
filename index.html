@@ -139,44 +139,45 @@
 
     <div id="lessonStats" class="stats-bar"></div>
 
-	<!-- FRAGE -->
-<div id="promptBox" class="prompt-box">
+    <!-- FRAGE -->
+    <div id="promptBox" class="prompt-box">
 
-    <div class="prompt-row">
-        <div class="prompt-col">
-            <div id="promptWord" class="prompt big">—</div>
+        <div class="prompt-row">
+            <div class="prompt-col">
+                <div id="promptWord" class="prompt big">—</div>
 
-            <!-- Pinyin vom WORT -->
-            <div id="promptWordSub" class="prompt sub small"></div>
+                <!-- Pinyin vom WORT -->
+                <div id="promptWordSub" class="prompt sub small"></div>
 
-            <!-- ✅ POS -->
-            <div id="promptPOS" class="prompt pos small"></div>
+                <!-- ✅ POS -->
+                <div id="promptPOS" class="prompt pos small"></div>
+            </div>
         </div>
-    </div>
 
-    <div class="prompt-row">
-        <div class="prompt-col">
-            <div id="promptSent" class="prompt">—</div>
+        <div class="prompt-row">
+            <div class="prompt-col">
+                <div id="promptSent" class="prompt">—</div>
 
-            <!-- ✅ SVG statt Emoji -->
-            <div id="speakerQuestion" class="card-speaker">
-                <svg viewBox="0 0 24 24" class="icon-speaker">
-                    <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
-                    <path d="M14 9.23a4 4 0 010 5.54"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"></path>
-                    <path d="M14 4a9 9 0 010 16"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"></path>
-                </svg>
+                <div id="speakerQuestion" class="card-speaker">🔊</div>
             </div>
         </div>
     </div>
-</div>
 
-		
+    <!-- LÖSUNG -->
+    <div class="solution">
+        <div id="solBox" class="sol masked">
+
+            <div class="sol-part">
+                <div id="solWord" class="sol-text">—</div>
+            </div>
+
+            <div class="sol-part">
+                <div id="solSent" class="sol-text">—</div>
+                <div id="speakerAnswer" class="card-speaker">🔊</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation -->
     <div class="card-controls">
         <button id="btnPrev" class="btn">◀ Zurück</button>
