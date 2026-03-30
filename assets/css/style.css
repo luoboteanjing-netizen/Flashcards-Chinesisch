@@ -298,10 +298,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 
-#btnPlayQ, #btnPlayA { display:none !important; }
-#promptBox .card-speaker { opacity:1 !important; }
-#speakerQuestion, #speakerAnswer { color:#333; }
-
 /* ============================================= */
 /* ✅ Lautsprecher – sichtbar in Dark & Light    */
 /* ============================================= */
@@ -316,6 +312,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 :root.light .card-speaker {
     color: #444;
 }
+
+
+#btnPlayQ, #btnPlayA { display:none !important; }
+#promptBox .card-speaker { opacity:1 !important; }
+#speakerQuestion, #speakerAnswer { var(--text); }
+
 
 /*  ✅ FEHLEND GEWESEN: Größeres WORT‑PINYIN */
 .pinyin-word {
