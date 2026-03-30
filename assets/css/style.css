@@ -302,10 +302,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  bottom:8px;
  right:8px;
  font-size:1.6rem;
- color:#333;
+ color: var(--text);
  cursor:pointer;
  opacity:1;
  z-index:10;
+ 
+}
+:root.light .card-speaker {
+    color: #444;
 }
 #btnPlayQ, #btnPlayA { display:none !important; }
 #promptBox .card-speaker { opacity:1 !important; }
@@ -446,9 +450,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     grid-template-columns:
         60px   /* Lektion */
         60px    /* Karten */
-        50px    /* ✅ */
-        50px    /* ❌ */
-        50px;   /* % */
+        40px    /* ✅ */
+        40px    /* ❌ */
+        40px;   /* % */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
@@ -566,7 +570,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     --muted: #666;
     --border: #cccccc;
 
-    --accent: #3366cc;   /* Blauton für Light Mode */
+    --accent: #7aa2f7;   /* Blauton für Light Mode (#3366cc;)*/
     --good: #2e8b57;     /* dunkleres Grün */
     --bad: #cc3333;      /* dunkleres Rot */
     --unsure: #cc9900;   /* dunkleres Orange */
@@ -650,4 +654,24 @@ html.light .lesson-table::-webkit-scrollbar-track {
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
     background: #b3b3b3;
+}
+
+/* =======================
+   Einstellungen Menü
+   ======================= */
+.menu-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.menu-input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 14px;
 }
