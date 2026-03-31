@@ -229,7 +229,7 @@ function populateLessonSelect() {
             saveSettings();
 
             gatherPoolFromSettings();
-           
+            populateLessonSelect();
         });
 
         table.appendChild(row);
