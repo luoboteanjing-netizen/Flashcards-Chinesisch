@@ -14,7 +14,15 @@
 /* === Version manuell definieren === */
 const APP_VERSION = "1.0.1";   // beim nächsten Release erhöhen
 
-const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
+// CSV-Datei dynamisch über URL-Parameter auswählen
+const params = new URLSearchParams(location.search);
+const csvParam = params.get("csv");
+
+// Falls ?csv=xyz.csv gesetzt ist → diese Datei laden
+// Sonst → Standarddatei verwenden
+const CSV_URL = csvParam 
+    ? `./data/${csvParam}`
+    : "./data/Long-Chinesisch_Lektionen.csv";
 
 const LS_KEYS = {
     settings: "fc_settings_v1",
