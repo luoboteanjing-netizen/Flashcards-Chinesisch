@@ -125,45 +125,65 @@ function loadProgress() {
 
 /* ============================ CSV PARSING ================================= */
 
-function parseCSVLine(line) {
-    const result = [];
-    let cur = "";
-    let quotes = false;
+function populateLessonSelect() {
+    const sel = $("#lessonSelect");
+    const table = $("#lessonTable");
 
-    for (let i = 0; i < line.length; i++) {
-        const c = line[i];
+    sel.innerHTML = "";
+    table.innerHTML = "";
 
-        if (c === '"') {
-            if (quotes && line[i + 1] === '"') {
-                cur += '"';
-                i++;
-            } else {
-                quotes = !quotes;
-            }
-        } else if (c === ";" && !quotes) {
-            result.push(cur);
-            cur = "";
-        } else {
-            cur += c;
-        }
-    }
+    const header = `
+        <div class="lt-row lt-head">
+            <span class="lt-lesson" data-sort="lesson">Lektion</span>
+            <span class="lt-total" data-sort="total">Karten</span>
+            <span class="lt-known" data-sort="known">✅</span>
+            <span class="lt-unknown" data-sort="unknown">❌</span>
+            <span class="lt-percent" data-sort="percent">%</span>
+        </div>
+    `;
+    table.insertAdjacentHTML("beforeend", header);
 
-    result.push(cur);
-    return result;
-}
+    for (const k of state.lessonOrder) {
 
-async function loadCSV() {
-    try {
-        const res = await fetch(CSV_URL);
-        const buf = await res.arrayBuffer();
-        const text = new TextDecoder("utf-8").decode(buf);
+        const cards = state.lessons.get(k) || [];
+        const total = cards.length;
 
-        parseCSV(text);
-        populateLessonSelect();
-    } catch (e) {
-        alert("Fehler beim Laden der CSV.");
-        console.error(e);
-    }
+        const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
+        const known = p.known || 0;
+        const unknown = p.unknown || 0;
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+
+        const opt = document.createElement("option");
+        opt.value = k;
+        sel.appendChild(opt);
+
+        const row = document.createElement("div");
+        row.className = "lt-row";
+        row.dataset.lesson = k;
+        row.innerHTML = `
+            <span class="lt-lesson">${k}</span>
+            <span class="lt-total">${total}</span>
+            <span class="lt-known">${known}</span>
+            <span class="lt-unknown">${unknown}</span>
+            <span class="lt-percent">${percent}%</span>
+        `;
+
+        row.addEventListener("click", () => {
+            opt.selected = !opt.selected;
+            row.classList.toggle("selected", opt.selected);
+
+            const selectedLessons =
+                [...sel.options].filter(o => o.selected).map(o => o.value);
+
+            state.settings.lessons = selectedLessons;
+            saveSettings();
+
+            gatherPoolFromSettings();
+       
+        });
+
+        table.appendChild(row);
+    } // ✅ WICHTIG – diese Klammer hat in deiner Datei gefehlt!
 }
 
 function parseCSV(text) {
@@ -244,16 +264,13 @@ function populateLessonSelect() {
         const unknown = p.unknown || 0;
         const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        // Option für Training
         const opt = document.createElement("option");
         opt.value = k;
         sel.appendChild(opt);
 
-        // Tabellenzeile
         const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
-
         row.innerHTML = `
             <span class="lt-lesson">${k}</span>
             <span class="lt-total">${total}</span>
@@ -262,7 +279,6 @@ function populateLessonSelect() {
             <span class="lt-percent">${percent}%</span>
         `;
 
-        // Auto-Übernahme
         row.addEventListener("click", () => {
             opt.selected = !opt.selected;
             row.classList.toggle("selected", opt.selected);
@@ -278,8 +294,8 @@ function populateLessonSelect() {
         });
 
         table.appendChild(row);
-    }
-}  // ✅ <-- Diese Klammer hat bei dir gefehlt!
+    }  // ✅ wichtig: diese Klammer hat bei dir gefehlt!
+}
 
 function sortLessons() {
     const key = lessonSort.key;
