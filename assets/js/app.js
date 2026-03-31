@@ -1662,7 +1662,7 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
         currentX = e.touches ? e.touches[0].clientX : e.clientX;
         let diff = currentX - startX;
 
-        // ✅ Nur rechts wischen erlaubt (diff > 0)
+        // ✅ Nur rechts wischen erlaubt
         if (diff > 0) {
             menu.style.right = `${-diff}px`;
         }
@@ -1676,13 +1676,13 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 
         let diff = currentX - startX;
 
-        // ✅ genug nach rechts gewischt → Menü schließen
+        // ✅ Menü schließen
         if (diff > 40) {
             menu.classList.remove("open");
             document.body.classList.remove("menu-open");
         }
 
-        // ✅ Menü zurück in Ausgangsposition
+        // ✅ Reset
         menu.style.right = "";
     }
 
@@ -1691,28 +1691,25 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     menu.addEventListener("touchmove", onMove);
     menu.addEventListener("touchend", onEnd);
 
-    // Maus (Desktop)
+    // Maus Events
     menu.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
-})();   
-
+})();
 
 /* ============================================
    Overlay tap-to-close
    ============================================ */
+const sideMenu = document.querySelector("#sideMenu");
 const overlay = document.querySelector("#sideOverlay");
 
 if (overlay) {
     overlay.addEventListener("click", () => {
         sideMenu.classList.remove("open");
+        document.body.classList.remove("menu-open");
     });
 }
 
-    console.log("[INIT] Alles bereit ✅");
-});
-
-
-/* ========================================================================== */
-/*                                ENDE TEIL 4                                 */
-/* ========================================================================== */
+console.log("[INIT] Alles bereit ✅");
+});   // ✅ schließt DOMContentLoaded korrekt!
+``
