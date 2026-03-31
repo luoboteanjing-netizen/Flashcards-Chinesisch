@@ -198,37 +198,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  #btnAutoplay { min-width:100px; padding:8px 14px; }
  .mode-item { padding:10px 12px; min-height:28px; min-width:70px; font-size:13px; }
 
-/* ============================================
-   MODE-ITEM Flags + Text größer,
-   aber Gesamtgröße gleich behalten
-============================================ */
-
-.mode-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-
-    /* ↓ Padding reduziert, damit das Feld NICHT größer wird */
-    padding: 6px 5px;
-
-    /* ↓ Text & Flagge größer */
-    font-size: 20px;
-    font-weight: 700;
-
-    /* ↓ dadurch gleiche Feldhöhe wie vorher */
-    min-height: 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    /* Abstand zwischen Flagge & Text */
-    gap: 6px;
-
-    /* verhindert Umbrechen */
-    white-space: nowrap;
-}
-
 
 .lesson-bar {
  display: inline-block;
