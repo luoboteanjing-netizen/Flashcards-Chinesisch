@@ -217,18 +217,44 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     line-height: 1.1;
 }
 
+/* ============================================
+   MODE-ITEM Flags + Text größer,
+   aber Gesamtgröße gleich behalten
+============================================ */
+
+.mode-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    /* ↓ Padding reduziert, damit das Feld NICHT größer wird */
+    padding: 6px 10px;
+
+    /* ↓ Text & Flagge größer */
+    font-size: 18px;
+    font-weight: 700;
+
+    /* ↓ dadurch gleiche Feldhöhe wie vorher */
+    min-height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Abstand zwischen Flagge & Text */
+    gap: 6px;
+
+    /* verhindert Umbrechen */
+    white-space: nowrap;
+}
+
+/* Optional, aber besser: Flagge minimal größer als Text */
 .mode-item .flag-icon {
-    font-size: 24px;       /* ✅ Flagge etwas größer */
+    font-size: 22px;
     line-height: 1;
-    display: inline-block; /* saubere vertikale Ausrichtung */
+    display: inline-block;
 }
- .mode-inline, .actions-inline { gap:10px; }
- .voice-btn, .voice-config .lbl, .gap-row .lbl { font-size:13px; }
- #rateZhVal, #pitchZhVal, #rateDeVal, #pitchDeVal, #gapVal { font-size:11px; }
- .voice-config { gap:6px; }
- .voice-config > *:first-child { margin-top:8px; }
- .voice-config .lbl { margin-bottom:3px; }
-}
+
 .lesson-bar {
  display: inline-block;
  height: 6px;
