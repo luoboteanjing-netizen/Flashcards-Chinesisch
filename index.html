@@ -16,10 +16,10 @@
 
 <body>
 
-    <!-- ✅ Menü-Button (⋮) oben rechts -->
+    <!-- ✅ Drei-Punkte-Menü Icon (oben rechts) -->
     <div id="menuToggle">⋮</div>
 
-    <!-- ✅ Seitenmenü -->
+    <!-- ✅ Seitenmenü für Einstellungen (RICHTIG positioniert) -->
     <div id="sideMenu" class="side-menu">
         <h3>Einstellungen</h3>
 
@@ -62,18 +62,26 @@
 
         <!-- Lektionen -->
         <div class="pane">
+  
             <select id="lessonSelect" class="select" multiple size="10"></select>
 
-            <!-- ✅ Tabelle für Lektionen -->
+            <!-- ✅ Neue Tabelle für die Lektionen-Auswahl -->
             <div id="lessonTable" class="lesson-table"></div>
+
+            <div class="controls mt8">
+                <button id="btnUseLessons" class="btn">Übernehmen</button>
+                <button id="btnClearLessons" class="btn ghost">Leeren</button>
+            </div>
         </div>
 
         <!-- Richtung / Reihenfolge / Autoplay -->
         <div class="pane">
 
+           
+
             <div class="mode-inline">
                 <div class="mode-item" id="modeLeft">🇩🇪 DE</div>
-                <button id="btnSwapMode" class="btn ghost swap">⇄</button>
+                <button id="btnSwapMode" class="btn ghost swap" title="Richtung umschalten">⇄</button>
                 <div class="mode-item" id="modeRight">🇨🇳 ZH</div>
             </div>
 
@@ -144,8 +152,10 @@
             <div class="prompt-col">
                 <div id="promptWord" class="prompt big">—</div>
 
+                <!-- Pinyin vom WORT -->
                 <div id="promptWordSub" class="prompt sub small"></div>
 
+                <!-- ✅ POS -->
                 <div id="promptPOS" class="prompt pos small"></div>
             </div>
         </div>
@@ -154,14 +164,7 @@
             <div class="prompt-col">
                 <div id="promptSent" class="prompt">—</div>
 
-                <!-- SVG Speaker -->
-                <div id="speakerQuestion" class="card-speaker">
-                    <svg viewBox="0 0 24 24" class="icon-speaker">
-                        <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
-                        <path d="M14 9.23a4 4 0 010 5.54" fill="none" stroke="currentColor" stroke-width="2"></path>
-                        <path d="M14 4a9 9 0 010 16" fill="none" stroke="currentColor" stroke-width="2"></path>
-                    </svg>
-                </div>
+                <div id="speakerQuestion" class="card-speaker">🔊</div>
             </div>
         </div>
     </div>
@@ -176,24 +179,19 @@
 
             <div class="sol-part">
                 <div id="solSent" class="sol-text">—</div>
-
-                <div id="speakerAnswer" class="card-speaker">
-                    <svg viewBox="0 0 24 24" class="icon-speaker">
-                        <path d="M3 9v6h4l5 5V4L7 9H3z"></path>
-                        <path d="M14 9.23a4 4 0 010 5.54" fill="none" stroke="currentColor" stroke-width="2"></path>
-                        <path d="M14 4a9 9 0 010 16" fill="none" stroke="currentColor" stroke-width="2"></path>
-                    </svg>
-                </div>
+                <div id="speakerAnswer" class="card-speaker">🔊</div>
             </div>
         </div>
     </div>
 
+    <!-- Navigation -->
     <div class="card-controls">
         <button id="btnPrev" class="btn">◀ Zurück</button>
         <button id="btnReveal" class="btn ghost" disabled>Aufdecken</button>
         <button id="btnNext" class="btn" disabled>Nächste ▶</button>
     </div>
 
+    <!-- Rating-Bar -->
     <div class="ratebar" id="rateBar" style="display:none;">
         <button id="btnRateKnown" class="btn rate good" disabled>✅ Gewusst</button>
         <button id="btnRateUnsure" class="btn rate unsure" disabled>🤔 Unsicher</button>
