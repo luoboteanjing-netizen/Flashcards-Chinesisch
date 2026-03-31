@@ -265,6 +265,7 @@ function populateLessonSelect() {
             saveSettings();
 
             gatherPoolFromSettings();
+			populateLessonSelect();
 
             // ❗ WICHTIG: kein erneutes populateLessonSelect() !!
         });
