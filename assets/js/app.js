@@ -1,6 +1,8 @@
 /* ========================================================================== */
 /*                           FLASHCARDS – VERSION OPTION A                    */
+/*                       Repaired, Stabilized, Fully Functional               */
 /* ========================================================================== */
+
 /* -------------------------------------------------------------------------- */
 /* TEIL 1 – GLOBAL STATE · SETTINGS · CSV PARSER                              */
 /* -------------------------------------------------------------------------- */
@@ -10,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.0.2";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.0.1";   // beim nächsten Release erhöhen
 
 const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
 
@@ -44,8 +46,8 @@ const state = {
     historyPos: -1,
 
     current: null,
-    delayedSentenceTimer: null,
-    sentenceDelay: 3000,  // in Millisekunden
+	delayedSentenceTimer: null,
+	sentenceDelay: 3000,  // in Millisekunden
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -145,6 +147,7 @@ function parseCSVLine(line) {
             cur += c;
         }
     }
+
     result.push(cur);
     return result;
 }
@@ -154,6 +157,7 @@ async function loadCSV() {
         const res = await fetch(CSV_URL);
         const buf = await res.arrayBuffer();
         const text = new TextDecoder("utf-8").decode(buf);
+
         parseCSV(text);
         populateLessonSelect();
     } catch (e) {
@@ -175,10 +179,11 @@ function parseCSV(text) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
 
-        // Skip commented rows
+        // ✅ Skip disabled/commented rows (starting with "*")
         const firstCell = (cols[0] || "").replace(/\uFEFF/g, "").trim();
         if (firstCell.startsWith("*")) continue;
 
+        // ✅ Extract lesson name
         const lesson = (cols[8] || "")
             .replace(/\uFEFF/g, "")
             .trim();
@@ -199,6 +204,7 @@ function parseCSV(text) {
             lesson
         };
 
+        // ✅ Insert lesson & entry into the map
         if (!state.lessons.has(lesson)) {
             state.lessons.set(lesson, []);
             state.lessonOrder.push(lesson);
@@ -209,7 +215,6 @@ function parseCSV(text) {
 }
 
 /* ============================ LESSON SELECT =============================== */
-/* ✅ Dies ist die EINZIGE gültige Version! */
 
 function populateLessonSelect() {
     const sel = $("#lessonSelect");
@@ -218,15 +223,17 @@ function populateLessonSelect() {
     sel.innerHTML = "";
     table.innerHTML = "";
 
-    const header = `
-        <div class="lt-row lt-head">
-            <span class="lt-lesson" data-sort="lesson">Lektion</span>
-            <span class="lt-total" data-sort="total">Karten</span>
-            <span class="lt-known" data-sort="known">✅</span>
-            <span class="lt-unknown" data-sort="unknown">❌</span>
-            <span class="lt-percent" data-sort="percent">%</span>
-        </div>
-    `;
+
+const header = `
+    <div class="lt-row lt-head">
+        <span class="lt-lesson" data-sort="lesson">Lektion</span>
+        <span class="lt-total" data-sort="total">Karten</span>
+        <span class="lt-known" data-sort="known">✅</span>
+        <span class="lt-unknown" data-sort="unknown">❌</span>
+        <span class="lt-percent" data-sort="percent">%</span>
+    </div>
+`;
+
     table.insertAdjacentHTML("beforeend", header);
 
     for (const k of state.lessonOrder) {
@@ -235,10 +242,11 @@ function populateLessonSelect() {
         const total = cards.length;
 
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
-        const known = p.known || 0;
+        const known   = p.known   || 0;
         const unknown = p.unknown || 0;
         const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
+        // Unter der Haube weiter Optionen befüllen (für Training)
         const opt = document.createElement("option");
         opt.value = k;
         sel.appendChild(opt);
@@ -246,6 +254,7 @@ function populateLessonSelect() {
         const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
+
         row.innerHTML = `
             <span class="lt-lesson">${k}</span>
             <span class="lt-total">${total}</span>
@@ -257,23 +266,114 @@ function populateLessonSelect() {
         row.addEventListener("click", () => {
             opt.selected = !opt.selected;
             row.classList.toggle("selected", opt.selected);
-
-            const selectedLessons =
-                [...sel.options].filter(o => o.selected).map(o => o.value);
-
-            state.settings.lessons = selectedLessons;
-            saveSettings();
-
-            gatherPoolFromSettings();   // ✅ JETZT definierter Bereich
         });
 
         table.appendChild(row);
+
+        // vorauswahl anzeigen
+        if (state.settings.lessons.includes(k)) {
+            opt.selected = true;
+            row.classList.add("selected");
+        }
     }
+}
+
+function sortLessons() {
+    const key = lessonSort.key;
+    if (!key) return;
+
+    state.lessonOrder.sort((a, b) => {
+        const A = getLessonStats(a);
+        const B = getLessonStats(b);
+
+        let vA = A[key];
+        let vB = B[key];
+
+        if (typeof vA === "string") vA = vA.toLowerCase();
+        if (typeof vB === "string") vB = vB.toLowerCase();
+
+        if (vA < vB) return lessonSort.asc ? -1 : 1;
+        if (vA > vB) return lessonSort.asc ? 1 : -1;
+        return 0;
+    });
+}
+
+let lessonSort = { key: null, asc: true };
+
+document.addEventListener("click", (ev) => {
+    const sortKey = ev.target.dataset.sort;
+    if (!sortKey) return;
+
+    lessonSort.asc = lessonSort.key === sortKey ? !lessonSort.asc : true;
+    lessonSort.key = sortKey;
+
+    sortLessons();
+    populateLessonSelect();
+});
+
+function getLessonStats(lessonName) {
+    const cards = state.lessons.get(lessonName) || [];
+    const total = cards.length;
+
+    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0 };
+    const known = p.known || 0;
+    const unknown = p.unknown || 0;
+    const percent = total ? Math.round((known / total) * 100) : 0;
+
+    return {
+        lesson: lessonName,
+        total,
+        known,
+        unknown,
+        percent
+    };
+}
+
+/* ============================ POOL HANDLING =============================== */
+
+function resetSessionStats() {
+    state.session = {
+        total: state.pool.length,
+        done: 0,
+        known: 0,
+        unsure: 0,
+        unknown: 0,
+        ttrSum: 0,
+        ttrCount: 0
+    };
+}
+
+function gatherPool() {
+    const out = [];
+    for (const k of state.selectedLessons) {
+        const arr = state.lessons.get(k);
+        if (arr) out.push(...arr);
+    }
+    state.pool = out;
+    state.idx = null;
+    resetSessionStats();
+}
+
+function gatherPoolFromSettings() {
+    state.selectedLessons.clear();
+    (state.settings.lessons || []).forEach((x) => state.selectedLessons.add(x));
+    gatherPool();
+}
+
+/* ============================ UTILS =============================== */
+
+function formatZh(hz, py) {
+    hz = (hz || "").trim();
+    py = (py || "").trim();
+    return py
+        ? `${hz}<br><span class="zh-pinyin">${py}</span>`
+        : hz || "—";
 }
 
 /* ========================================================================== */
 /*                                ENDE TEIL 1                                 */
 /* ========================================================================== */
+
 /* ========================================================================== */
 /*                           TEIL 2 – CARD LOGIC                              */
 /*                Rendering · Navigation · Rating · Training                  */
@@ -1135,91 +1235,162 @@ function stopAutoplayOnUserAction() {
 /* ========================================================================== */
 /*                                ENDE TEIL 3                                 */
 /* ========================================================================== */
+``
 /* ========================================================================== */
-/* TEIL 4 – INIT & EVENTS */
+/*                           TEIL 4 – INIT & EVENTS                           */
 /* ========================================================================== */
 
 function renderModeUI() {
-    const left = $("#modeLeft");
+    const left  = $("#modeLeft");
     const right = $("#modeRight");
+
     if (state.mode === "de2zh") {
-        left.textContent = "🇩🇪 DE";
+        left.textContent  = "🇩🇪 DE";
         right.textContent = "🇨🇳 ZH";
     } else {
-        left.textContent = "🇨🇳 ZH";
+        left.textContent  = "🇨🇳 ZH";
         right.textContent = "🇩🇪 DE";
     }
+
     $("#btnOrderToggle").textContent =
         "Reihenfolge: " +
         (state.order === "seq" ? "Sequenziell" : "Zufällig");
+
     updateTrainingBtn();
 }
 
 /* ========================================================================== */
-/* INIT ROUTINE */
+/*                                INIT ROUTINE                                */
 /* ========================================================================== */
+
 window.addEventListener("DOMContentLoaded", () => {
 
-    /* Versionierung */
-    const css = document.querySelector("#cssMain");
-    const js = document.querySelector("#jsMain");
-    if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
-    if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
+/* ================================
+   Asset-Versionierung aktivieren
+   ================================ */
+const css = document.querySelector("#cssMain");
+const js  = document.querySelector("#jsMain");
 
+if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
+if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
+    console.log("[INIT] Starte Initialisierung …");
+
+    /* ============================================================
+       SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
+       ============================================================ */
     loadSettings();
     loadProgress();
 
-    /* Theme */
+    // Theme laden
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.classList.toggle("light", savedTheme === "light");
 
-    /* Satzdelay */
-    const delayInput = $("#delayInput");
-    if (state.settings.sentenceDelay !== undefined)
+    // Satz-Delay (ms)
+    if (state.settings.sentenceDelay !== undefined) {
         state.sentenceDelay = state.settings.sentenceDelay;
-    if (delayInput)
-        delayInput.value = state.sentenceDelay / 1000;
+    }
 
-    /* Mode / Order / Autoplay */
+    const delayInput = document.querySelector("#delayInput");
+    if (delayInput) delayInput.value = state.sentenceDelay / 1000;
+
+    // MODE & ORDER
     state.mode  = state.settings.mode  || "de2zh";
     state.order = state.settings.order || "random";
+
+    // AUTOPLAY GAP
     state.autoplay.gapMs = state.settings.autoplayGap || 800;
 
-    /* TTS Werte */
+    // TTS-Werte übernehmen
     state.rateDe  = state.settings.rateDe;
     state.pitchDe = state.settings.pitchDe;
     state.rateZh  = state.settings.rateZh;
     state.pitchZh = state.settings.pitchZh;
 
     renderModeUI();
+
+    /* ============================================================
+       CSV LADEN
+       ============================================================ */
     loadCSV();
 
-    speechSynthesis.onvoiceschanged = refreshVoices;
-    setTimeout(refreshVoices, 300);
+    /* ============================================================
+       STIMMEN LADEN
+       ============================================================ */
+    speechSynthesis.onvoiceschanged = () => {
+        refreshVoices();
+    };
+    setTimeout(refreshVoices, 300); // Fallback
 
-    /* SLIDE MENU – BUTTON (⋮) */
-    const toggleBtn = $("#menuToggle");
-    const sideMenu  = $("#sideMenu");
+    /* Slider auf gespeicherte Werte setzen */
+    const rateDeRange  = document.querySelector("#rateDeRange");
+    const pitchDeRange = document.querySelector("#pitchDeRange");
+    const rateZhRange  = document.querySelector("#rateZhRange");
+    const pitchZhRange = document.querySelector("#pitchZhRange");
 
-    toggleBtn.addEventListener("click", () => {
-        sideMenu.classList.toggle("open");
-        document.body.classList.toggle("menu-open");
-    });
+    const rateDeVal  = document.querySelector("#rateDeVal");
+    const pitchDeVal = document.querySelector("#pitchDeVal");
+    const rateZhVal  = document.querySelector("#rateZhVal");
+    const pitchZhVal = document.querySelector("#pitchZhVal");
 
-    /* THEME SWITCH */
-    $("#btnLight")?.addEventListener("click", () => {
+    if (rateDeRange)  rateDeRange.value  = state.rateDe;
+    if (pitchDeRange) pitchDeRange.value = state.pitchDe;
+    if (rateZhRange)  rateZhRange.value  = state.rateZh;
+    if (pitchZhRange) pitchZhRange.value = state.pitchZh;
+
+    if (rateDeVal)  rateDeVal.textContent  = `(${state.rateDe.toFixed(2)})`;
+    if (pitchDeVal) pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
+    if (rateZhVal)  rateZhVal.textContent  = `(${state.rateZh.toFixed(2)})`;
+    if (pitchZhVal) pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
+
+    /* ============================================================
+       AUTOPLAY BUTTON In TRAINING-GRUPPE SETZEN
+       ============================================================ */
+    (function placeAutoplayButton() {
+        const trainingBtn = document.querySelector("#btnStart");
+        const autoplayBtn = document.querySelector("#btnAutoplay");
+
+        if (!trainingBtn || !autoplayBtn) return;
+
+        const parent = trainingBtn.parentNode;
+        let group = parent.querySelector(".training-group");
+
+        if (!group) {
+            group = document.createElement("div");
+            group.className = "training-group";
+            parent.insertBefore(group, trainingBtn);
+            group.appendChild(trainingBtn);
+        }
+
+        group.appendChild(autoplayBtn);
+        autoplayBtn.classList.add("primary");
+    })();
+
+    /* ============================================================
+       SLIDE-DRAWER (⋮)
+       ============================================================ */
+    const toggleBtn = document.querySelector("#menuToggle");
+    const sideMenu  = document.querySelector("#sideMenu");
+
+    if (toggleBtn && sideMenu) {
+        toggleBtn.addEventListener("click", () => {
+            sideMenu.classList.toggle("open");
+        });
+    }
+
+    /* THEME-SWITCH */
+    document.querySelector("#btnLight")?.addEventListener("click", () => {
         document.documentElement.classList.add("light");
         localStorage.setItem("theme", "light");
     });
 
-    $("#btnDark")?.addEventListener("click", () => {
+    document.querySelector("#btnDark")?.addEventListener("click", () => {
         document.documentElement.classList.remove("light");
         localStorage.setItem("theme", "dark");
     });
 
     /* DELAY INPUT */
     if (delayInput) {
-        delayInput.addEventListener("input", e => {
+        delayInput.addEventListener("input", (e) => {
             const seconds = parseFloat(e.target.value) || 0;
             state.sentenceDelay = seconds * 1000;
             state.settings.sentenceDelay = state.sentenceDelay;
@@ -1227,21 +1398,205 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* IMPORT / EXPORT (Seitenmenü) */
-    $("#btnMenuExport")?.addEventListener("click", () => {
-        const blob = new Blob([JSON.stringify(state.progress, null, 2)],
-                              { type: "application/json" });
+    /* ============================================================
+       STIMMEN-EINSTELLUNG
+       ============================================================ */
+    rateDeRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.rateDe = parseFloat(e.target.value);
+        state.settings.rateDe = state.rateDe;
+        rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
+        saveSettings();
+    });
+
+    pitchDeRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.pitchDe = parseFloat(e.target.value);
+        state.settings.pitchDe = state.pitchDe;
+        pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
+        saveSettings();
+    });
+
+    rateZhRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.rateZh = parseFloat(e.target.value);
+        state.settings.rateZh = state.rateZh;
+        rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
+        saveSettings();
+    });
+
+    pitchZhRange?.addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        state.pitchZh = parseFloat(e.target.value);
+        state.settings.pitchZh = state.pitchZh;
+        pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
+        saveSettings();
+    });
+
+    document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        openVoicesPanelFor("de");
+    });
+
+    document.querySelector("#btnVoiceZh")?.addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        openVoicesPanelFor("zh");
+    });
+
+    document.querySelector("#btnCloseVoices")?.addEventListener("click", () => {
+        closeVoices();
+    });
+
+    /* ============================================================
+       MODUS, REIHENFOLGE, AUTOPLAY
+       ============================================================ */
+    $("#btnSwapMode").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
+        state.settings.mode = state.mode;
+        saveSettings();
+        renderModeUI();
+        if (state.current) setCard(state.current);
+    });
+
+    $("#btnOrderToggle").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.order = state.order === "random" ? "seq" : "random";
+        state.settings.order = state.order;
+        saveSettings();
+        renderModeUI();
+    });
+
+    $("#btnAutoplay").addEventListener("click", () => {
+        toggleAutoplay();
+    });
+
+    $("#gapRange").addEventListener("input", (e) => {
+        stopAutoplayOnUserAction();
+        const s = parseFloat(e.target.value) || 0.8;
+        state.autoplay.gapMs = Math.round(s * 1000);
+        state.settings.autoplayGap = state.autoplay.gapMs;
+        $("#gapVal").textContent = `(${s.toFixed(1)} s)`;
+        saveSettings();
+    });
+
+    /* ============================================================
+       TRAINING + NAVIGATION
+       ============================================================ */
+
+    $("#btnStart").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        startTraining();
+    });
+
+    $("#btnNext").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        nextCard();
+    });
+
+    $("#btnPrev").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        prevCard();
+    });
+
+    $("#btnReveal").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        doReveal();
+    });
+
+    /* ============================================================
+       AUDIO SPRECHER
+       ============================================================ */
+    $("#speakerQuestion").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        playQuestion();
+    });
+
+    $("#speakerAnswer").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        playAnswer();
+    });
+
+    /* ============================================================
+       RATING
+       ============================================================ */
+
+    $("#btnRateKnown").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("known");
+    });
+
+    $("#btnRateUnsure").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unsure");
+    });
+
+    $("#btnRateUnknown").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unknown");
+    });
+
+    /* ============================================================
+       LEKTIONEN
+       ============================================================ */
+    $("#btnUseLessons").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+
+        const sel = $("#lessonSelect");
+        const picked = [];
+
+        for (const o of sel.selectedOptions) picked.push(o.value);
+
+        state.settings.lessons = picked;
+        saveSettings();
+
+        gatherPoolFromSettings();
+        populateLessonSelect();
+    });
+
+    $("#btnClearLessons").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+
+        state.selectedLessons.clear();
+        state.settings.lessons = [];
+        saveSettings();
+
+        state.pool = [];
+        state.idx = null;
+
+        resetSessionStats();
+
+        const sel = $('#lessonSelect');
+        for (const o of sel.options) o.selected = false;
+
+        document.querySelectorAll(".lt-row.selected")
+            .forEach(row => row.classList.remove("selected"));
+
+        if (state.trainingOn) stopTraining();
+    });
+
+    /* ============================================================
+       IMPORT/EXPORT → jetzt im Seitenmenü
+       ============================================================ */
+
+    document.querySelector("#btnMenuExport")?.addEventListener("click", () => {
+        const blob = new Blob(
+            [JSON.stringify(state.progress, null, 2)],
+            { type: "application/json" }
+        );
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = "progress.json";
         a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 300);
     });
 
-    $("#btnMenuImport")?.addEventListener("click", () => {
+    document.querySelector("#btnMenuImport")?.addEventListener("click", () => {
         const inp = document.createElement("input");
         inp.type = "file";
         inp.accept = "application/json";
-        inp.onchange = e => {
+
+        inp.onchange = (e) => {
             const f = e.target.files?.[0];
             if (!f) return;
             const r = new FileReader();
@@ -1253,87 +1608,102 @@ window.addEventListener("DOMContentLoaded", () => {
                         saveProgress();
                         populateLessonSelect();
                         alert("Fortschritt importiert.");
-                    } else alert("Ungültiges Format.");
-                } catch {
+                    } else {
+                        alert("Ungültiges Format.");
+                    }
+                } catch (err) {
                     alert("Fehler beim Import.");
                 }
             };
             r.readAsText(f);
         };
+
         inp.click();
     });
+	// ================================
+	// Version im Menü anzeigen
+	// ================================
+	const verElem = document.querySelector("#appVersion");
+	if (verElem) verElem.textContent = APP_VERSION;
 
-    /* VERSION-ANZEIGE */
-    const verElem = $("#appVersion");
-    if (verElem) verElem.textContent = APP_VERSION;
+/* ============================================================
+   DRAG-TO-CLOSE – professionell wie in Mobile-Apps
+   ============================================================ */
 
-    /* ============================================================ */
-    /* OVERLAY TAP-TO-CLOSE                                        */
-    /* ============================================================ */
+(function enableDragToClose() {
+    const menu = document.querySelector("#sideMenu");
+    if (!menu) return;
 
-    const overlay = $("#sideOverlay");
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+
+    function onStart(e) {
+        if (!menu.classList.contains("open")) return;
+
+        dragging = true;
+        menu.classList.add("dragging");
+
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
+        currentX = startX;
+    }
+
+    function onMove(e) {
+        if (!dragging) return;
+
+        currentX = e.touches ? e.touches[0].clientX : e.clientX;
+        let diff = currentX - startX;
+
+        // ✅ Nur rechts wischen erlaubt diff > 0
+        if (diff > 0) {
+            // Ziehe das Menü entsprechend nach rechts hinaus
+            menu.style.right = `${-diff}px`;
+        }
+    }
+
+    function onEnd() {
+        if (!dragging) return;
+
+        dragging = false;
+        menu.classList.remove("dragging");
+
+        let diff = currentX - startX;
+
+        // ✅ Wenn genug nach rechts gewischt → Menü schließen
+        if (diff > 40) {
+            menu.classList.remove("open");
+        }
+
+        // Menü resetten
+        menu.style.right = "";
+    }
+
+    // Touch Events
+    menu.addEventListener("touchstart", onStart);
+    menu.addEventListener("touchmove", onMove);
+    menu.addEventListener("touchend", onEnd);
+
+    // Maus (für Desktop)
+    menu.addEventListener("mousedown", onStart);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+})();
+
+/* ============================================
+   Overlay tap-to-close
+   ============================================ */
+const overlay = document.querySelector("#sideOverlay");
+
+if (overlay) {
     overlay.addEventListener("click", () => {
         sideMenu.classList.remove("open");
-        document.body.classList.remove("menu-open");
     });
-
-    /* ============================================================ */
-    /* DRAG-TO-CLOSE (korrekt, getestet)                           */
-    /* ============================================================ */
-
-    (function enableDragToClose() {
-        const menu = sideMenu;
-        if (!menu) return;
-
-        let startX = 0;
-        let currentX = 0;
-        let dragging = false;
-
-        function onStart(e) {
-            if (!menu.classList.contains("open")) return;
-
-            dragging = true;
-            menu.classList.add("dragging");
-
-            startX = e.touches ? e.touches[0].clientX : e.clientX;
-            currentX = startX;
-        }
-
-        function onMove(e) {
-            if (!dragging) return;
-
-            currentX = e.touches ? e.touches[0].clientX : e.clientX;
-            const diff = currentX - startX;
-
-            if (diff > 0) {
-                menu.style.right = `${-diff}px`;
-            }
-        }
-
-        function onEnd() {
-            if (!dragging) return;
-
-            dragging = false;
-            menu.classList.remove("dragging");
-
-            const diff = currentX - startX;
-
-            if (diff > 40) {
-                menu.classList.remove("open");
-                document.body.classList.remove("menu-open");
-            }
-
-            menu.style.right = "";
-        }
-
-        menu.addEventListener("touchstart", onStart);
-        menu.addEventListener("touchmove", onMove);
-        menu.addEventListener("touchend", onEnd);
-
-        menu.addEventListener("mousedown", onStart);
-        window.addEventListener("mousemove", onMove);
-        window.addEventListener("mouseup", onEnd);
-    })();
+}
 
     console.log("[INIT] Alles bereit ✅");
 });
+
+
+/* ========================================================================== */
+/*                                ENDE TEIL 4                                 */
+/* ========================================================================== */
