@@ -197,8 +197,13 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  .btn.swap { padding:8px 10px; min-height:28px; font-size:16px; }
  #btnAutoplay { min-width:100px; padding:8px 14px; }
  .mode-item { padding:10px 12px; min-height:28px; min-width:70px; font-size:13px; }
-
-
+ .mode-inline, .actions-inline { gap:10px; }
+ .voice-btn, .voice-config .lbl, .gap-row .lbl { font-size:13px; }
+ #rateZhVal, #pitchZhVal, #rateDeVal, #pitchDeVal, #gapVal { font-size:11px; }
+ .voice-config { gap:6px; }
+ .voice-config > *:first-child { margin-top:8px; }
+ .voice-config .lbl { margin-bottom:3px; }
+}
 .lesson-bar {
  display: inline-block;
  height: 6px;
@@ -477,11 +482,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-unknown { color: var(--bad);  }
 
 /* Auswahlzustand */
-/* ✅ Deutliche Sichtbarkeit im Dark Mode */
 .lt-row.selected {
-    background: #475569 !important;       /* deutlich heller */ 
-    border-left: 4px solid #7aa2f7 !important; /* blauer Auswahlstreifen */
-    box-shadow: 0 0 0 1px #7aa2f7 inset;  /* leichte Umrandung */
+    background: #334155;
 }
 
 #menuToggle {
@@ -814,10 +816,3 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     pointer-events: auto;
 }
 
-.lt-head .lt-lesson {
-    transition: background 0.15s ease;
-}
-
-.lt-head .lt-lesson:active {
-    background: rgba(122,162,247,0.25);
-}
