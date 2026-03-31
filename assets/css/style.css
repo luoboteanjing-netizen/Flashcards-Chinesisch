@@ -1,4 +1,4 @@
-/* VERSION 1.0.2 styles (Umschaltbtn größer, breiter,schriftgrößen angepasst, Abstände, Farbe) */
+/* VERSION = 1.0.2 styles (Umschaltbtn größer, breiter,schriftgrößen angepasst, Abstände, Farbe) */
 :root{  
 	--bg: #0b0d10;
 	--card: #12161b;
@@ -422,16 +422,19 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     cursor: pointer;
 }
 
-/* ✅ Klickbereich für Datenzeilen vergrößern (sanft) */
-.lt-row {
-    padding: 8px 6px;          /* statt bisher 4px → doppelte Höhe */
-    min-height: 32px;          /* sorgt für mehr vertikale Fläche */
-}
-
 .lt-head {
     background: #283344;
     font-weight: 700;
 }
+
+.lt-head .lt-lesson {
+    transition: background 0.15s ease;
+}
+
+.lt-head .lt-lesson:active {
+    background: rgba(122,162,247,0.25);
+}
+
 
 /* ✅ Deutliche Sichtbarkeit im Dark Mode */
 .lt-row.selected {
@@ -547,17 +550,6 @@ body.menu-open #menuToggle::before {
     margin-top: 0;
     margin-bottom: 12px;
     color: var(--text);
-}
-
-/* ✅ Klickbereiche im Header vergrößern */
-.lt-head span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 10px 0;           /* höherer Klickbereich */
-    height: 32px;              /* feste Mindesthöhe */
-    cursor: pointer;           /* klar als klickbar sichtbar */
 }
 
 /* ========================================================= */
