@@ -223,17 +223,15 @@ function populateLessonSelect() {
     sel.innerHTML = "";
     table.innerHTML = "";
 
-
-const header = `
-    <div class="lt-row lt-head">
-        <span class="lt-lesson" data-sort="lesson">Lektion</span>
-        <span class="lt-total" data-sort="total">Karten</span>
-        <span class="lt-known" data-sort="known">✅</span>
-        <span class="lt-unknown" data-sort="unknown">❌</span>
-        <span class="lt-percent" data-sort="percent">%</span>
-    </div>
-`;
-
+    const header = `
+        <div class="lt-row lt-head">
+            <span class="lt-lesson" data-sort="lesson">Lektion</span>
+            <span class="lt-total" data-sort="total">Karten</span>
+            <span class="lt-known" data-sort="known">✅</span>
+            <span class="lt-unknown" data-sort="unknown">❌</span>
+            <span class="lt-percent" data-sort="percent">%</span>
+        </div>
+    `;
     table.insertAdjacentHTML("beforeend", header);
 
     for (const k of state.lessonOrder) {
@@ -242,15 +240,16 @@ const header = `
         const total = cards.length;
 
         const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
-        const known   = p.known   || 0;
+        const known = p.known || 0;
         const unknown = p.unknown || 0;
         const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        // Unter der Haube weiter Optionen befüllen (für Training)
+        // Option für Training
         const opt = document.createElement("option");
         opt.value = k;
         sel.appendChild(opt);
 
+        // Tabellenzeile
         const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
@@ -263,24 +262,24 @@ const header = `
             <span class="lt-percent">${percent}%</span>
         `;
 
-	row.addEventListener("click", () => {
-		// Auswahl togglen
-		opt.selected = !opt.selected;
-		row.classList.toggle("selected", opt.selected);
+        // Auto-Übernahme
+        row.addEventListener("click", () => {
+            opt.selected = !opt.selected;
+            row.classList.toggle("selected", opt.selected);
 
-		// ✅ Auto-Übernahme der Auswahl
-		const selectedLessons =
-			[...sel.options].filter(o => o.selected).map(o => o.value);
+            const selectedLessons =
+                [...sel.options].filter(o => o.selected).map(o => o.value);
 
-		state.settings.lessons = selectedLessons;
-		saveSettings();
+            state.settings.lessons = selectedLessons;
+            saveSettings();
 
-		// Kartenpool sofort neu aufbauen
-		gatherPoolFromSettings();
+            gatherPoolFromSettings();
+            populateLessonSelect();
+        });
 
-		// Lektionen-Liste neu rendern (Farben & Sortierung)
-		populateLessonSelect();
-});
+        table.appendChild(row);
+    }
+}  // ✅ <-- Diese Klammer hat bei dir gefehlt!
 
 function sortLessons() {
     const key = lessonSort.key;
