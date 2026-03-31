@@ -1,4 +1,4 @@
-/* r15.2.6 styles (Umschaltbtn größer, breiter,schriftgrößen angepasst, Abstände, Farbe) */
+/* VERSION 1.0.2 styles (Umschaltbtn größer, breiter,schriftgrößen angepasst, Abstände, Farbe) */
 :root{  
 	--bg: #0b0d10;
 	--card: #12161b;
@@ -427,9 +427,13 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     font-weight: 700;
 }
 
+/* ✅ Deutliche Sichtbarkeit im Dark Mode */
 .lt-row.selected {
-    background: #334155;
+    background: #475569 !important;       /* deutlich heller */ 
+    border-left: 4px solid #7aa2f7 !important; /* blauer Auswahlstreifen */
+    box-shadow: 0 0 0 1px #7aa2f7 inset;  /* leichte Umrandung */
 }
+
 
 .lt-known   { color: var(--good); }
 .lt-unknown { color: var(--bad);  }
