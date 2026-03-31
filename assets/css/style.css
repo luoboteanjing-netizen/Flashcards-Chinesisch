@@ -859,3 +859,83 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     pointer-events: auto;
 }
 
+/* ============================================
+   ✅ CANDY-FANCY THEME (Orange + Grün)
+   ============================================ */
+body.theme-candy {
+    --bg: #fff7f0;      /* pastell-cream */
+    --card: #ffffff;
+    --text: #333;
+    --muted: #777;
+    --border: #ffd6b8;  /* Pastell-Orange */
+    --accent: #ff9f50;  /* Candy-Orange */
+    --good: #5ac878;    /* Bonbon-Grün */
+    --bad: #ff6b6b;     /* Coral */
+    --unsure: #ffb84d;  /* weiches Apricot */
+}
+
+/* ✅ Buttons im Candy-Theme orange */
+body.theme-candy .btn {
+    background: #ffe8d7;
+    border-color: #ff9f50;
+    color: #663300;
+}
+
+body.theme-candy .btn.primary,
+body.theme-candy #btnAutoplay.primary {
+    background: #ff9f50 !important;
+    border-color: #ff9f50 !important;
+    color: #ffffff !important;
+}
+
+body.theme-candy .btn.ghost {
+    background: transparent;
+    border-color: #ff9f50;
+    color: #ff9f50;
+}
+
+body.theme-candy .btn:hover {
+    background: #ffb074;
+}
+
+/* ✅ Auswahl-Balken in der Lektionstabelle – Orange statt Blau */
+body.theme-candy .lt-row.selected {
+    background: #ffe1c4 !important;           /* helles Apricot */
+    border-left: 4px solid #ff9f50 !important; /* Orange */
+    box-shadow: 0 0 0 1px #ff9f50 inset !important;
+    color: #663300;
+}
+
+/* ✅ Speaker Icons im Candy-Orange */
+body.theme-candy .icon-speaker,
+body.theme-candy .card-speaker {
+    color: #ff9f50 !important;
+}
+
+/* ✅ Swap-Button orange */
+body.theme-candy #btnSwapMode {
+    border-color: #ff9f50 !important;
+    color: #ff9f50 !important;
+}
+
+/* ✅ Reveal-Button orange */
+body.theme-candy #btnReveal {
+    background: #ff9f50 !important;
+    border-color: #ff9f50 !important;
+    color: #fff !important;
+}
+
+/* ============================================
+   ✅ SOFT-LIGHT THEME (Augenschonend)
+   ============================================ */
+body.theme-softlight {
+    --bg: #ece7df;
+    --card: #f8f5f0;
+    --text: #2a2a2a;
+    --muted: #666;
+    --border: #d4cfc7;
+    --accent: #6a9fb5;
+    --good: #4d9950;
+    --bad: #d85c5c;
+    --unsure: #d8a65c;
+}
