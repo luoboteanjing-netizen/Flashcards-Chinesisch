@@ -1,14 +1,4 @@
 /* r15.2.6 styles (Umschaltbtn größer, breiter,schriftgrößen angepasst, Abstände, Farbe) */
-:root{  
-	--bg: var(--bg);
-	--card: var(--card);
-	--text: #e6edf3;
-	--muted: #8fa1b3;
-	--border: var(--border);
-	--accent:#7aa2f7; 
-	--good:#7bd88f; 
-	--bad:#f7768e; 
-	--unsure:#ffbd6b; }
 
 /* ============================================================================
    THEME VARIABLE SYSTEM (MUSS GANZ OBEN STEHEN!)
