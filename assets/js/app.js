@@ -1365,17 +1365,29 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
         autoplayBtn.classList.add("primary");
     })();
 
-    /* ============================================================
-       SLIDE-DRAWER (⋮)
-       ============================================================ */
-    const toggleBtn = document.querySelector("#menuToggle");
-    const sideMenu  = document.querySelector("#sideMenu");
+ 
+	/* ============================================================
+		SLIDE-DRAWER (⋮) – Öffnen/Schließen + Animation
+	============================================================ */
+	const toggleBtn = document.querySelector("#menuToggle");
+	const sideMenu  = document.querySelector("#sideMenu");
+	const overlay   = document.querySelector("#sideOverlay");
 
-    if (toggleBtn && sideMenu) {
-        toggleBtn.addEventListener("click", () => {
-            sideMenu.classList.toggle("open");
-        });
-    }
+	if (toggleBtn && sideMenu && overlay) {
+
+    // Öffnen/Schließen per Button
+    toggleBtn.addEventListener("click", () => {
+        const isOpen = sideMenu.classList.toggle("open");
+        document.body.classList.toggle("menu-open", isOpen);
+    });
+
+    // Tap außerhalb → Menü schließen
+    overlay.addEventListener("click", () => {
+        sideMenu.classList.remove("open");
+        document.body.classList.remove("menu-open");
+    });
+}
+
 
     /* THEME-SWITCH */
     document.querySelector("#btnLight")?.addEventListener("click", () => {
