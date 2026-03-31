@@ -1687,6 +1687,7 @@ if (overlay) {
         // ✅ Wenn genug nach rechts gewischt → Menü schließen
         if (diff > 40) {
             menu.classList.remove("open");
+			document.body.classList.remove("menu-open");
         }
 
         // Menü resetten
