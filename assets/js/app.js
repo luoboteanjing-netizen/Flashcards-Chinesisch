@@ -1635,10 +1635,9 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 	if (verElem) verElem.textContent = APP_VERSION;
 
 
- /* ============================================================
+/* ============================================================
    DRAG-TO-CLOSE – korrekt für Menü auf rechter Seite
-    ============================================================ */
-	
+   ============================================================ */
 (function enableDragToClose() {
     const menu = document.querySelector("#sideMenu");
     if (!menu) return;
@@ -1696,7 +1695,8 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     menu.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
-})();
+})();   
+
 
 /* ============================================
    Overlay tap-to-close
