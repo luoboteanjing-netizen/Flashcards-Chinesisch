@@ -308,6 +308,31 @@ row.addEventListener("click", () => {
     }
 }
 
+// ✅ Fortschritt in der Lektionstabelle live aktualisieren
+function updateLessonStatsUI() {
+
+    const table = document.querySelector("#lessonTable");
+    if (!table) return;
+
+    // Gehe durch alle sichtbaren Zeilen
+    document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
+        const lesson = row.dataset.lesson;
+        const cards = state.lessons.get(lesson) || [];
+        const total = cards.length;
+
+        const p = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
+        const known = p.known || 0;
+        const unknown = p.unknown || 0;
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+
+        // Spalten aktualisieren
+        row.querySelector(".lt-total").textContent = total;
+        row.querySelector(".lt-known").textContent = known;
+        row.querySelector(".lt-unknown").textContent = unknown;
+        row.querySelector(".lt-percent").textContent = percent + "%";
+    });
+}
+
 function sortLessons() {
     const key = lessonSort.key;
     if (!key) return;
@@ -674,6 +699,7 @@ function rate(mark) {
         if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
+		updateLessonStatsUI();
     }
 
     disableRating();
@@ -758,6 +784,7 @@ function stopTraining() {
 
     disableRating();
     hideRatingButtons();
+	updateLessonStatsUI();
 
     $("#solBox").classList.add("masked");
 }
