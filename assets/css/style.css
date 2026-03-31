@@ -212,7 +212,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     padding: 6px 5px;
 
     /* ↓ Text & Flagge größer */
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
 
     /* ↓ dadurch gleiche Feldhöhe wie vorher */
@@ -229,12 +229,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     white-space: nowrap;
 }
 
-/* Optional, aber besser: Flagge minimal größer als Text */
-.mode-item .flag-icon {
-    font-size: 22px;
-    line-height: 1;
-    display: inline-block;
-}
 
 .lesson-bar {
  display: inline-block;
