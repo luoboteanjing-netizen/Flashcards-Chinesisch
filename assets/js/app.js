@@ -1235,6 +1235,7 @@ function stopAutoplayOnUserAction() {
 /* ========================================================================== */
 /*                                ENDE TEIL 3                                 */
 /* ========================================================================== */
+
 /* ========================================================================== */
 /*                           TEIL 4 – INIT & EVENTS                           */
 /* ========================================================================== */
@@ -1364,29 +1365,17 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
         autoplayBtn.classList.add("primary");
     })();
 
- 
-	/* ============================================================
-		SLIDE-DRAWER (⋮) – Öffnen/Schließen + Animation
-	============================================================ */
-	const toggleBtn = document.querySelector("#menuToggle");
-	const sideMenu  = document.querySelector("#sideMenu");
-	const overlay   = document.querySelector("#sideOverlay");
+    /* ============================================================
+       SLIDE-DRAWER (⋮)
+       ============================================================ */
+    const toggleBtn = document.querySelector("#menuToggle");
+    const sideMenu  = document.querySelector("#sideMenu");
 
-	if (toggleBtn && sideMenu && overlay) {
-
-    // Öffnen/Schließen per Button
-    toggleBtn.addEventListener("click", () => {
-        const isOpen = sideMenu.classList.toggle("open");
-        document.body.classList.toggle("menu-open", isOpen);
-    });
-
-    // Tap außerhalb → Menü schließen
-    overlay.addEventListener("click", () => {
-        sideMenu.classList.remove("open");
-        document.body.classList.remove("menu-open");
-    });
-}
-
+    if (toggleBtn && sideMenu) {
+        toggleBtn.addEventListener("click", () => {
+            sideMenu.classList.toggle("open");
+        });
+    }
 
     /* THEME-SWITCH */
     document.querySelector("#btnLight")?.addEventListener("click", () => {
@@ -1703,12 +1692,16 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 /* ============================================
    Overlay tap-to-close
    ============================================ */
+const overlay = document.querySelector("#sideOverlay");
+
 if (overlay) {
     overlay.addEventListener("click", () => {
         sideMenu.classList.remove("open");
-        document.body.classList.remove("menu-open");
     });
 }
+
+    console.log("[INIT] Alles bereit ✅");
+});
 
 
 /* ========================================================================== */
