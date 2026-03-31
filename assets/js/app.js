@@ -1349,6 +1349,43 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.classList.toggle("light", savedTheme === "light");
 
+	/* ============================================================
+   THEME AUSWAHL (Custom Themes)
+   ============================================================ */
+
+function setCustomTheme(name) {
+    // Entferne alte Theme-Klassen
+    document.body.classList.remove("theme-softlight", "theme-candy");
+
+    // Falls ein Theme gesetzt werden soll
+    if (name) {
+        document.body.classList.add(name);
+    }
+
+    // Speicherung für später
+    localStorage.setItem("customTheme", name || "");
+}
+
+// Beim Start gespeichertes Theme wieder setzen
+const savedCustomTheme = localStorage.getItem("customTheme");
+if (savedCustomTheme) {
+    setCustomTheme(savedCustomTheme);
+}
+
+// ---- BUTTONS ----
+document.querySelector("#btnThemeSoftLight")?.addEventListener("click", () => {
+    setCustomTheme("theme-softlight");
+});
+
+document.querySelector("#btnThemeCandy")?.addEventListener("click", () => {
+    setCustomTheme("theme-candy");
+});
+
+document.querySelector("#btnThemeReset")?.addEventListener("click", () => {
+    setCustomTheme(""); // Theme entfernen
+});
+	
+	
     // Satz-Delay (ms)
     if (state.settings.sentenceDelay !== undefined) {
         state.sentenceDelay = state.settings.sentenceDelay;
