@@ -1,8 +1,6 @@
 /* ========================================================================== */
 /*                           FLASHCARDS – VERSION OPTION A                    */
-/*                       Repaired, Stabilized, Fully Functional               */
 /* ========================================================================== */
-
 /* -------------------------------------------------------------------------- */
 /* TEIL 1 – GLOBAL STATE · SETTINGS · CSV PARSER                              */
 /* -------------------------------------------------------------------------- */
@@ -46,8 +44,8 @@ const state = {
     historyPos: -1,
 
     current: null,
-	delayedSentenceTimer: null,
-	sentenceDelay: 3000,  // in Millisekunden
+    delayedSentenceTimer: null,
+    sentenceDelay: 3000,  // in Millisekunden
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -125,6 +123,45 @@ function loadProgress() {
 
 /* ============================ CSV PARSING ================================= */
 
+function parseCSVLine(line) {
+    const result = [];
+    let cur = "";
+    let quotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+
+        if (c === '"') {
+            if (quotes && line[i + 1] === '"') {
+                cur += '"';
+                i++;
+            } else {
+                quotes = !quotes;
+            }
+        } else if (c === ";" && !quotes) {
+            result.push(cur);
+            cur = "";
+        } else {
+            cur += c;
+        }
+    }
+    result.push(cur);
+    return result;
+}
+
+async function loadCSV() {
+    try {
+        const res = await fetch(CSV_URL);
+        const buf = await res.arrayBuffer();
+        const text = new TextDecoder("utf-8").decode(buf);
+        parseCSV(text);
+        populateLessonSelect();
+    } catch (e) {
+        alert("Fehler beim Laden der CSV.");
+        console.error(e);
+    }
+}
+
 function parseCSV(text) {
 
     state.lessons.clear();
@@ -138,11 +175,10 @@ function parseCSV(text) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
 
-        // ✅ Skip disabled/commented rows (starting with "*")
+        // Skip commented rows
         const firstCell = (cols[0] || "").replace(/\uFEFF/g, "").trim();
         if (firstCell.startsWith("*")) continue;
 
-        // ✅ Extract lesson name
         const lesson = (cols[8] || "")
             .replace(/\uFEFF/g, "")
             .trim();
@@ -163,7 +199,6 @@ function parseCSV(text) {
             lesson
         };
 
-        // ✅ Insert lesson & entry into the map
         if (!state.lessons.has(lesson)) {
             state.lessons.set(lesson, []);
             state.lessonOrder.push(lesson);
@@ -174,6 +209,7 @@ function parseCSV(text) {
 }
 
 /* ============================ LESSON SELECT =============================== */
+/* ✅ Dies ist die EINZIGE gültige Version! */
 
 function populateLessonSelect() {
     const sel = $("#lessonSelect");
@@ -229,103 +265,12 @@ function populateLessonSelect() {
             saveSettings();
 
             gatherPoolFromSettings();
-            populateLessonSelect();
+
+            // ❗ WICHTIG: kein erneutes populateLessonSelect() !!
         });
 
         table.appendChild(row);
-    }  // ✅ wichtig: diese Klammer hat bei dir gefehlt!
-}
-
-function sortLessons() {
-    const key = lessonSort.key;
-    if (!key) return;
-
-    state.lessonOrder.sort((a, b) => {
-        const A = getLessonStats(a);
-        const B = getLessonStats(b);
-
-        let vA = A[key];
-        let vB = B[key];
-
-        if (typeof vA === "string") vA = vA.toLowerCase();
-        if (typeof vB === "string") vB = vB.toLowerCase();
-
-        if (vA < vB) return lessonSort.asc ? -1 : 1;
-        if (vA > vB) return lessonSort.asc ? 1 : -1;
-        return 0;
-    });
-}
-
-let lessonSort = { key: null, asc: true };
-
-document.addEventListener("click", (ev) => {
-    const sortKey = ev.target.dataset.sort;
-    if (!sortKey) return;
-
-    lessonSort.asc = lessonSort.key === sortKey ? !lessonSort.asc : true;
-    lessonSort.key = sortKey;
-
-    sortLessons();
-    populateLessonSelect();
-});
-
-function getLessonStats(lessonName) {
-    const cards = state.lessons.get(lessonName) || [];
-    const total = cards.length;
-
-    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0 };
-    const known = p.known || 0;
-    const unknown = p.unknown || 0;
-    const percent = total ? Math.round((known / total) * 100) : 0;
-
-    return {
-        lesson: lessonName,
-        total,
-        known,
-        unknown,
-        percent
-    };
-}
-
-/* ============================ POOL HANDLING =============================== */
-
-function resetSessionStats() {
-    state.session = {
-        total: state.pool.length,
-        done: 0,
-        known: 0,
-        unsure: 0,
-        unknown: 0,
-        ttrSum: 0,
-        ttrCount: 0
-    };
-}
-
-function gatherPool() {
-    const out = [];
-    for (const k of state.selectedLessons) {
-        const arr = state.lessons.get(k);
-        if (arr) out.push(...arr);
     }
-    state.pool = out;
-    state.idx = null;
-    resetSessionStats();
-}
-
-function gatherPoolFromSettings() {
-    state.selectedLessons.clear();
-    (state.settings.lessons || []).forEach((x) => state.selectedLessons.add(x));
-    gatherPool();
-}
-
-/* ============================ UTILS =============================== */
-
-function formatZh(hz, py) {
-    hz = (hz || "").trim();
-    py = (py || "").trim();
-    return py
-        ? `${hz}<br><span class="zh-pinyin">${py}</span>`
-        : hz || "—";
 }
 
 /* ========================================================================== */
