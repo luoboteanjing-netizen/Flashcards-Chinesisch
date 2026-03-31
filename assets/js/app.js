@@ -1707,7 +1707,7 @@ if (overlay) {
 /* ============================================
    Overlay tap-to-close
    ============================================ */
-// overlay wurde oben bereits definiert – hier NICHT erneut deklarieren!
+// overlay wurde oben im Menüblock definiert
 
 if (overlay) {
     overlay.addEventListener("click", () => {
@@ -1716,7 +1716,12 @@ if (overlay) {
     });
 }
 
+console.log("[INIT] Alles bereit ✅");
+});  // ✅ schließt NUR den DOMContentLoaded – korrekt!
 
+/* ========================================================================== */
+/* ENDE TEIL 4 */
+/* ========================================================================== */
 /* ========================================================================== */
 /*                                ENDE TEIL 4                                 */
 /* ========================================================================== */
