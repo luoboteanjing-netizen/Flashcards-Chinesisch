@@ -277,18 +277,17 @@ row.addEventListener("click", () => {
     opt.selected = !opt.selected;
     row.classList.toggle("selected", opt.selected);
 
-    // ✅ Automatisch ausgewählte Lektionen auslesen
+    // ✅ Automatisch alle selektierten Lektionen übernehmen
     const selectedLessons =
         [...sel.options].filter(o => o.selected).map(o => o.value);
 
-    // ✅ In Settings speichern
     state.settings.lessons = selectedLessons;
     saveSettings();
 
     // ✅ Pool neu befüllen
     gatherPoolFromSettings();
 
-    // ✅ Falls Training läuft → Pool aktualisieren
+    // ✅ Falls Training läuft → sofort aktualisieren
     if (state.trainingOn) {
         state.idx = null;
         resetSessionStats();
@@ -296,6 +295,9 @@ row.addEventListener("click", () => {
             setCard(state.pool[0]);
         }
     }
+
+    // ✅ Fortschritt der Liste live aktualisieren
+    updateLessonStatsUI();
 });
 
         table.appendChild(row);
@@ -306,6 +308,31 @@ row.addEventListener("click", () => {
             row.classList.add("selected");
         }
     }
+}
+
+// ✅ Fortschritt in der Lektionstabelle live aktualisieren
+function updateLessonStatsUI() {
+
+    const table = document.querySelector("#lessonTable");
+    if (!table) return;
+
+    // durch alle Zeilen der Tabelle gehen (außer Header)
+    document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
+        const lesson = row.dataset.lesson;
+        const cards = state.lessons.get(lesson) || [];
+        const total = cards.length;
+
+        const p = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
+        const known = p.known || 0;
+        const unknown = p.unknown || 0;
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+
+        // Spalten aktualisieren
+        row.querySelector(".lt-total").textContent = total;
+        row.querySelector(".lt-known").textContent = known;
+        row.querySelector(".lt-unknown").textContent = unknown;
+        row.querySelector(".lt-percent").textContent = percent + "%";
+    });
 }
 
 function sortLessons() {
@@ -664,6 +691,7 @@ function rate(mark) {
         if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
+		updateLessonStatsUI();
     }
 
     disableRating();
@@ -748,6 +776,7 @@ function stopTraining() {
 
     disableRating();
     hideRatingButtons();
+	updateLessonStatsUI();
 
     $("#solBox").classList.add("masked");
 }
