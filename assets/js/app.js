@@ -1239,166 +1239,91 @@ function stopAutoplayOnUserAction() {
 /* ========================================================================== */
 /*                                ENDE TEIL 3                                 */
 /* ========================================================================== */
-``
 /* ========================================================================== */
-/*                           TEIL 4 – INIT & EVENTS                           */
+/* TEIL 4 – INIT & EVENTS */
 /* ========================================================================== */
 
 function renderModeUI() {
-    const left  = $("#modeLeft");
+    const left = $("#modeLeft");
     const right = $("#modeRight");
-
     if (state.mode === "de2zh") {
-        left.textContent  = "🇩🇪 DE";
+        left.textContent = "🇩🇪 DE";
         right.textContent = "🇨🇳 ZH";
     } else {
-        left.textContent  = "🇨🇳 ZH";
+        left.textContent = "🇨🇳 ZH";
         right.textContent = "🇩🇪 DE";
     }
-
     $("#btnOrderToggle").textContent =
         "Reihenfolge: " +
         (state.order === "seq" ? "Sequenziell" : "Zufällig");
-
     updateTrainingBtn();
 }
 
 /* ========================================================================== */
-/*                                INIT ROUTINE                                */
+/* INIT ROUTINE */
 /* ========================================================================== */
-
 window.addEventListener("DOMContentLoaded", () => {
 
-/* ================================
-   Asset-Versionierung aktivieren
-   ================================ */
-const css = document.querySelector("#cssMain");
-const js  = document.querySelector("#jsMain");
+    /* Versionierung */
+    const css = document.querySelector("#cssMain");
+    const js = document.querySelector("#jsMain");
+    if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
+    if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 
-if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
-if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
-    console.log("[INIT] Starte Initialisierung …");
-
-    /* ============================================================
-       SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
-       ============================================================ */
     loadSettings();
     loadProgress();
 
-    // Theme laden
+    /* Theme */
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.classList.toggle("light", savedTheme === "light");
 
-    // Satz-Delay (ms)
-    if (state.settings.sentenceDelay !== undefined) {
+    /* Satzdelay */
+    const delayInput = $("#delayInput");
+    if (state.settings.sentenceDelay !== undefined)
         state.sentenceDelay = state.settings.sentenceDelay;
-    }
+    if (delayInput)
+        delayInput.value = state.sentenceDelay / 1000;
 
-    const delayInput = document.querySelector("#delayInput");
-    if (delayInput) delayInput.value = state.sentenceDelay / 1000;
-
-    // MODE & ORDER
+    /* Mode / Order / Autoplay */
     state.mode  = state.settings.mode  || "de2zh";
     state.order = state.settings.order || "random";
-
-    // AUTOPLAY GAP
     state.autoplay.gapMs = state.settings.autoplayGap || 800;
 
-    // TTS-Werte übernehmen
+    /* TTS Werte */
     state.rateDe  = state.settings.rateDe;
     state.pitchDe = state.settings.pitchDe;
     state.rateZh  = state.settings.rateZh;
     state.pitchZh = state.settings.pitchZh;
 
     renderModeUI();
-
-    /* ============================================================
-       CSV LADEN
-       ============================================================ */
     loadCSV();
 
-    /* ============================================================
-       STIMMEN LADEN
-       ============================================================ */
-    speechSynthesis.onvoiceschanged = () => {
-        refreshVoices();
-    };
-    setTimeout(refreshVoices, 300); // Fallback
+    speechSynthesis.onvoiceschanged = refreshVoices;
+    setTimeout(refreshVoices, 300);
 
-    /* Slider auf gespeicherte Werte setzen */
-    const rateDeRange  = document.querySelector("#rateDeRange");
-    const pitchDeRange = document.querySelector("#pitchDeRange");
-    const rateZhRange  = document.querySelector("#rateZhRange");
-    const pitchZhRange = document.querySelector("#pitchZhRange");
+    /* SLIDE MENU – BUTTON (⋮) */
+    const toggleBtn = $("#menuToggle");
+    const sideMenu  = $("#sideMenu");
 
-    const rateDeVal  = document.querySelector("#rateDeVal");
-    const pitchDeVal = document.querySelector("#pitchDeVal");
-    const rateZhVal  = document.querySelector("#rateZhVal");
-    const pitchZhVal = document.querySelector("#pitchZhVal");
+    toggleBtn.addEventListener("click", () => {
+        sideMenu.classList.toggle("open");
+        document.body.classList.toggle("menu-open");
+    });
 
-    if (rateDeRange)  rateDeRange.value  = state.rateDe;
-    if (pitchDeRange) pitchDeRange.value = state.pitchDe;
-    if (rateZhRange)  rateZhRange.value  = state.rateZh;
-    if (pitchZhRange) pitchZhRange.value = state.pitchZh;
-
-    if (rateDeVal)  rateDeVal.textContent  = `(${state.rateDe.toFixed(2)})`;
-    if (pitchDeVal) pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
-    if (rateZhVal)  rateZhVal.textContent  = `(${state.rateZh.toFixed(2)})`;
-    if (pitchZhVal) pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
-
-    /* ============================================================
-       AUTOPLAY BUTTON In TRAINING-GRUPPE SETZEN
-       ============================================================ */
-    (function placeAutoplayButton() {
-        const trainingBtn = document.querySelector("#btnStart");
-        const autoplayBtn = document.querySelector("#btnAutoplay");
-
-        if (!trainingBtn || !autoplayBtn) return;
-
-        const parent = trainingBtn.parentNode;
-        let group = parent.querySelector(".training-group");
-
-        if (!group) {
-            group = document.createElement("div");
-            group.className = "training-group";
-            parent.insertBefore(group, trainingBtn);
-            group.appendChild(trainingBtn);
-        }
-
-        group.appendChild(autoplayBtn);
-        autoplayBtn.classList.add("primary");
-    })();
-
-    /* ============================================================
-       SLIDE-DRAWER (⋮)
-       ============================================================ */
-    const toggleBtn = document.querySelector("#menuToggle");
-    const sideMenu  = document.querySelector("#sideMenu");
-
-	toggleBtn.addEventListener("click", () => {
-		sideMenu.classList.toggle("open");
-		document.body.classList.toggle("menu-open");   // ✅ Wichtig!
-	});
-
-		overlay.addEventListener("click", () => {
-		sideMenu.classList.remove("open");
-		document.body.classList.remove("menu-open");   // ✅ Auch hier entfernen
-	});
-	
-    /* THEME-SWITCH */
-    document.querySelector("#btnLight")?.addEventListener("click", () => {
+    /* THEME SWITCH */
+    $("#btnLight")?.addEventListener("click", () => {
         document.documentElement.classList.add("light");
         localStorage.setItem("theme", "light");
     });
 
-    document.querySelector("#btnDark")?.addEventListener("click", () => {
+    $("#btnDark")?.addEventListener("click", () => {
         document.documentElement.classList.remove("light");
         localStorage.setItem("theme", "dark");
     });
 
     /* DELAY INPUT */
     if (delayInput) {
-        delayInput.addEventListener("input", (e) => {
+        delayInput.addEventListener("input", e => {
             const seconds = parseFloat(e.target.value) || 0;
             state.sentenceDelay = seconds * 1000;
             state.settings.sentenceDelay = state.sentenceDelay;
@@ -1406,205 +1331,21 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
         });
     }
 
-    /* ============================================================
-       STIMMEN-EINSTELLUNG
-       ============================================================ */
-    rateDeRange?.addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.rateDe = parseFloat(e.target.value);
-        state.settings.rateDe = state.rateDe;
-        rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    pitchDeRange?.addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.pitchDe = parseFloat(e.target.value);
-        state.settings.pitchDe = state.pitchDe;
-        pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
-        saveSettings();
-    });
-
-    rateZhRange?.addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.rateZh = parseFloat(e.target.value);
-        state.settings.rateZh = state.rateZh;
-        rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
-        saveSettings();
-    });
-
-    pitchZhRange?.addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        state.pitchZh = parseFloat(e.target.value);
-        state.settings.pitchZh = state.pitchZh;
-        pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
-        saveSettings();
-    });
-
-    document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        openVoicesPanelFor("de");
-    });
-
-    document.querySelector("#btnVoiceZh")?.addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        openVoicesPanelFor("zh");
-    });
-
-    document.querySelector("#btnCloseVoices")?.addEventListener("click", () => {
-        closeVoices();
-    });
-
-    /* ============================================================
-       MODUS, REIHENFOLGE, AUTOPLAY
-       ============================================================ */
-    $("#btnSwapMode").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
-        state.settings.mode = state.mode;
-        saveSettings();
-        renderModeUI();
-        if (state.current) setCard(state.current);
-    });
-
-    $("#btnOrderToggle").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        state.order = state.order === "random" ? "seq" : "random";
-        state.settings.order = state.order;
-        saveSettings();
-        renderModeUI();
-    });
-
-    $("#btnAutoplay").addEventListener("click", () => {
-        toggleAutoplay();
-    });
-
-    $("#gapRange").addEventListener("input", (e) => {
-        stopAutoplayOnUserAction();
-        const s = parseFloat(e.target.value) || 0.8;
-        state.autoplay.gapMs = Math.round(s * 1000);
-        state.settings.autoplayGap = state.autoplay.gapMs;
-        $("#gapVal").textContent = `(${s.toFixed(1)} s)`;
-        saveSettings();
-    });
-
-    /* ============================================================
-       TRAINING + NAVIGATION
-       ============================================================ */
-
-    $("#btnStart").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        startTraining();
-    });
-
-    $("#btnNext").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        nextCard();
-    });
-
-    $("#btnPrev").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        prevCard();
-    });
-
-    $("#btnReveal").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        doReveal();
-    });
-
-    /* ============================================================
-       AUDIO SPRECHER
-       ============================================================ */
-    $("#speakerQuestion").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        playQuestion();
-    });
-
-    $("#speakerAnswer").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        playAnswer();
-    });
-
-    /* ============================================================
-       RATING
-       ============================================================ */
-
-    $("#btnRateKnown").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("known");
-    });
-
-    $("#btnRateUnsure").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unsure");
-    });
-
-    $("#btnRateUnknown").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unknown");
-    });
-
-    /* ============================================================
-       LEKTIONEN
-       ============================================================ */
-    $("#btnUseLessons").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        const sel = $("#lessonSelect");
-        const picked = [];
-
-        for (const o of sel.selectedOptions) picked.push(o.value);
-
-        state.settings.lessons = picked;
-        saveSettings();
-
-        gatherPoolFromSettings();
-        populateLessonSelect();
-    });
-
-    $("#btnClearLessons").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        state.selectedLessons.clear();
-        state.settings.lessons = [];
-        saveSettings();
-
-        state.pool = [];
-        state.idx = null;
-
-        resetSessionStats();
-
-        const sel = $('#lessonSelect');
-        for (const o of sel.options) o.selected = false;
-
-        document.querySelectorAll(".lt-row.selected")
-            .forEach(row => row.classList.remove("selected"));
-
-        if (state.trainingOn) stopTraining();
-    });
-
-    /* ============================================================
-       IMPORT/EXPORT → jetzt im Seitenmenü
-       ============================================================ */
-
-    document.querySelector("#btnMenuExport")?.addEventListener("click", () => {
-        const blob = new Blob(
-            [JSON.stringify(state.progress, null, 2)],
-            { type: "application/json" }
-        );
+    /* IMPORT / EXPORT (Seitenmenü) */
+    $("#btnMenuExport")?.addEventListener("click", () => {
+        const blob = new Blob([JSON.stringify(state.progress, null, 2)],
+                              { type: "application/json" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = "progress.json";
         a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 300);
     });
 
-    document.querySelector("#btnMenuImport")?.addEventListener("click", () => {
+    $("#btnMenuImport")?.addEventListener("click", () => {
         const inp = document.createElement("input");
         inp.type = "file";
         inp.accept = "application/json";
-
-        inp.onchange = (e) => {
+        inp.onchange = e => {
             const f = e.target.files?.[0];
             if (!f) return;
             const r = new FileReader();
@@ -1616,100 +1357,87 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
                         saveProgress();
                         populateLessonSelect();
                         alert("Fortschritt importiert.");
-                    } else {
-                        alert("Ungültiges Format.");
-                    }
-                } catch (err) {
+                    } else alert("Ungültiges Format.");
+                } catch {
                     alert("Fehler beim Import.");
                 }
             };
             r.readAsText(f);
         };
-
         inp.click();
     });
-	// ================================
-	// Version im Menü anzeigen
-	// ================================
-	const verElem = document.querySelector("#appVersion");
-	if (verElem) verElem.textContent = APP_VERSION;
 
+    /* VERSION-ANZEIGE */
+    const verElem = $("#appVersion");
+    if (verElem) verElem.textContent = APP_VERSION;
 
-/* ============================================================
-   DRAG-TO-CLOSE – korrekt für Menü auf rechter Seite
-   ============================================================ */
-(function enableDragToClose() {
-    const menu = document.querySelector("#sideMenu");
-    if (!menu) return;
+    /* ============================================================ */
+    /* OVERLAY TAP-TO-CLOSE                                        */
+    /* ============================================================ */
 
-    let startX = 0;
-    let currentX = 0;
-    let dragging = false;
-
-    function onStart(e) {
-        if (!menu.classList.contains("open")) return;
-
-        dragging = true;
-        menu.classList.add("dragging");
-
-        startX = e.touches ? e.touches[0].clientX : e.clientX;
-        currentX = startX;
-    }
-
-    function onMove(e) {
-        if (!dragging) return;
-
-        currentX = e.touches ? e.touches[0].clientX : e.clientX;
-        let diff = currentX - startX;
-
-        // ✅ Nur rechts wischen erlaubt
-        if (diff > 0) {
-            menu.style.right = `${-diff}px`;
-        }
-    }
-
-    function onEnd() {
-        if (!dragging) return;
-
-        dragging = false;
-        menu.classList.remove("dragging");
-
-        let diff = currentX - startX;
-
-        // ✅ Menü schließen
-        if (diff > 40) {
-            menu.classList.remove("open");
-            document.body.classList.remove("menu-open");
-        }
-
-        // ✅ Reset
-        menu.style.right = "";
-    }
-
-    // Touch Events
-    menu.addEventListener("touchstart", onStart);
-    menu.addEventListener("touchmove", onMove);
-    menu.addEventListener("touchend", onEnd);
-
-    // Maus Events
-    menu.addEventListener("mousedown", onStart);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onEnd);
-})();
-
-/* ============================================
-   Overlay tap-to-close
-   ============================================ */
-const sideMenu = document.querySelector("#sideMenu");
-const overlay = document.querySelector("#sideOverlay");
-
-if (overlay) {
+    const overlay = $("#sideOverlay");
     overlay.addEventListener("click", () => {
         sideMenu.classList.remove("open");
         document.body.classList.remove("menu-open");
     });
-}
 
-console.log("[INIT] Alles bereit ✅");
-});   // ✅ schließt DOMContentLoaded korrekt!
-``
+    /* ============================================================ */
+    /* DRAG-TO-CLOSE (korrekt, getestet)                           */
+    /* ============================================================ */
+
+    (function enableDragToClose() {
+        const menu = sideMenu;
+        if (!menu) return;
+
+        let startX = 0;
+        let currentX = 0;
+        let dragging = false;
+
+        function onStart(e) {
+            if (!menu.classList.contains("open")) return;
+
+            dragging = true;
+            menu.classList.add("dragging");
+
+            startX = e.touches ? e.touches[0].clientX : e.clientX;
+            currentX = startX;
+        }
+
+        function onMove(e) {
+            if (!dragging) return;
+
+            currentX = e.touches ? e.touches[0].clientX : e.clientX;
+            const diff = currentX - startX;
+
+            if (diff > 0) {
+                menu.style.right = `${-diff}px`;
+            }
+        }
+
+        function onEnd() {
+            if (!dragging) return;
+
+            dragging = false;
+            menu.classList.remove("dragging");
+
+            const diff = currentX - startX;
+
+            if (diff > 40) {
+                menu.classList.remove("open");
+                document.body.classList.remove("menu-open");
+            }
+
+            menu.style.right = "";
+        }
+
+        menu.addEventListener("touchstart", onStart);
+        menu.addEventListener("touchmove", onMove);
+        menu.addEventListener("touchend", onEnd);
+
+        menu.addEventListener("mousedown", onStart);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onEnd);
+    })();
+
+    console.log("[INIT] Alles bereit ✅");
+});
