@@ -330,15 +330,25 @@ function sortLessons() {
 
 let lessonSort = { key: null, asc: true };
 
+/* ============================================================
+   SORTIERUNG FÜR LEKTIONSTABELLE
+   ============================================================ */
 document.addEventListener("click", (ev) => {
     const sortKey = ev.target.dataset.sort;
     if (!sortKey) return;
 
-    lessonSort.asc = lessonSort.key === sortKey ? !lessonSort.asc : true;
+    // ✅ Beim Klick auf "Lektion" → original CSV-Reihenfolge wiederherstellen
+    if (sortKey === "lesson") {
+        loadCSV();      // CSV neu laden = Reihenfolge exakt wie importiert
+        return;
+    }
+
+    // ✅ Alle anderen Spalten sortieren wie bisher
+    lessonSort.asc = (lessonSort.key === sortKey) ? !lessonSort.asc : true;
     lessonSort.key = sortKey;
 
-    sortLessons();
-    populateLessonSelect();
+    sortLessons();          // sortiert lessonOrder anhand der gewählten Spalte
+    populateLessonSelect(); // Liste neu aufbauen
 });
 
 function getLessonStats(lessonName) {
