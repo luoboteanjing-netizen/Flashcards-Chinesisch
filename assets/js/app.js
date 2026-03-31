@@ -271,10 +271,32 @@ const header = `
             <span class="lt-percent">${percent}%</span>
         `;
 
-        row.addEventListener("click", () => {
-            opt.selected = !opt.selected;
-            row.classList.toggle("selected", opt.selected);
-        });
+row.addEventListener("click", () => {
+
+    // Toggle Auswahl
+    opt.selected = !opt.selected;
+    row.classList.toggle("selected", opt.selected);
+
+    // ✅ Automatisch ausgewählte Lektionen auslesen
+    const selectedLessons =
+        [...sel.options].filter(o => o.selected).map(o => o.value);
+
+    // ✅ In Settings speichern
+    state.settings.lessons = selectedLessons;
+    saveSettings();
+
+    // ✅ Pool neu befüllen
+    gatherPoolFromSettings();
+
+    // ✅ Falls Training läuft → Pool aktualisieren
+    if (state.trainingOn) {
+        state.idx = null;
+        resetSessionStats();
+        if (state.pool.length) {
+            setCard(state.pool[0]);
+        }
+    }
+});
 
         table.appendChild(row);
 
@@ -1559,45 +1581,7 @@ if (overlay) {
         rate("unknown");
     });
 
-    /* ============================================================
-       LEKTIONEN
-       ============================================================ */
-    $("#btnUseLessons").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        const sel = $("#lessonSelect");
-        const picked = [];
-
-        for (const o of sel.selectedOptions) picked.push(o.value);
-
-        state.settings.lessons = picked;
-        saveSettings();
-
-        gatherPoolFromSettings();
-        populateLessonSelect();
-    });
-
-    $("#btnClearLessons").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-
-        state.selectedLessons.clear();
-        state.settings.lessons = [];
-        saveSettings();
-
-        state.pool = [];
-        state.idx = null;
-
-        resetSessionStats();
-
-        const sel = $('#lessonSelect');
-        for (const o of sel.options) o.selected = false;
-
-        document.querySelectorAll(".lt-row.selected")
-            .forEach(row => row.classList.remove("selected"));
-
-        if (state.trainingOn) stopTraining();
-    });
-
+  
     /* ============================================================
        IMPORT/EXPORT → jetzt im Seitenmenü
        ============================================================ */
