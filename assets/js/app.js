@@ -1704,16 +1704,12 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 /* ============================================
    Overlay tap-to-close
    ============================================ */
-const overlay = document.querySelector("#sideOverlay");
-
 if (overlay) {
     overlay.addEventListener("click", () => {
         sideMenu.classList.remove("open");
+        document.body.classList.remove("menu-open");
     });
 }
-
-    console.log("[INIT] Alles bereit ✅");
-});
 
 
 /* ========================================================================== */
