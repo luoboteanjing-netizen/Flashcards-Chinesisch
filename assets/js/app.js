@@ -125,67 +125,6 @@ function loadProgress() {
 
 /* ============================ CSV PARSING ================================= */
 
-function populateLessonSelect() {
-    const sel = $("#lessonSelect");
-    const table = $("#lessonTable");
-
-    sel.innerHTML = "";
-    table.innerHTML = "";
-
-    const header = `
-        <div class="lt-row lt-head">
-            <span class="lt-lesson" data-sort="lesson">Lektion</span>
-            <span class="lt-total" data-sort="total">Karten</span>
-            <span class="lt-known" data-sort="known">✅</span>
-            <span class="lt-unknown" data-sort="unknown">❌</span>
-            <span class="lt-percent" data-sort="percent">%</span>
-        </div>
-    `;
-    table.insertAdjacentHTML("beforeend", header);
-
-    for (const k of state.lessonOrder) {
-
-        const cards = state.lessons.get(k) || [];
-        const total = cards.length;
-
-        const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
-        const known = p.known || 0;
-        const unknown = p.unknown || 0;
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
-
-        const opt = document.createElement("option");
-        opt.value = k;
-        sel.appendChild(opt);
-
-        const row = document.createElement("div");
-        row.className = "lt-row";
-        row.dataset.lesson = k;
-        row.innerHTML = `
-            <span class="lt-lesson">${k}</span>
-            <span class="lt-total">${total}</span>
-            <span class="lt-known">${known}</span>
-            <span class="lt-unknown">${unknown}</span>
-            <span class="lt-percent">${percent}%</span>
-        `;
-
-        row.addEventListener("click", () => {
-            opt.selected = !opt.selected;
-            row.classList.toggle("selected", opt.selected);
-
-            const selectedLessons =
-                [...sel.options].filter(o => o.selected).map(o => o.value);
-
-            state.settings.lessons = selectedLessons;
-            saveSettings();
-
-            gatherPoolFromSettings();
-       
-        });
-
-        table.appendChild(row);
-    } // ✅ WICHTIG – diese Klammer hat in deiner Datei gefehlt!
-}
-
 function parseCSV(text) {
 
     state.lessons.clear();
@@ -290,7 +229,7 @@ function populateLessonSelect() {
             saveSettings();
 
             gatherPoolFromSettings();
-            populateLessonSelect();
+           
         });
 
         table.appendChild(row);
