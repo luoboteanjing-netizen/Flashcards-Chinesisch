@@ -2,17 +2,12 @@
 /*                           FLASHCARDS – VERSION OPTION A                    */
 /*                       Repaired, Stabilized, Fully Functional               */
 /* ========================================================================== */
-
 /* -------------------------------------------------------------------------- */
 /* TEIL 1 – GLOBAL STATE · SETTINGS · CSV PARSER                              */
 /* -------------------------------------------------------------------------- */
 
-/* ===========================
-   AUTOMATISCHE VERSIONIERUNG
-   =========================== */
-
 /* === Version manuell definieren === */
-const APP_VERSION = "1.0.1";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.0.2";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -360,6 +355,13 @@ let lessonSort = { key: null, asc: true };
 document.addEventListener("click", (ev) => {
     const sortKey = ev.target.dataset.sort;
     if (!sortKey) return;
+
+    // ✅ Sonderfall: Lektionen sollen NICHT alphabetisch sortieren
+    if (sortKey === "lesson") {
+        // nichts sortieren – CSV‑Reihenfolge bleibt bestehen
+        populateLessonSelect();
+        return;
+    }
 
     lessonSort.asc = lessonSort.key === sortKey ? !lessonSort.asc : true;
     lessonSort.key = sortKey;
