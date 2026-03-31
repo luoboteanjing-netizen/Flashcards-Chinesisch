@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.0.1";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.0.2";   // beim nächsten Release erhöhen
 
 const CSV_URL = "./data/Long-Chinesisch_Lektionen.csv";
 
@@ -263,20 +263,24 @@ const header = `
             <span class="lt-percent">${percent}%</span>
         `;
 
-        row.addEventListener("click", () => {
-            opt.selected = !opt.selected;
-            row.classList.toggle("selected", opt.selected);
-        });
+	row.addEventListener("click", () => {
+		// Auswahl togglen
+		opt.selected = !opt.selected;
+		row.classList.toggle("selected", opt.selected);
 
-        table.appendChild(row);
+		// ✅ Auto-Übernahme der Auswahl
+		const selectedLessons =
+			[...sel.options].filter(o => o.selected).map(o => o.value);
 
-        // vorauswahl anzeigen
-        if (state.settings.lessons.includes(k)) {
-            opt.selected = true;
-            row.classList.add("selected");
-        }
-    }
-}
+		state.settings.lessons = selectedLessons;
+		saveSettings();
+
+		// Kartenpool sofort neu aufbauen
+		gatherPoolFromSettings();
+
+		// Lektionen-Liste neu rendern (Farben & Sortierung)
+		populateLessonSelect();
+});
 
 function sortLessons() {
     const key = lessonSort.key;
@@ -1371,12 +1375,16 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     const toggleBtn = document.querySelector("#menuToggle");
     const sideMenu  = document.querySelector("#sideMenu");
 
-    if (toggleBtn && sideMenu) {
-        toggleBtn.addEventListener("click", () => {
-            sideMenu.classList.toggle("open");
-        });
-    }
+	toggleBtn.addEventListener("click", () => {
+		sideMenu.classList.toggle("open");
+		document.body.classList.toggle("menu-open");   // ✅ Wichtig!
+	});
 
+		overlay.addEventListener("click", () => {
+		sideMenu.classList.remove("open");
+		document.body.classList.remove("menu-open");   // ✅ Auch hier entfernen
+	});
+	
     /* THEME-SWITCH */
     document.querySelector("#btnLight")?.addEventListener("click", () => {
         document.documentElement.classList.add("light");
@@ -1626,10 +1634,11 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 	const verElem = document.querySelector("#appVersion");
 	if (verElem) verElem.textContent = APP_VERSION;
 
-/* ============================================================
-   DRAG-TO-CLOSE – professionell wie in Mobile-Apps
-   ============================================================ */
 
+ /* ============================================================
+   DRAG-TO-CLOSE – korrekt für Menü auf rechter Seite
+    ============================================================ */
+	
 (function enableDragToClose() {
     const menu = document.querySelector("#sideMenu");
     if (!menu) return;
@@ -1654,9 +1663,8 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
         currentX = e.touches ? e.touches[0].clientX : e.clientX;
         let diff = currentX - startX;
 
-        // ✅ Nur rechts wischen erlaubt diff > 0
+        // ✅ Nur rechts wischen erlaubt (diff > 0)
         if (diff > 0) {
-            // Ziehe das Menü entsprechend nach rechts hinaus
             menu.style.right = `${-diff}px`;
         }
     }
@@ -1669,12 +1677,13 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 
         let diff = currentX - startX;
 
-        // ✅ Wenn genug nach rechts gewischt → Menü schließen
+        // ✅ genug nach rechts gewischt → Menü schließen
         if (diff > 40) {
             menu.classList.remove("open");
+            document.body.classList.remove("menu-open");
         }
 
-        // Menü resetten
+        // ✅ Menü zurück in Ausgangsposition
         menu.style.right = "";
     }
 
@@ -1683,7 +1692,7 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     menu.addEventListener("touchmove", onMove);
     menu.addEventListener("touchend", onEnd);
 
-    // Maus (für Desktop)
+    // Maus (Desktop)
     menu.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
