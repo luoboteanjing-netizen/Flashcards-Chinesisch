@@ -264,10 +264,7 @@ function populateLessonSelect() {
             state.settings.lessons = selectedLessons;
             saveSettings();
 
-            gatherPoolFromSettings();
-			populateLessonSelect();
-
-            // ❗ WICHTIG: kein erneutes populateLessonSelect() !!
+            gatherPoolFromSettings();   // ✅ JETZT definierter Bereich
         });
 
         table.appendChild(row);
@@ -277,7 +274,6 @@ function populateLessonSelect() {
 /* ========================================================================== */
 /*                                ENDE TEIL 1                                 */
 /* ========================================================================== */
-
 /* ========================================================================== */
 /*                           TEIL 2 – CARD LOGIC                              */
 /*                Rendering · Navigation · Rating · Training                  */
