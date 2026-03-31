@@ -356,13 +356,15 @@ document.addEventListener("click", (ev) => {
     const sortKey = ev.target.dataset.sort;
     if (!sortKey) return;
 
-    // ✅ Sonderfall: Lektionen sollen NICHT alphabetisch sortieren
+    // ✅ LEKTION (Spalte 1) → zurück zur CSV-Reihenfolge
     if (sortKey === "lesson") {
-        // nichts sortieren – CSV‑Reihenfolge bleibt bestehen
+        // Reihenfolge NICHT verändern
+        // Nur UI neu aufbauen
         populateLessonSelect();
         return;
     }
 
+    // ✅ Alle anderen Spalten wie gewohnt sortieren
     lessonSort.asc = lessonSort.key === sortKey ? !lessonSort.asc : true;
     lessonSort.key = sortKey;
 
