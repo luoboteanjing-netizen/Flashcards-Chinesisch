@@ -936,3 +936,14 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     padding-top: 10px !important;    /* vorher 14px */
 }
 
+/* ============================================================
+   Fix: Alle Zahlen in der Lektionsliste rechtsbündig
+   ============================================================ */
+.lt-total,
+.lt-strong,
+.lt-weak,
+.lt-unknown,
+.lt-percent {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums;
+}
