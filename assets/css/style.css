@@ -488,12 +488,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-        80px   /* Lektion */
-        40px   /* Total */
+        60px   /* Lektion */
+        30px   /* Total */
         30px   /* strong (✅) */
         30px   /* weak   (⚠️) */
         30px   /* unknown (❌) */
-        40px;  /* % */
+        30px;  /* % */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
