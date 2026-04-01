@@ -461,12 +461,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #lessonSelect option {
     display: grid;
     grid-template-columns:
-        60px   /* Lektionstitel */
-        40px    /* total */
-        40px    /* known */
-        40px   /* unsure */
-        40px    /* unknown */
-        50px;   /* percent */
+        160px   /* Lektionstitel */
+        60px    /* total */
+        80px    /* known */
+        100px   /* unknown */
+        60px;   /* percent */
     gap: 8px;
     font-family: inherit;
     font-size: 14px;
@@ -567,12 +566,11 @@ html:not(.light) .lt-row.selected {
 .lt-row {
     display: grid;
     grid-template-columns:
-        60px   /* Lektionstitel */
-        40px    /* total */
-        40px    /* known */
-        40px    /* weak */
-        40px   /* unknown */
-        50px;   /* percent *
+        80px   /* Lektion */
+        40px    /* Karten */
+        30px    /* ✅ */
+        30px    /* ❌ */
+        40px;   /* % */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
@@ -938,53 +936,3 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     padding-top: 10px !important;    /* vorher 14px */
 }
 
-/* =========================================
-   Fix: Zahlen in der Lektionsliste rechtsbündig
-========================================= */
-
-.lt-total,
-.lt-strong,
-.lt-weak,
-.lt-unknown,
-.lt-percent {
-    text-align: right !important;
-    font-variant-numeric: tabular-nums;
-}
-
-/* ============================================================
-   Fix: Leitner-Fortschrittsbalken von links nach rechts
-   (Layer-Reihenfolge eindeutig definiert)
-   ============================================================ */
-
-.lesson-bar-unseen {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    background: #8884; /* grau */
-    z-index: 1;
-}
-
-.lesson-bar-red {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    background: #e74c3c; /* rot */
-    z-index: 2;
-}
-
-.lesson-bar-yellow {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    background: #ffcc33; /* gelb */
-    z-index: 3;
-}
-
-.lesson-bar-green {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    background: #3c9f40; /* grün */
-    z-index: 4;
-}
