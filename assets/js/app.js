@@ -665,18 +665,23 @@ function doReveal() {
     // -----------------------------------------
     const p = ensureCardProgress(state.current);
     if (p.box === 0) {
-        p.box = 1; // neu → schwach
+        p.box = 1;     // neu → schwach
         p.lastReview = Date.now();
         saveProgress();
         updateLessonStatsUI();
     }
 
-    // Rest wie normal
+    // -----------------------------------------
+    // Originalverhalten: Verzögerten Timer stoppen
+    // -----------------------------------------
     if (state.delayedSentenceTimer) {
         clearTimeout(state.delayedSentenceTimer);
         state.delayedSentenceTimer = null;
     }
 
+    // -----------------------------------------
+    // Buttons & UI setzen
+    // -----------------------------------------
     if (!state.autoplay.on) hideNavButtons();
     showRatingButtons();
     enableRating();
