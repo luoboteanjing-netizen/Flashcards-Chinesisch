@@ -561,25 +561,30 @@ if (stats) {
         if (p.box === 0) unseen++;
         else if (p.box === 1) red++;
         else if (p.box === 2 || p.box === 3) yellow++;
-        else if (p.box === 4 || p.box === 5) green++;
+        else green++; // box 4–5
     }
 
     const total = cards.length;
 
-    const unseenPct = total ? unseen / total * 100 : 0;
-    const redPct    = total ? red    / total * 100 : 0;
-    const yellowPct = total ? yellow / total * 100 : 0;
-    const greenPct  = total ? green  / total * 100 : 0;
+    const unseenPct = total ? (unseen / total) * 100 : 0;
+    const redPct    = total ? (red    / total) * 100 : 0;
+    const yellowPct = total ? (yellow / total) * 100 : 0;
+    const greenPct  = total ? (green  / total) * 100 : 0;
+
+    const leftRed    = unseenPct;
+    const leftYellow = unseenPct + redPct;
+    const leftGreen  = unseenPct + redPct + yellowPct;
 
     stats.innerHTML = `
         <div class="lesson-bar-large">
-            <div class="lesson-bar-unseen" style="width:${unseenPct}%"></div>
-            <div class="lesson-bar-red"    style="left:${unseenPct}%; width:${redPct}%"></div>
-            <div class="lesson-bar-yellow" style="left:${unseenPct + redPct}%; width:${yellowPct}%"></div>
-            <div class="lesson-bar-green"  style="left:${unseenPct + redPct + yellowPct}%; width:${greenPct}%"></div>
+            <div class="lesson-bar-unseen" style="left:0%; width:${unseenPct}%"></div>
+            <div class="lesson-bar-red"    style="left:${leftRed}%; width:${redPct}%"></div>
+            <div class="lesson-bar-yellow" style="left:${leftYellow}%; width:${yellowPct}%"></div>
+            <div class="lesson-bar-green"  style="left:${leftGreen}%; width:${greenPct}%"></div>
         </div>
     `;
 }
+
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
     sol.classList.add("masked");
