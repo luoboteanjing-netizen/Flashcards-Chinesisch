@@ -315,9 +315,9 @@ function updateLessonStatsUI() {
         const lesson = row.dataset.lesson;
         const cards = state.lessons.get(lesson) ?? [];
 
-        let red = 0;      // Box 1
-        let yellow = 0;   // Box 2 + 3
-        let green = 0;    // Box 4 + 5
+        let red = 0;      // Box 1 (falsch/schwach)
+        let yellow = 0;   // Box 2 + 3 (unsicher)
+        let green = 0;    // Box 4 + 5 (sicher)
 
         for (const c of cards) {
             const p = state.progress.cards[c.id] ?? { box: 0 };
@@ -582,12 +582,13 @@ function ensureCardProgress(entry) {
     const id = entry.id;
     if (!state.progress.cards[id]) {
         state.progress.cards[id] = {
-            box: 0,          // 0 = völlig neu, noch nie aufgedeckt
+            box: 0,          // 0 = neu (noch nie gesehen)
             timesCorrect: 0,
             timesWrong: 0,
             lastReview: 0
         };
     }
+    return state.progress.cards[id];
 }
 
 /* ============================ HISTORY / NAV ============================ */
@@ -657,6 +658,7 @@ function showNavButtons() {
 
 
 /* ============================ REVEAL / RATING ============================ */
+
 function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
@@ -666,7 +668,7 @@ function doReveal() {
     // -----------------------------------------
     const p = ensureCardProgress(state.current);
     if (p.box === 0) {
-        p.box = 1;                   // neu → schwach
+        p.box = 1;                    // neu → schwach
         p.lastReview = Date.now();
         saveProgress();
         updateLessonStatsUI();
@@ -712,36 +714,32 @@ function disableRating() {
 function rate(mark) {
     if (!state.current) return;
 
-    // ---------------------------------------------------------
-    // LEITNER: Bewertung der aktuellen Karte
-    // ---------------------------------------------------------
+    // -----------------------------------------
+    // LEITNER: Bewertung
+    // -----------------------------------------
     const p = ensureCardProgress(state.current);
 
-    // Falls Karte noch nie gesehen wurde:
-    if (p.box === 0) {
-        p.box = 1;  // erstes Aufdecken hat Box 1 gesetzt
-    }
+    // Falls Karte gerade erst zum ersten Mal aufgedeckt wurde:
+    if (p.box === 0) p.box = 1;
 
     if (mark === "known") {
         // richtig:
-        // - Box 1 → Box 2
-        // - danach: normaler Leitner-Aufstieg
+        // - Box 1 → Box 2 (erste korrekte Antwort)
+        // - danach normale Leiter hoch
         if (p.box === 1) p.box = 2;
         else p.box = Math.min(p.box + 1, 5);
 
         p.timesCorrect++;
     }
     else if (mark === "unsure") {
-        // unsicher:
-        // - Box 1 → Box 2
-        // - Box 2 → Box 3
-        if (p.box < 2) p.box = 2;
-        else if (p.box === 2) p.box = 3;
+        // unsicher → 2 oder 3
+        if (p.box < 2)      p.box = 2;   // 1 → 2
+        else if (p.box === 2) p.box = 3; // 2 → 3
 
         p.timesWrong++;
     }
     else if (mark === "unknown") {
-        // falsch → Zurück zu Box 1
+        // falsch → zurück zu 1
         p.box = 1;
         p.timesWrong++;
     }
@@ -750,10 +748,9 @@ function rate(mark) {
     saveProgress();
     updateLessonStatsUI();
 
-    // ---------------------------------------------------------
-    // DEIN ORIGINALER RATE-CODE (Session-Stats, Navigation, etc.)
-    // ---------------------------------------------------------
-
+    // -----------------------------------------
+    // DEIN ORIGINALER CODE (unverändert)
+    // -----------------------------------------
     state.session.done++;
     if (mark === "known") state.session.known++;
     else if (mark === "unsure") state.session.unsure++;
@@ -776,7 +773,6 @@ function rate(mark) {
     showNavButtons();
     nextCard();
 }
-
 
 /* ============================ SESSION STATS ============================ */
 
