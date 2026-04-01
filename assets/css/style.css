@@ -448,6 +448,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row.selected {
     background: #334155;
 }
+/* ============================================
+   Dark Mode – ausgewählte Lektion deutlicher
+============================================ */
+html:not(.light) .lt-row.selected {
+    background: #3d4f64 !important;            /* 20% heller */
+    border-left: 4px solid var(--accent) !important;
+    box-shadow: 0 0 0 1px var(--accent) inset !important;
+}
 
 .lt-known   { color: var(--good); }
 .lt-unknown { color: var(--bad);  }
@@ -600,23 +608,6 @@ body.menu-open #menuToggle::before {
 
 :root.light #menuToggle {
     color: #333;           /* klarer im hellen Modus */
-}
-
-/* ========================================== */
-/* ✅ Light Mode Fixes (ergänzend zu root.light) */
-/* ========================================== */
-
-:root.light {
-    --bg: #f5f5f5;
-    --card: #ffffff;
-    --text: #222;
-    --muted: #666;
-    --border: #cccccc;
-
-    --accent: #7aa2f7;   /* Blauton für Light Mode (#3366cc;)*/
-    --good: #2e8b57;     /* dunkleres Grün */
-    --bad: #cc3333;      /* dunkleres Rot */
-    --unsure: #cc9900;   /* dunkleres Orange */
 }
 
 /* ✅ Hintergrundfarben anpassen */
