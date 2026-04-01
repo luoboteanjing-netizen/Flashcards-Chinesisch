@@ -643,10 +643,11 @@ html.light .pane {
 }
 
 /* ✅ Buttons im Light Mode */
-html.light .btn {
-    background: #e9e9e9;
-    color: var(--text);
-    border-color: var(--border);
+
+html.light .btn.primary {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent-text) !important;
 }
 
 /* ✅ Mode-Buttons (DE/ZH) */
