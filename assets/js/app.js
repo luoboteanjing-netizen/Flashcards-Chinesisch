@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.0.3";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.0.4";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -263,13 +263,24 @@ const header = `
         row.className = "lt-row";
         row.dataset.lesson = k;
 
-        row.innerHTML = `
-            <span class="lt-lesson">${k}</span>
-            <span class="lt-total">${total}</span>
-            <span class="lt-known">${known}</span>
-            <span class="lt-unknown">${unknown}</span>
-            <span class="lt-percent">${percent}%</span>
-        `;
+		// Leitner-Auswertung pro Lektion
+let strong = 0;
+let weak = 0;
+
+for (const c of cards) {
+    const p = state.progress.cards[c.id] ?? { box: 1 };
+    if (p.box <= 2) weak++;
+    else strong++;
+}
+		
+row.innerHTML = `
+   <span class="lt-lesson">${k}</span>
+   <span class="lt-total">${total}</span>
+   <span class="lt-strong">${strong}</span>
+   <span class="lt-weak">${weak}</span>
+   <span class="lt-unknown">${unknown}</span>
+   <span class="lt-percent">${percent}%</span>
+`;
 
 row.addEventListener("click", () => {
 
@@ -408,16 +419,40 @@ function resetSessionStats() {
     };
 }
 
+// =====================================================
+// LEITNER: Pool nach Box-Gewichtung
+// =====================================================
 function gatherPool() {
     const out = [];
-    for (const k of state.selectedLessons) {
-        const arr = state.lessons.get(k);
-        if (arr) out.push(...arr);
+
+    for (const lesson of state.selectedLessons) {
+        const cards = state.lessons.get(lesson);
+        if (!cards) continue;
+
+        for (const entry of cards) {
+            const p = ensureCardProgress(entry);
+
+            // Gewichtung nach Leitner-Box
+            let weight = 1;
+            if (p.box === 1) weight = 5;
+            else if (p.box === 2) weight = 3;
+            else if (p.box === 3) weight = 2;
+            else if (p.box === 4) weight = 1;
+            else if (p.box === 5) weight = 0.5;
+
+            // Karte mehrfach in den Pool klonen = Gewichtung
+            const copies = Math.max(1, Math.round(weight));
+            for (let i = 0; i < copies; i++) {
+                out.push(entry);
+            }
+        }
     }
+
     state.pool = out;
     state.idx = null;
     resetSessionStats();
 }
+
 
 function gatherPoolFromSettings() {
     state.selectedLessons.clear();
@@ -484,6 +519,7 @@ function setCard(entry, fromHistory = false) {
     if (!fromHistory) pushToHistory(entry);
 
     state.current = entry;
+	ensureCardProgress(entry);
     state.startedAt = Date.now();
     state.revealedAt = null;
 
@@ -496,20 +532,30 @@ function setCard(entry, fromHistory = false) {
 
     /* -------- Fortschrittsbalken -------- */
     const stats = document.querySelector("#lessonStats");
-    if (stats) {
-        const cards = state.lessons.get(entry.lesson) || [];
-        const total = cards.length;
-        const prog = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
+if (stats) {
+    const cards = state.lessons.get(entry.lesson) ?? [];
+    const total = cards.length;
 
-        const green = total > 0 ? (prog.known / total) * 100 : 0;
-        const red   = total > 0 ? (prog.unknown / total) * 100 : 0;
+    // Leitner-Gruppen
+    let weak = 0;   // Box 1 + 2
+    let strong = 0; // Box 3 + 4 + 5
 
-        stats.innerHTML = `
-            <div class="lesson-bar-large">
-                <div class="lesson-bar-red"   style="width:${red}%"></div>
-                <div class="lesson-bar-green" style="left:${red}%; width:${green}%"></div>
-            </div>
-        `;
+    for (const c of cards) {
+        const p = state.progress.cards[c.id] ?? { box: 1 };
+        if (p.box <= 2) weak++;
+        else strong++;
+    }
+
+    const weakPct = total > 0 ? (weak / total) * 100 : 0;
+    const strongPct = total > 0 ? (strong / total) * 100 : 0;
+
+    stats.innerHTML = `
+        <div class="lesson-bar-large">
+            <div class="lesson-bar-yellow" style="width:${weakPct}%"></div>
+            <div class="lesson-bar-green" style="left:${weakPct}%; width:${strongPct}%"></div>
+        </div>
+    `;
+}
     }
 
     /* -------- Karte anzeigen -------- */
@@ -575,6 +621,21 @@ function setCard(entry, fromHistory = false) {
     syncCardHeights();
 }
 
+// =====================================================
+// LEITNER: pro-Karte Eintrag sicherstellen
+// =====================================================
+function ensureCardProgress(entry) {
+    const id = entry.id;
+    if (!state.progress.cards[id]) {
+        state.progress.cards[id] = {
+            box: 1,               // Leitner-Box 1–5
+            timesCorrect: 0,
+            timesWrong: 0,
+            lastReview: 0
+        };
+    }
+    return state.progress.cards[id];
+}
 
 /* ============================ HISTORY / NAV ============================ */
 
@@ -682,6 +743,25 @@ function disableRating() {
 function rate(mark) {
 
     if (!state.current) return;
+// =====================================================
+// LEITNER-LOGIK
+// =====================================================
+const p = ensureCardProgress(state.current);
+
+if (mark === "known") {
+    p.box = Math.min(p.box + 1, 5);   // eine Box hoch, max 5
+    p.timesCorrect++;
+}
+else if (mark === "unknown") {
+    p.box = 1;                        // komplett zurücksetzen
+    p.timesWrong++;
+}
+else if (mark === "unsure") {
+    // bleibt in derselben Box
+    p.timesWrong++;
+}
+
+p.lastReview = Date.now();
 
     state.session.done++;
 
