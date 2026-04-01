@@ -309,6 +309,7 @@ row.addEventListener("click", () => {
 }
 
 // ✅ Fortschritt in der Lektionstabelle live aktualisieren
+
 function updateLessonStatsUI() {
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
@@ -665,14 +666,14 @@ function doReveal() {
     // -----------------------------------------
     const p = ensureCardProgress(state.current);
     if (p.box === 0) {
-        p.box = 1;     // neu → schwach
+        p.box = 1;                   // neu → schwach
         p.lastReview = Date.now();
         saveProgress();
         updateLessonStatsUI();
     }
 
     // -----------------------------------------
-    // Originalverhalten: Verzögerten Timer stoppen
+    // Timer abbrechen
     // -----------------------------------------
     if (state.delayedSentenceTimer) {
         clearTimeout(state.delayedSentenceTimer);
@@ -680,7 +681,7 @@ function doReveal() {
     }
 
     // -----------------------------------------
-    // Buttons & UI setzen
+    // Buttons anzeigen
     // -----------------------------------------
     if (!state.autoplay.on) hideNavButtons();
     showRatingButtons();
