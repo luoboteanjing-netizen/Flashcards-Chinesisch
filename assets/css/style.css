@@ -15,6 +15,7 @@
     --card: #ffffff;
     --text: #222;
     --muted: #555;
+	--accent-text: #222;    /* dunkles Textgrau für bessere Lesbarkeit */
     --border: #bbbbbb;
 	--accent: #ffbb55;    /* z.B. warmes Orange statt blau */
     --good:   #2e8b57;
@@ -57,9 +58,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  flex-wrap: nowrap; /* NEU: Immer single-line auf Desktop (kein Wrap für die beiden Buttons) */
 }
 /* NEU: Autoplay als Primary (wenn Klasse hinzugefügt): Farblich identisch zum Training-Button */
+
 #btnAutoplay.primary {
- background: #7aa2f7 !important;
- border-color: #7aa2f7 !important;
+ background: var(--accent) !important;
+ border-color: var(--accent) !important;
+ color: var(--accent-text) !important;
  color: #081018 !important;
  font-weight: 700;
  white-space: nowrap;
@@ -265,12 +268,17 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .ratebar { gap:12px; }
 .card-controls { gap:12px; }
 /* ================== JETZT AUFDECKEN in blau ================== */
+
 #btnReveal {
- background: #7aa2f7 !important;
- border-color: #7aa2f7 !important;
- color: #081018 !important;
- font-weight: 700 !important;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent-text) !important;
+	 flex: 1 1 auto;
+	max-width: 100px;
+	margin: 0 auto;
+	text-align:center;
 }
+
 /* Flex Layout */
 .card-controls {
  display:flex;
@@ -284,12 +292,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  flex: 0 0 100px;
  text-align:center;
 }
-#btnReveal {
- flex: 1 1 auto;
- max-width: 100px;
- margin: 0 auto;
- text-align:center;
-}
+
 #btnReveal::after {
  content: "";
 }
