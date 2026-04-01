@@ -1,4 +1,4 @@
-/* Version 1.0.4 */
+/* Version 1.0.3 */
 :root{  
 	--bg: #0b0d10;
 	--card: #12161b;
@@ -288,13 +288,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     position: absolute;
     top: 0;
 }
-.lesson-bar-unseen {
-    height: 100%;
-    background: #8888;    /* dezentes Grau */
-    position: absolute;
-    top: 0;
-    left: 0;
-}
 /* ================== BUTTON-KOSMETIK ================== */
 .ratebar .btn { flex: 1 1 0; max-width: none; text-align:center; }
 .card-controls .btn { flex: 1 1 0; max-width:none; text-align:center; }
@@ -495,12 +488,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-        60px   /* Lektion */
-        30px   /* Total */
+        80px   /* Lektion */
+        40px   /* Total */
         30px   /* strong (✅) */
         30px   /* weak   (⚠️) */
         30px   /* unknown (❌) */
-        30px;  /* % */
+        40px;  /* % */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
@@ -677,14 +670,6 @@ body.menu-open #menuToggle::before {
 
 :root.light .lt-unknown {
     color: #cc3333;                 /* dunkles Rot */
-}
-
-:root.light .lt-weak {
-    color: #d6a500;
-}
-
-:root.light .lt-strong {
-    color: #3c9f40;
 }
 
 /* ============================================= */
@@ -934,16 +919,4 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* Optional (falls nötig): Karte selbst oben etwas kompakter */
 .card {
     padding-top: 10px !important;    /* vorher 14px */
-}
-
-/* ============================================================
-   Fix: Alle Zahlen in der Lektionsliste rechtsbündig
-   ============================================================ */
-.lt-total,
-.lt-strong,
-.lt-weak,
-.lt-unknown,
-.lt-percent {
-    text-align: right !important;
-    font-variant-numeric: tabular-nums;
 }
