@@ -472,7 +472,6 @@ function scrollToBottom() {
 
 /* ============================ CARD RENDERING ============================ */
 
-
 function setCard(entry, fromHistory = false) {
 
     /* ---- Timer für verzögerten Satz abbrechen ---- */
@@ -575,6 +574,20 @@ function setCard(entry, fromHistory = false) {
     syncCardHeights();
 }
 
+// =====================================================
+// LEITNER: pro-Karte Status sicherstellen
+// =====================================================
+function ensureCardProgress(entry) {
+    const id = entry.id;
+    if (!state.progress.cards[id]) {
+        state.progress.cards[id] = {
+            box: 0,          // 0 = völlig neu, noch nie aufgedeckt
+            timesCorrect: 0,
+            timesWrong: 0,
+            lastReview: 0
+        };
+    }
+
 
 /* ============================ HISTORY / NAV ============================ */
 
@@ -643,17 +656,28 @@ function showNavButtons() {
 
 
 /* ============================ REVEAL / RATING ============================ */
-
 function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
 
-	if (state.delayedSentenceTimer) {
-    clearTimeout(state.delayedSentenceTimer);
-    state.delayedSentenceTimer = null;
-}	
-    if (!state.autoplay.on) hideNavButtons();
+    // -----------------------------------------
+    // LEITNER: Erste Sichtung → Box 0 → Box 1
+    // -----------------------------------------
+    const p = ensureCardProgress(state.current);
+    if (p.box === 0) {
+        p.box = 1; // neu → schwach
+        p.lastReview = Date.now();
+        saveProgress();
+        updateLessonStatsUI();
+    }
 
+    // Rest wie normal
+    if (state.delayedSentenceTimer) {
+        clearTimeout(state.delayedSentenceTimer);
+        state.delayedSentenceTimer = null;
+    }
+
+    if (!state.autoplay.on) hideNavButtons();
     showRatingButtons();
     enableRating();
     syncCardHeights();
@@ -680,17 +704,56 @@ function disableRating() {
 }
 
 function rate(mark) {
-
     if (!state.current) return;
 
-    state.session.done++;
+    // ---------------------------------------------------------
+    // LEITNER: Bewertung der aktuellen Karte
+    // ---------------------------------------------------------
+    const p = ensureCardProgress(state.current);
 
+    // Falls Karte noch nie gesehen wurde:
+    if (p.box === 0) {
+        p.box = 1;  // erstes Aufdecken hat Box 1 gesetzt
+    }
+
+    if (mark === "known") {
+        // richtig:
+        // - Box 1 → Box 2
+        // - danach: normaler Leitner-Aufstieg
+        if (p.box === 1) p.box = 2;
+        else p.box = Math.min(p.box + 1, 5);
+
+        p.timesCorrect++;
+    }
+    else if (mark === "unsure") {
+        // unsicher:
+        // - Box 1 → Box 2
+        // - Box 2 → Box 3
+        if (p.box < 2) p.box = 2;
+        else if (p.box === 2) p.box = 3;
+
+        p.timesWrong++;
+    }
+    else if (mark === "unknown") {
+        // falsch → Zurück zu Box 1
+        p.box = 1;
+        p.timesWrong++;
+    }
+
+    p.lastReview = Date.now();
+    saveProgress();
+    updateLessonStatsUI();
+
+    // ---------------------------------------------------------
+    // DEIN ORIGINALER RATE-CODE (Session-Stats, Navigation, etc.)
+    // ---------------------------------------------------------
+
+    state.session.done++;
     if (mark === "known") state.session.known++;
     else if (mark === "unsure") state.session.unsure++;
     else state.session.unknown++;
 
     const lesson = state.current.lesson;
-
     if (lesson) {
         if (!state.progress.byLesson[lesson])
             state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
@@ -699,13 +762,12 @@ function rate(mark) {
         if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
-		updateLessonStatsUI();
+        updateLessonStatsUI();
     }
 
     disableRating();
     hideRatingButtons();
     showNavButtons();
-
     nextCard();
 }
 
