@@ -321,27 +321,38 @@ row.addEventListener("click", () => {
 
 // ✅ Fortschritt in der Lektionstabelle live aktualisieren
 function updateLessonStatsUI() {
-
-    const table = document.querySelector("#lessonTable");
-    if (!table) return;
-
-    // Gehe durch alle sichtbaren Zeilen
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
-        const cards = state.lessons.get(lesson) || [];
-        const total = cards.length;
+        const cards = state.lessons.get(lesson) ?? [];
 
-        const p = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
-        const known = p.known || 0;
-        const unknown = p.unknown || 0;
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+        let red = 0;
+        let yellow = 0;
+        let green = 0;
 
-        // Spalten aktualisieren
-        row.querySelector(".lt-total").textContent = total;
-        row.querySelector(".lt-known").textContent = known;
-        row.querySelector(".lt-unknown").textContent = unknown;
+        for (const c of cards) {
+            const p = state.progress.cards[c.id] ?? { box: 0 };
+
+            if (p.box === 0) {
+                continue;              // neu, nicht anzeigen
+            } else if (p.box === 1) {
+                red++;
+            } else if (p.box === 2 || p.box === 3) {
+                yellow++;
+            } else if (p.box === 4 || p.box === 5) {
+                green++;
+            }
+        }
+
+        const totalVisible = red + yellow + green;
+        const percent = totalVisible ? Math.round((green / totalVisible) * 100) : 0;
+
+        row.querySelector(".lt-total").textContent = cards.length;
+        row.querySelector(".lt-strong").textContent = green;
+        row.querySelector(".lt-weak").textContent   = yellow;
+        row.querySelector(".lt-unknown").textContent = red;
         row.querySelector(".lt-percent").textContent = percent + "%";
-    });
+ 
+   });
 }
 
 function sortLessons() {
@@ -531,32 +542,41 @@ function setCard(entry, fromHistory = false) {
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
     /* -------- Fortschrittsbalken -------- */
-    const stats = document.querySelector("#lessonStats");
+const stats = document.querySelector("#lessonStats");
 if (stats) {
     const cards = state.lessons.get(entry.lesson) ?? [];
-    const total = cards.length;
 
-    // Leitner-Gruppen
-    let weak = 0;   // Box 1 + 2
-    let strong = 0; // Box 3 + 4 + 5
+    let red = 0;      // box 1
+    let yellow = 0;   // box 2-3
+    let green = 0;    // box 4-5
 
     for (const c of cards) {
-        const p = state.progress.cards[c.id] ?? { box: 1 };
-        if (p.box <= 2) weak++;
-        else strong++;
+        const p = state.progress.cards[c.id] ?? { box: 0 };
+
+        if (p.box === 0) {
+            continue;                      // 0 = neu → nicht zeigen
+        } else if (p.box === 1) {
+            red++;
+        } else if (p.box === 2 || p.box === 3) {
+            yellow++;
+        } else if (p.box === 4 || p.box === 5) {
+            green++;
+        }
     }
 
-    const weakPct = total > 0 ? (weak / total) * 100 : 0;
-    const strongPct = total > 0 ? (strong / total) * 100 : 0;
+    const totalVisible = red + yellow + green;
+    const redPct    = totalVisible ? red    / totalVisible * 100 : 0;
+    const yellowPct = totalVisible ? yellow / totalVisible * 100 : 0;
+    const greenPct  = totalVisible ? green  / totalVisible * 100 : 0;
 
     stats.innerHTML = `
         <div class="lesson-bar-large">
-            <div class="lesson-bar-yellow" style="width:${weakPct}%"></div>
-            <div class="lesson-bar-green" style="left:${weakPct}%; width:${strongPct}%"></div>
+            <div class="lesson-bar-red"    style="width:${redPct}%"></div>
+            <div class="lesson-bar-yellow" style="left:${redPct}%; width:${yellowPct}%"></div>
+            <div class="lesson-bar-green"  style="left:${redPct + yellowPct}%; width:${greenPct}%"></div>
         </div>
     `;
-}
-    
+}   
 
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
@@ -628,7 +648,7 @@ function ensureCardProgress(entry) {
     const id = entry.id;
     if (!state.progress.cards[id]) {
         state.progress.cards[id] = {
-            box: 1,               // Leitner-Box 1–5
+            box: 0,               // 0 = noch nie gesehen
             timesCorrect: 0,
             timesWrong: 0,
             lastReview: 0
@@ -717,6 +737,17 @@ function doReveal() {
 
     showRatingButtons();
     enableRating();
+	
+	// --------------------------------------------------
+	// Karte erstmals gesehen? Dann Box 0 → Box 1
+	// --------------------------------------------------
+	const p = ensureCardProgress(state.current);
+	if (p.box === 0) {
+		p.box = 1;
+		p.lastReview = Date.now();
+		saveProgress();
+}
+	
     syncCardHeights();
 }
 
@@ -743,42 +774,34 @@ function disableRating() {
 function rate(mark) {
 
     if (!state.current) return;
-// =====================================================
-// LEITNER-LOGIK
-// =====================================================
+	
+// --------------------------------------------------
+// LEITNER LOGIK (neues Mapping)
+// --------------------------------------------------
 const p = ensureCardProgress(state.current);
 
+// Falls Box noch 0 ist (neue Karte), zunächst auf 1 setzen
+if (p.box === 0) p.box = 1;
+
+// Bewertung
 if (mark === "known") {
-    p.box = Math.min(p.box + 1, 5);   // eine Box hoch, max 5
+    p.box = Math.min(p.box + 1, 5);  // gut → hoch
     p.timesCorrect++;
 }
-else if (mark === "unknown") {
-    p.box = 1;                        // komplett zurücksetzen
+else if (mark === "unsure") {
+    // bleibt in 2 oder 3 → unsicher
+    if (p.box < 2) p.box = 2;        // sehr schwach → auf unsicher heben
     p.timesWrong++;
 }
-else if (mark === "unsure") {
-    // bleibt in derselben Box
+else if (mark === "unknown") {
+    p.box = 1;                        // falsch → zurück zu Box 1
     p.timesWrong++;
 }
 
 p.lastReview = Date.now();
+saveProgress();
 
-    state.session.done++;
 
-    if (mark === "known") state.session.known++;
-    else if (mark === "unsure") state.session.unsure++;
-    else state.session.unknown++;
-
-    const lesson = state.current.lesson;
-
-    if (lesson) {
-        if (!state.progress.byLesson[lesson])
-            state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
-
-        if (mark === "known")   state.progress.byLesson[lesson].known++;
-        if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
-
-        saveProgress();
 		updateLessonStatsUI();
     }
 
