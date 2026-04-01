@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.0.1";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.0.3";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
