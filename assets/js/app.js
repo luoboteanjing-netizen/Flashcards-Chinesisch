@@ -493,25 +493,47 @@ function setCard(entry, fromHistory = false) {
 
     if (cardTitle)  cardTitle.textContent  = `Karte (ID ${entry.id})`;
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
+// ----------------------------------------------------------
+// Fortschrittsbalken (Leitner) – von links nach rechts:
+// Grün (Box 4+5) → Rot (Box 1) → Gelb (Box 2+3) → Grau (Box 0)
+// ----------------------------------------------------------
+const stats = document.querySelector("#lessonStats");
+if (stats) {
+    const cards = state.lessons.get(entry.lesson) ?? [];
+    const total = cards.length;
 
-    /* -------- Fortschrittsbalken -------- */
-    const stats = document.querySelector("#lessonStats");
-    if (stats) {
-        const cards = state.lessons.get(entry.lesson) || [];
-        const total = cards.length;
-        const prog = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
+    let green = 0;   // Box 4 + 5
+    let red   = 0;   // Box 1
+    let yellow = 0;  // Box 2 + 3
+    let grey  = 0;   // Box 0
 
-        const green = total > 0 ? (prog.known / total) * 100 : 0;
-        const red   = total > 0 ? (prog.unknown / total) * 100 : 0;
+    for (const c of cards) {
+        const p = state.progress.cards[c.id] ?? { box: 0 };
 
-        stats.innerHTML = `
-            <div class="lesson-bar-large">
-                <div class="lesson-bar-red"   style="width:${red}%"></div>
-                <div class="lesson-bar-green" style="left:${red}%; width:${green}%"></div>
-            </div>
-        `;
+        if (p.box === 0) grey++;
+        else if (p.box === 1) red++;
+        else if (p.box === 2 || p.box === 3) yellow++;
+        else if (p.box === 4 || p.box === 5) green++;
     }
 
+    const greenPct  = total ? (green  / total) * 100 : 0;
+    const redPct    = total ? (red    / total) * 100 : 0;
+    const yellowPct = total ? (yellow / total) * 100 : 0;
+    const greyPct   = total ? (grey   / total) * 100 : 0;
+
+    const leftRed    = greenPct;
+    const leftYellow = greenPct + redPct;
+    const leftGrey   = greenPct + redPct + yellowPct;
+
+    stats.innerHTML = `
+        <div class="lesson-bar-large">
+            <div class="lesson-bar-green"  style="left:0%;           width:${greenPct}%"></div>
+            <div class="lesson-bar-red"    style="left:${leftRed}%;   width:${redPct}%"></div>
+            <div class="lesson-bar-yellow" style="left:${leftYellow}%;width:${yellowPct}%"></div>
+            <div class="lesson-bar-grey"   style="left:${leftGrey}%;  width:${greyPct}%"></div>
+        </div>
+    `;
+}
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
     sol.classList.add("masked");
