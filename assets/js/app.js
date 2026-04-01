@@ -803,7 +803,7 @@ saveProgress();
 
 
 		updateLessonStatsUI();
-    }
+    
 
     disableRating();
     hideRatingButtons();
