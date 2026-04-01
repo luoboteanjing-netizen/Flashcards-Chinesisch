@@ -328,6 +328,31 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  position:relative;
 }
 
+/* ============================
+   Perfekte Zentrierung der 3 Buttons
+============================ */
+
+.card-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;   /* 3 gleich breite Spalten */
+    width: 100%;                          /* genau so breit wie die Karte */
+    gap: 12px;
+    padding: 0;
+}
+
+#btnPrev {
+    justify-self: start;                 /* links bündig */
+}
+
+#btnReveal {
+    justify-self: center;                /* EXAKT zentriert */
+    min-width: 120px;                    /* stabile Breite */
+}
+
+#btnNext {
+    justify-self: end;                   /* rechts bündig */
+}
+
 
 /* ============================================= */
 /* ✅ Lautsprecher – sichtbar in Dark & Light    */
