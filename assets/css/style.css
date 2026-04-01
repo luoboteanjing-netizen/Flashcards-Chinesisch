@@ -328,47 +328,44 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  position:relative;
 }
 
-/* ============================
-   Perfekte Zentrierung der 3 Buttons
-============================ */
+/* =======================================================
+   Perfekte dreiteilige Button-Leiste (Zurück / Reveal / Next)
+======================================================= */
 
 .card-controls {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;   /* 3 gleich breite Spalten */
-    width: 100%;                          /* genau so breit wie die Karte */
-    gap: 12px;
+    grid-template-columns: 1fr auto 1fr;   /* links und rechts füllen, Mitte bleibt kompakt */
+    align-items: center;
+    width: 100%;                           /* exakt so breit wie die Karte */
+    gap: 12px;                             /* sinnvoller Abstand */
     padding: 0;
 }
 
+/* Linker Button = VOLLE linke Fläche */
 #btnPrev {
-    justify-self: start;                 /* links bündig */
+    justify-self: stretch;                 /* füllt die ganze erste Spalte */
+    width: 100%;
 }
 
+/* Mittlerer Button = kompakt, exakt zentriert */
 #btnReveal {
-    justify-self: center;                /* EXAKT zentriert */
-    min-width: 120px;                    /* stabile Breite */
+    justify-self: center;                  /* absolute Zentrierung */
+    padding: 8px 20px;                     /* angenehme Breite */
+    min-width: 120px;                      /* nicht zu klein */
+    width: auto;                           /* bleibt kompakt */
+    max-width: 200px;                      /* Überlauf in XS vermeiden */
 }
 
+/* Rechter Button = VOLLE rechte Fläche */
 #btnNext {
-    justify-self: end;                   /* rechts bündig */
+    justify-self: stretch;                 /* füllt die ganze dritte Spalte */
+    width: 100%;
 }
 
-/* ============================================
-   Fix: Buttons nicht mehr zu breit auf Mobile
-   ============================================ */
-
-.card-controls button,
+/* Falls nötig: min-width entfernen für volle Flexibilität */
 #btnPrev, #btnNext, #btnReveal {
-    min-width: 0 !important;      /* verhindert starre Mindestbreiten */
-    flex: 1 1 auto !important;     /* erlaubt echtes Schrumpfen */
-    white-space: normal !important; /* Text darf umbrechen, falls nötig */
-    padding: 8px 10px;             /* kompakteres Padding */
-    max-width: 100%;               /* niemals breiter als ihre Zelle */
-}
-
-/* Reveal nicht mehr auf 100px festnageln */
-#btnReveal {
-    max-width: none !important;
+    min-width: 0 !important;               /* kein Überlaufen */
+    white-space: nowrap;                   /* Text bleibt auf einer Zeile */
 }
 
 /* ============================================= */
