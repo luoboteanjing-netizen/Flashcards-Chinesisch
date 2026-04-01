@@ -1,4 +1,4 @@
-/* Version 1.0.3 */
+/* Version 1.0.4 */
 :root{  
 	--bg: #0b0d10;
 	--card: #12161b;
@@ -275,12 +275,18 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  left: 0;
  top: 0;
 }
+.lesson-bar-yellow {
+    height: 100%;
+    background: #ffcc33;  /* gelb (Box 1+2) */
+    position: absolute;
+    left: 0;
+    top: 0;
+}
 .lesson-bar-green {
- height: 100%;
- background: #2ecc71; /* grün */
- position: absolute;
- left: 0;
- top: 0;
+    height: 100%;
+    background: #2ecc71; /* grün (Box 3+4+5) */
+    position: absolute;
+    top: 0;
 }
 /* ================== BUTTON-KOSMETIK ================== */
 .ratebar .btn { flex: 1 1 0; max-width: none; text-align:center; }
@@ -475,19 +481,24 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 4px;
 }
 
+/* ===============================================
+   6-Spalten-Layout (Lektion / Total / ✅ / ⚠️ / ❌ / %)
+================================================= */
+
 .lt-row {
     display: grid;
     grid-template-columns:
-        60px   /* Lektionstitel */
-        60px    /* total */
-        60px    /* known */
-        60px    /* unknown */
-        60px;   /* percent */
-    gap: 12px;
+        80px   /* Lektion */
+        40px   /* Total */
+        30px   /* strong (✅) */
+        30px   /* weak   (⚠️) */
+        30px   /* unknown (❌) */
+        40px;  /* % */
+    gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
     align-items: center;
-    background: #1b2330;
+    background: var(--card);
     border-radius: 6px;
     cursor: pointer;
 }
@@ -508,9 +519,27 @@ html:not(.light) .lt-row.selected {
     border-left: 4px solid var(--accent) !important;
     box-shadow: 0 0 0 1px var(--accent) inset !important;
 }
+/* ================================
+   Neue Spalte: Schwach (⚠️)
+================================ */
 
 .lt-known   { color: var(--good); }
 .lt-unknown { color: var(--bad);  }
+
+.lt-weak {
+    color: #cc9900;        /* Gelb/Orange */
+    font-weight: 600;
+}
+
+.lt-strong {
+    color: var(--good);    /* Dein Grün */
+    font-weight: 600;
+}
+
+.lt-unknown {
+    color: var(--bad);     /* Rot */
+    font-weight: 600;
+}
 
 #lessonSelect {
     display: none;
@@ -641,6 +670,14 @@ body.menu-open #menuToggle::before {
 
 :root.light .lt-unknown {
     color: #cc3333;                 /* dunkles Rot */
+}
+
+:root.light .lt-weak {
+    color: #d6a500;
+}
+
+:root.light .lt-strong {
+    color: #3c9f40;
 }
 
 /* ============================================= */
@@ -777,6 +814,8 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     text-align: right;
     font-variant-numeric: tabular-nums;   /* monospaced Zahlen für perfekte Ausrichtung */
 }
+
+
 
 /* === Fix: Lautsprecher wieder unten rechts fixieren === */
 
