@@ -866,3 +866,21 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     pointer-events: auto;
 }
 
+/* =======================================================
+   Optimierung: Titel höher, Fortschrittsbalken höher
+======================================================= */
+
+/* Fortschrittsbalken näher an die Karte (höher) */
+.stats-bar {
+    margin-top: 4px !important;   /* vorher ~8px */
+}
+
+/* Titel näher an oberen Kartenrand */
+#promptBox {
+    padding-top: 8px !important;  /* vorher 12px */
+}
+
+/* Falls nötig: sicherstellen dass prompt nicht extra Platz darüber hat */
+#promptBox .prompt {
+    margin-top: 0 !important;
+}
