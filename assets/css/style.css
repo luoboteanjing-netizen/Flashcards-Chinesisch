@@ -16,6 +16,11 @@
     --text: #222;
     --muted: #555;
     --border: #bbbbbb;
+	--accent: #ffbb55;    /* z.B. warmes Orange statt blau */
+    --good:   #2e8b57;
+    --bad:    #cc3333;
+    --unsure: #cc9900;
+
 }		
 		
 *{box-sizing:border-box}
