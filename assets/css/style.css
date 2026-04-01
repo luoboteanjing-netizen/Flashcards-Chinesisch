@@ -288,6 +288,13 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     position: absolute;
     top: 0;
 }
+.lesson-bar-unseen {
+    height: 100%;
+    background: #8888;    /* dezentes Grau */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 /* ================== BUTTON-KOSMETIK ================== */
 .ratebar .btn { flex: 1 1 0; max-width: none; text-align:center; }
 .card-controls .btn { flex: 1 1 0; max-width:none; text-align:center; }
