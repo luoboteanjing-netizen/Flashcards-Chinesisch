@@ -920,3 +920,17 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 .card {
     padding-top: 10px !important;    /* vorher 14px */
 }
+
+.lesson-bar-green,
+.lesson-bar-red,
+.lesson-bar-yellow,
+.lesson-bar-grey {
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+.lesson-bar-green  { background: #2ecc71; z-index: 4; }
+.lesson-bar-red    { background: #e74c3c; z-index: 3; }
+.lesson-bar-yellow { background: #ffcc33; z-index: 2; }
+.lesson-bar-grey   { background: #99999966; z-index: 1; }
