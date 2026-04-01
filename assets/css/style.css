@@ -866,21 +866,26 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     pointer-events: auto;
 }
 
-/* =======================================================
-   Optimierung: Titel höher, Fortschrittsbalken höher
-======================================================= */
+/* =======================================
+   Fix: Titel & Fortschrittsbalken höher
+======================================= */
 
-/* Fortschrittsbalken näher an die Karte (höher) */
-.stats-bar {
-    margin-top: 4px !important;   /* vorher ~8px */
-}
-
-/* Titel näher an oberen Kartenrand */
+/* Weniger Abstand oben IN der Karte */
 #promptBox {
-    padding-top: 8px !important;  /* vorher 12px */
+    padding-top: 6px !important;   /* vorher 12px → merklich höher */
 }
 
-/* Falls nötig: sicherstellen dass prompt nicht extra Platz darüber hat */
+/* Der eigentliche Titel (Wort) soll keinen extra Abstand nach oben haben */
 #promptBox .prompt {
     margin-top: 0 !important;
+}
+
+/* Der Fortschrittsbalken über der Karte soll näher heranrücken */
+.stats-bar {
+    margin-bottom: 6px !important;   /* drückt ihn näher an die Karte */
+}
+
+/* Optional (falls nötig): Karte selbst oben etwas kompakter */
+.card {
+    padding-top: 10px !important;    /* vorher 14px */
 }
