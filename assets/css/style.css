@@ -1,4 +1,4 @@
-/* r15.2.6 styles (Umschaltbtn größer, breiter,schriftgrößen angepasst, Abstände, Farbe) */
+/* Version 1.0.3 */
 :root{  
 	--bg: #0b0d10;
 	--card: #12161b;
@@ -286,6 +286,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 	max-width: 100px;
 	margin: 0 auto;
 	text-align:center;
+	font-weight: 700
 }
 
 /* Flex Layout */
