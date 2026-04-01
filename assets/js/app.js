@@ -556,7 +556,7 @@ if (stats) {
         </div>
     `;
 }
-    }
+    
 
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
