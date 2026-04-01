@@ -946,3 +946,25 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     text-align: right !important;
     font-variant-numeric: tabular-nums; /* sorgt für perfekte Spaltenausrichtung */
 }
+/* ============================================================
+   Bewertungs-Buttons exakt wie Navigations-Buttons
+   ============================================================ */
+
+#rateBar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;   /* drei gleich breite Spalten */
+    gap: 12px;                            /* gleiche Lücke wie bei Nav */
+    width: 100%;                          /* volle Breite wie Nav */
+    padding: 0;
+}
+
+#rateBar .btn {
+    width: 100%;
+    height: 100%;
+    padding: 8px 12px;             /* gleiche Innenabstände */
+    border-radius: 8px;            /* wie Nav-Buttons */
+    text-align: center;
+    font-size: 16px;               /* gleiche Größe wie „Aufdecken” */
+    font-weight: 600;              /* wie Nav-Buttons */
+    white-space: nowrap;           /* kein Zeilenumbruch */
+}
