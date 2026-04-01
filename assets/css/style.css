@@ -709,18 +709,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     border-left: 3px solid #3366cc;     /* schöner „Markierungsstreifen“ */
 }
 
-/* ========================================= */
-/* ✅ Training + Autoplay IMMER in gleicher Farbe */
-/* ========================================= */
-
-.btn.primary,
-#btnAutoplay.primary {
-    background: #7aa2f7 !important;
-    border: 1px solid #7aa2f7 !important;
-    color: #081018 !important;
-    font-weight: 700 !important;
-}
-
 /* ============================================= */
 /* ✅ Lektionsliste – Zahlen rechtsbündig        */
 /* ============================================= */
