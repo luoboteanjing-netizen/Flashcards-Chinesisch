@@ -550,38 +550,36 @@ const stats = document.querySelector("#lessonStats");
 if (stats) {
     const cards = state.lessons.get(entry.lesson) ?? [];
 
-    let red = 0;      // box 1
-    let yellow = 0;   // box 2-3
-    let green = 0;    // box 4-5
+    let unseen = 0;   // Box 0
+    let red = 0;      // Box 1
+    let yellow = 0;   // Box 2 + 3
+    let green = 0;    // Box 4 + 5
 
     for (const c of cards) {
         const p = state.progress.cards[c.id] ?? { box: 0 };
 
-        if (p.box === 0) {
-            continue;                      // 0 = neu → nicht zeigen
-        } else if (p.box === 1) {
-            red++;
-        } else if (p.box === 2 || p.box === 3) {
-            yellow++;
-        } else if (p.box === 4 || p.box === 5) {
-            green++;
-        }
+        if (p.box === 0) unseen++;
+        else if (p.box === 1) red++;
+        else if (p.box === 2 || p.box === 3) yellow++;
+        else if (p.box === 4 || p.box === 5) green++;
     }
 
-    const totalVisible = red + yellow + green;
-    const redPct    = totalVisible ? red    / totalVisible * 100 : 0;
-    const yellowPct = totalVisible ? yellow / totalVisible * 100 : 0;
-    const greenPct  = totalVisible ? green  / totalVisible * 100 : 0;
+    const total = cards.length;
+
+    const unseenPct = total ? unseen / total * 100 : 0;
+    const redPct    = total ? red    / total * 100 : 0;
+    const yellowPct = total ? yellow / total * 100 : 0;
+    const greenPct  = total ? green  / total * 100 : 0;
 
     stats.innerHTML = `
         <div class="lesson-bar-large">
-            <div class="lesson-bar-red"    style="width:${redPct}%"></div>
-            <div class="lesson-bar-yellow" style="left:${redPct}%; width:${yellowPct}%"></div>
-            <div class="lesson-bar-green"  style="left:${redPct + yellowPct}%; width:${greenPct}%"></div>
+            <div class="lesson-bar-unseen" style="width:${unseenPct}%"></div>
+            <div class="lesson-bar-red"    style="left:${unseenPct}%; width:${redPct}%"></div>
+            <div class="lesson-bar-yellow" style="left:${unseenPct + redPct}%; width:${yellowPct}%"></div>
+            <div class="lesson-bar-green"  style="left:${unseenPct + redPct + yellowPct}%; width:${greenPct}%"></div>
         </div>
     `;
-}   
-
+}
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
     sol.classList.add("masked");
@@ -1485,7 +1483,9 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     /* ============================================================
        CSV LADEN
        ============================================================ */
-    loadCSV();
+    
+	loadCSV();
+	setTimeout(updateLessonStatsUI, 50);
 
     /* ============================================================
        STIMMEN LADEN
