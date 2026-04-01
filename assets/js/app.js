@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.0.4";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.0.3";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -263,24 +263,13 @@ const header = `
         row.className = "lt-row";
         row.dataset.lesson = k;
 
-		// Leitner-Auswertung pro Lektion
-let strong = 0;
-let weak = 0;
-
-for (const c of cards) {
-    const p = state.progress.cards[c.id] ?? { box: 1 };
-    if (p.box <= 2) weak++;
-    else strong++;
-}
-		
-row.innerHTML = `
-   <span class="lt-lesson">${k}</span>
-   <span class="lt-total">${total}</span>
-   <span class="lt-strong">${strong}</span>
-   <span class="lt-weak">${weak}</span>
-   <span class="lt-unknown">${unknown}</span>
-   <span class="lt-percent">${percent}%</span>
-`;
+        row.innerHTML = `
+            <span class="lt-lesson">${k}</span>
+            <span class="lt-total">${total}</span>
+            <span class="lt-known">${known}</span>
+            <span class="lt-unknown">${unknown}</span>
+            <span class="lt-percent">${percent}%</span>
+        `;
 
 row.addEventListener("click", () => {
 
@@ -321,40 +310,25 @@ row.addEventListener("click", () => {
 
 // ✅ Fortschritt in der Lektionstabelle live aktualisieren
 function updateLessonStatsUI() {
+
+    const table = document.querySelector("#lessonTable");
+    if (!table) return;
+
+    // Gehe durch alle sichtbaren Zeilen
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
-        const cards = state.lessons.get(lesson) ?? [];
+        const cards = state.lessons.get(lesson) || [];
+        const total = cards.length;
 
-        let red = 0;      // Box 1
-        let yellow = 0;   // Box 2 + 3
-        let green = 0;    // Box 4 + 5
+        const p = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
+        const known = p.known || 0;
+        const unknown = p.unknown || 0;
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        for (const c of cards) {
-            const p = state.progress.cards[c.id] ?? { box: 0 };
-
-            if (p.box === 0) {
-                // neu → unberührt → NICHT anzeigen
-                continue;
-            } 
-            else if (p.box === 1) {
-                red++;
-            }
-            else if (p.box === 2 || p.box === 3) {
-                yellow++;
-            }
-            else if (p.box === 4 || p.box === 5) {
-                green++;
-            }
-        }
-
-        // Prozent = Anteil sicherer Karten
-        const totalVisible = red + yellow + green;
-        const percent = totalVisible ? Math.round((green / totalVisible) * 100) : 0;
-
-        row.querySelector(".lt-total").textContent   = cards.length;
-        row.querySelector(".lt-strong").textContent  = green;
-        row.querySelector(".lt-weak").textContent    = yellow;
-        row.querySelector(".lt-unknown").textContent = red;
+        // Spalten aktualisieren
+        row.querySelector(".lt-total").textContent = total;
+        row.querySelector(".lt-known").textContent = known;
+        row.querySelector(".lt-unknown").textContent = unknown;
         row.querySelector(".lt-percent").textContent = percent + "%";
     });
 }
@@ -434,40 +408,16 @@ function resetSessionStats() {
     };
 }
 
-// =====================================================
-// LEITNER: Pool nach Box-Gewichtung
-// =====================================================
 function gatherPool() {
     const out = [];
-
-    for (const lesson of state.selectedLessons) {
-        const cards = state.lessons.get(lesson);
-        if (!cards) continue;
-
-        for (const entry of cards) {
-            const p = ensureCardProgress(entry);
-
-            // Gewichtung nach Leitner-Box
-            let weight = 1;
-            if (p.box === 1) weight = 5;
-            else if (p.box === 2) weight = 3;
-            else if (p.box === 3) weight = 2;
-            else if (p.box === 4) weight = 1;
-            else if (p.box === 5) weight = 0.5;
-
-            // Karte mehrfach in den Pool klonen = Gewichtung
-            const copies = Math.max(1, Math.round(weight));
-            for (let i = 0; i < copies; i++) {
-                out.push(entry);
-            }
-        }
+    for (const k of state.selectedLessons) {
+        const arr = state.lessons.get(k);
+        if (arr) out.push(...arr);
     }
-
     state.pool = out;
     state.idx = null;
     resetSessionStats();
 }
-
 
 function gatherPoolFromSettings() {
     state.selectedLessons.clear();
@@ -534,7 +484,6 @@ function setCard(entry, fromHistory = false) {
     if (!fromHistory) pushToHistory(entry);
 
     state.current = entry;
-	ensureCardProgress(entry);
     state.startedAt = Date.now();
     state.revealedAt = null;
 
@@ -546,44 +495,22 @@ function setCard(entry, fromHistory = false) {
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
     /* -------- Fortschrittsbalken -------- */
-const stats = document.querySelector("#lessonStats");
-if (stats) {
-    const cards = state.lessons.get(entry.lesson) ?? [];
+    const stats = document.querySelector("#lessonStats");
+    if (stats) {
+        const cards = state.lessons.get(entry.lesson) || [];
+        const total = cards.length;
+        const prog = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
 
-    let unseen = 0;   // Box 0
-    let red = 0;      // Box 1
-    let yellow = 0;   // Box 2 + 3
-    let green = 0;    // Box 4 + 5
+        const green = total > 0 ? (prog.known / total) * 100 : 0;
+        const red   = total > 0 ? (prog.unknown / total) * 100 : 0;
 
-    for (const c of cards) {
-        const p = state.progress.cards[c.id] ?? { box: 0 };
-
-        if (p.box === 0) unseen++;
-        else if (p.box === 1) red++;
-        else if (p.box === 2 || p.box === 3) yellow++;
-        else green++; // box 4–5
+        stats.innerHTML = `
+            <div class="lesson-bar-large">
+                <div class="lesson-bar-red"   style="width:${red}%"></div>
+                <div class="lesson-bar-green" style="left:${red}%; width:${green}%"></div>
+            </div>
+        `;
     }
-
-    const total = cards.length;
-
-    const unseenPct = total ? (unseen / total) * 100 : 0;
-    const redPct    = total ? (red    / total) * 100 : 0;
-    const yellowPct = total ? (yellow / total) * 100 : 0;
-    const greenPct  = total ? (green  / total) * 100 : 0;
-
-    const leftRed    = unseenPct;
-    const leftYellow = unseenPct + redPct;
-    const leftGreen  = unseenPct + redPct + yellowPct;
-
-    stats.innerHTML = `
-        <div class="lesson-bar-large">
-            <div class="lesson-bar-unseen" style="left:0%; width:${unseenPct}%"></div>
-            <div class="lesson-bar-red"    style="left:${leftRed}%; width:${redPct}%"></div>
-            <div class="lesson-bar-yellow" style="left:${leftYellow}%; width:${yellowPct}%"></div>
-            <div class="lesson-bar-green"  style="left:${leftGreen}%; width:${greenPct}%"></div>
-        </div>
-    `;
-}
 
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
@@ -648,21 +575,6 @@ if (stats) {
     syncCardHeights();
 }
 
-// =====================================================
-// LEITNER: pro-Karte Eintrag sicherstellen
-// =====================================================
-function ensureCardProgress(entry) {
-    const id = entry.id;
-    if (!state.progress.cards[id]) {
-        state.progress.cards[id] = {
-            box: 0,               // 0 = noch nie gesehen
-            timesCorrect: 0,
-            timesWrong: 0,
-            lastReview: 0
-        };
-    }
-    return state.progress.cards[id];
-}
 
 /* ============================ HISTORY / NAV ============================ */
 
@@ -744,17 +656,6 @@ function doReveal() {
 
     showRatingButtons();
     enableRating();
-	
-	// --------------------------------------------------
-	// Karte erstmals gesehen? Dann Box 0 → Box 1
-	// --------------------------------------------------
-	const p = ensureCardProgress(state.current);
-	if (p.box === 0) {
-		p.box = 1;
-		p.lastReview = Date.now();
-		saveProgress();
-}
-	
     syncCardHeights();
 }
 
@@ -781,36 +682,25 @@ function disableRating() {
 function rate(mark) {
 
     if (!state.current) return;
-	
-// --------------------------------------------------
-// LEITNER LOGIK (neues Mapping)
-// --------------------------------------------------
-const p = ensureCardProgress(state.current);
 
-// Falls Box noch 0 ist (neue Karte), zunächst auf 1 setzen
-if (p.box === 0) p.box = 1;
+    state.session.done++;
 
-// Bewertung
-if (mark === "known") {
-    p.box = Math.min(p.box + 1, 5);  // gut → hoch
-    p.timesCorrect++;
-}
-else if (mark === "unsure") {
-    // bleibt in 2 oder 3 → unsicher
-    if (p.box < 2) p.box = 2;        // sehr schwach → auf unsicher heben
-    p.timesWrong++;
-}
-else if (mark === "unknown") {
-    p.box = 1;                        // falsch → zurück zu Box 1
-    p.timesWrong++;
-}
+    if (mark === "known") state.session.known++;
+    else if (mark === "unsure") state.session.unsure++;
+    else state.session.unknown++;
 
-p.lastReview = Date.now();
-saveProgress();
+    const lesson = state.current.lesson;
 
+    if (lesson) {
+        if (!state.progress.byLesson[lesson])
+            state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
+        if (mark === "known")   state.progress.byLesson[lesson].known++;
+        if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
+
+        saveProgress();
 		updateLessonStatsUI();
-    
+    }
 
     disableRating();
     hideRatingButtons();
@@ -1488,9 +1378,7 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     /* ============================================================
        CSV LADEN
        ============================================================ */
-    
-	loadCSV();
-	setTimeout(updateLessonStatsUI, 50);
+    loadCSV();
 
     /* ============================================================
        STIMMEN LADEN
