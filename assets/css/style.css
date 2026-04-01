@@ -353,6 +353,23 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     justify-self: end;                   /* rechts bündig */
 }
 
+/* ============================================
+   Fix: Buttons nicht mehr zu breit auf Mobile
+   ============================================ */
+
+.card-controls button,
+#btnPrev, #btnNext, #btnReveal {
+    min-width: 0 !important;      /* verhindert starre Mindestbreiten */
+    flex: 1 1 auto !important;     /* erlaubt echtes Schrumpfen */
+    white-space: normal !important; /* Text darf umbrechen, falls nötig */
+    padding: 8px 10px;             /* kompakteres Padding */
+    max-width: 100%;               /* niemals breiter als ihre Zelle */
+}
+
+/* Reveal nicht mehr auf 100px festnageln */
+#btnReveal {
+    max-width: none !important;
+}
 
 /* ============================================= */
 /* ✅ Lautsprecher – sichtbar in Dark & Light    */
