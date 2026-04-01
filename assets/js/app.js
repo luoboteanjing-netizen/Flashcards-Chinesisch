@@ -493,9 +493,10 @@ function setCard(entry, fromHistory = false) {
 
     if (cardTitle)  cardTitle.textContent  = `Karte (ID ${entry.id})`;
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
+
 // ----------------------------------------------------------
 // Fortschrittsbalken (Leitner) – von links nach rechts:
-// Grün (Box 4+5) → Rot (Box 1) → Gelb (Box 2+3) → Grau (Box 0)
+// Grün (4+5) → Gelb (2+3) → Rot (1) → Grau (0)
 // ----------------------------------------------------------
 const stats = document.querySelector("#lessonStats");
 if (stats) {
@@ -503,8 +504,8 @@ if (stats) {
     const total = cards.length;
 
     let green = 0;   // Box 4 + 5
-    let red   = 0;   // Box 1
     let yellow = 0;  // Box 2 + 3
+    let red   = 0;   // Box 1
     let grey  = 0;   // Box 0
 
     for (const c of cards) {
@@ -517,19 +518,19 @@ if (stats) {
     }
 
     const greenPct  = total ? (green  / total) * 100 : 0;
-    const redPct    = total ? (red    / total) * 100 : 0;
     const yellowPct = total ? (yellow / total) * 100 : 0;
+    const redPct    = total ? (red    / total) * 100 : 0;
     const greyPct   = total ? (grey   / total) * 100 : 0;
 
-    const leftRed    = greenPct;
-    const leftYellow = greenPct + redPct;
-    const leftGrey   = greenPct + redPct + yellowPct;
+    const leftYellow = greenPct;
+    const leftRed    = greenPct + yellowPct;
+    const leftGrey   = greenPct + yellowPct + redPct;
 
     stats.innerHTML = `
         <div class="lesson-bar-large">
             <div class="lesson-bar-green"  style="left:0%;           width:${greenPct}%"></div>
-            <div class="lesson-bar-red"    style="left:${leftRed}%;   width:${redPct}%"></div>
             <div class="lesson-bar-yellow" style="left:${leftYellow}%;width:${yellowPct}%"></div>
+            <div class="lesson-bar-red"    style="left:${leftRed}%;   width:${redPct}%"></div>
             <div class="lesson-bar-grey"   style="left:${leftGrey}%;  width:${greyPct}%"></div>
         </div>
     `;
