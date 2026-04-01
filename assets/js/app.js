@@ -587,7 +587,7 @@ function ensureCardProgress(entry) {
             lastReview: 0
         };
     }
-
+}
 
 /* ============================ HISTORY / NAV ============================ */
 
