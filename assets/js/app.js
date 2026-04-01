@@ -236,10 +236,10 @@ const header = `
     <div class="lt-row lt-head">
         <span class="lt-lesson" data-sort="lesson">Lektion</span>
         <span class="lt-total" data-sort="total">Karten</span>
-        <span class="lt-known" data-sort="known">✅</span>
-        <span class="lt-unknown" data-sort="unknown">❌</span>
-        <span class="lt-percent" data-sort="percent">%</span>
-    </div>
+        <span class="lt-strong"  data-sort="strong">✅</span>    <!-- Box 4+5 -->
+        <span class="lt-weak"    data-sort="weak">⚠️</span>      <!-- Box 2+3 -->
+		<span class="lt-unknown" data-sort="unknown">❌</span>   <!-- Box 1 -->
+	</div>
 `;
 
     table.insertAdjacentHTML("beforeend", header);
@@ -266,9 +266,9 @@ const header = `
         row.innerHTML = `
             <span class="lt-lesson">${k}</span>
             <span class="lt-total">${total}</span>
-            <span class="lt-known">${known}</span>
-            <span class="lt-unknown">${unknown}</span>
-            <span class="lt-percent">${percent}%</span>
+			<span class="lt-strong">0</span>
+			<span class="lt-weak">0</span>
+			<span class="lt-unknown">0</span>
         `;
 
 row.addEventListener("click", () => {
@@ -310,26 +310,26 @@ row.addEventListener("click", () => {
 
 // ✅ Fortschritt in der Lektionstabelle live aktualisieren
 function updateLessonStatsUI() {
-
-    const table = document.querySelector("#lessonTable");
-    if (!table) return;
-
-    // Gehe durch alle sichtbaren Zeilen
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
-        const cards = state.lessons.get(lesson) || [];
-        const total = cards.length;
+        const cards = state.lessons.get(lesson) ?? [];
 
-        const p = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
-        const known = p.known || 0;
-        const unknown = p.unknown || 0;
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+        let red = 0;      // Box 1
+        let yellow = 0;   // Box 2 + 3
+        let green = 0;    // Box 4 + 5
 
-        // Spalten aktualisieren
-        row.querySelector(".lt-total").textContent = total;
-        row.querySelector(".lt-known").textContent = known;
-        row.querySelector(".lt-unknown").textContent = unknown;
-        row.querySelector(".lt-percent").textContent = percent + "%";
+        for (const c of cards) {
+            const p = state.progress.cards[c.id] ?? { box: 0 };
+
+            if (p.box === 1) red++;
+            else if (p.box === 2 || p.box === 3) yellow++;
+            else if (p.box === 4 || p.box === 5) green++;
+        }
+
+        row.querySelector(".lt-total").textContent   = cards.length;
+        row.querySelector(".lt-unknown").textContent = red;
+        row.querySelector(".lt-weak").textContent    = yellow;
+        row.querySelector(".lt-strong").textContent  = green;
     });
 }
 
