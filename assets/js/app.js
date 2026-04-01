@@ -325,34 +325,38 @@ function updateLessonStatsUI() {
         const lesson = row.dataset.lesson;
         const cards = state.lessons.get(lesson) ?? [];
 
-        let red = 0;
-        let yellow = 0;
-        let green = 0;
+        let red = 0;      // Box 1
+        let yellow = 0;   // Box 2 + 3
+        let green = 0;    // Box 4 + 5
 
         for (const c of cards) {
             const p = state.progress.cards[c.id] ?? { box: 0 };
 
             if (p.box === 0) {
-                continue;              // neu, nicht anzeigen
-            } else if (p.box === 1) {
+                // neu → unberührt → NICHT anzeigen
+                continue;
+            } 
+            else if (p.box === 1) {
                 red++;
-            } else if (p.box === 2 || p.box === 3) {
+            }
+            else if (p.box === 2 || p.box === 3) {
                 yellow++;
-            } else if (p.box === 4 || p.box === 5) {
+            }
+            else if (p.box === 4 || p.box === 5) {
                 green++;
             }
         }
 
+        // Prozent = Anteil sicherer Karten
         const totalVisible = red + yellow + green;
         const percent = totalVisible ? Math.round((green / totalVisible) * 100) : 0;
 
-        row.querySelector(".lt-total").textContent = cards.length;
-        row.querySelector(".lt-strong").textContent = green;
-        row.querySelector(".lt-weak").textContent   = yellow;
+        row.querySelector(".lt-total").textContent   = cards.length;
+        row.querySelector(".lt-strong").textContent  = green;
+        row.querySelector(".lt-weak").textContent    = yellow;
         row.querySelector(".lt-unknown").textContent = red;
         row.querySelector(".lt-percent").textContent = percent + "%";
- 
-   });
+    });
 }
 
 function sortLessons() {
