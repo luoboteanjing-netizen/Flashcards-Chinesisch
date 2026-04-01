@@ -934,3 +934,15 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 .lesson-bar-red    { background: #e74c3c; z-index: 3; }
 .lesson-bar-yellow { background: #ffcc33; z-index: 2; }
 .lesson-bar-grey   { background: #99999966; z-index: 1; }
+
+/* ============================================================
+   FIX: Alle Nummern in der Lektionsliste rechtsbündig ausrichten
+   ============================================================ */
+
+.lt-total,
+.lt-unknown,
+.lt-weak,
+.lt-strong {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums; /* sorgt für perfekte Spaltenausrichtung */
+}
