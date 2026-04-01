@@ -83,7 +83,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  background: var(--accent) !important;
  border-color: var(--accent) !important;
  color: var(--accent-text) !important;
- font-weight: 700;
+ font-weight: 600;
  white-space: nowrap;
  transition: all 0.2s ease; /* Smooth bei Text-Wechsel (z.B. "Stop") */
  flex: 0 1 auto; /* Kompakt, dynamisch */
@@ -98,6 +98,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  flex: 0 1 auto; /* Grow:0 (wächst nicht über Basis), Shrink:1 (schrumpft bei Engpass), Basis:auto (passt zu Inhalt) – verhindert Wrap */
  white-space: nowrap; /* Verhindert Text-Umbruch (z.B. "Autoplay ▶︎" oder "Autoplay ■ Stop") */
  font-weight: 600; /* Leicht bolder für Prominenz (wird zu 700 bei .primary) */
+ background: var(--primary-bg, var(--accent)) !important;
+ border-color: var(--primary-border, var(--accent)) !important;
+ color: var(--accent-text) !important;
 }
 /* Breitere und höhere Swap/Direction-Button (mit "< Richtung >" als zentriertem Text, kein Icon) */
 .btn.swap {
