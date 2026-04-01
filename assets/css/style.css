@@ -38,7 +38,16 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .btn{background:#1b2330;color:var(--text);border:1px solid #293241;padding:8px 12px;border-radius:8px;cursor:pointer; flex-shrink: 1;} /* Global: Buttons schrumpfen leicht bei Bedarf */
 .btn.small{padding:6px 10px;font-size:12px}
 .btn.large{padding:10px 16px;font-size:14px;font-weight:600}
-.btn.primary{background:#7aa2f7;border-color:#7aa2f7;color:#081018;font-weight:700; margin-top:12px; flex: 0 1 auto; white-space: nowrap; transition: all 0.2s ease; max-width: none;} /* Training-Button: Kompakter, verhindert Text-Umbruch bei "Stop" – Übergang für Smoothness */
+.btn.primary{
+	background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-text);
+	font-weight:700; margin-top:12px; 
+	flex: 0 1 auto; 
+	white-space: nowrap; 
+	transition: all 0.2s ease; 
+	max-width: none;
+}
 .btn.ghost{background:transparent}
 /* FIX: Speziell für Training-Button – kompakte Breite (nicht 100% oder flex:1), unabhängig von Parent */
 #btnStart {
