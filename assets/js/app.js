@@ -705,17 +705,22 @@ function doReveal() {
 	
 	showRatingButtons();
 	enableRating();
-	// ← Optional: Extra Force (falls showRatingButtons zu früh)
+// ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
 setTimeout(() => {
-    forceRatingButtons();  // Sicherstellen nach full Render
-    console.log('doReveal: Extra forceRatingButtons – Buttons im Space?');
-}, 150);
-	
-	// FIX: syncCardHeights mit Delay (nach Styles, gegen Hängen)
-	setTimeout(() => {
-	    syncCardHeights();
-	    console.log('syncCardHeights nach Delay');  // DEBUG: Läuft?
-	}, 100);  // 100ms – DOM ready machen
+    // Parent-Karte sichtbar machen (Space freigeben)
+    const card = document.querySelector('#card, main');
+    if (card) {
+        card.style.setProperty('display', 'block', 'important');
+        card.style.setProperty('height', 'auto', 'important');
+        card.style.setProperty('overflow', 'visible', 'important');
+        card.style.setProperty('opacity', '1', 'important');
+        console.log('doReveal: #card Parent sichtbar gemacht – Space offen!');
+    }
+    
+    forceRatingButtons();  // ← Sicherstellen: Buttons im Space
+    syncCardHeights();  // Höhe anpassen (nach Insert)
+    console.log('doReveal: forceRatingButtons + syncCardHeights – Buttons unter Solution?');
+}, 150);  // 150ms: DOM ready
 }
 
 
@@ -756,32 +761,10 @@ function hideRatingButtons() {
 }
 
 // Enable/Disable Rating: Mit Null-Checks (verhindert Klick-Errors) – KORRIGIERT
+
 function enableRating() {
-    const knownBtn = document.getElementById('btnRateKnown');
-    const unsureBtn = document.getElementById('btnRateUnsure');
-    const unknownBtn = document.getElementById('btnRateUnknown');
-    
-    // Events setzen (Strings für deine rate("known") Funktion)
-    if (knownBtn) {
-        knownBtn.addEventListener('click', () => {
-            stopAutoplayOnUserAction();  // Falls Autoplay läuft
-            rate("known");  // ← Fix: String statt Number (passt zu deiner rate-Funktion)
-        });
-    }
-    if (unsureBtn) {
-        unsureBtn.addEventListener('click', () => {
-            stopAutoplayOnUserAction();
-            rate("unsure");  // ← Fix
-        });
-    }
-    if (unknownBtn) {
-        unknownBtn.addEventListener('click', () => {
-            stopAutoplayOnUserAction();
-            rate("unknown");  // ← Fix
-        });
-    }
-    
-    console.log('enableRating: Events für rate("known"/"unsure"/"unknown") gesetzt');
+    // Events werden jetzt in forceRatingButtons() gesetzt – hier nur Log
+    console.log('enableRating: Buttons enabled (Events via forceRatingButtons)');
 }
 
 function disableRating() {
@@ -1649,19 +1632,39 @@ function stopAutoplayOnUserAction() {
 }
 
 // Neue Funktion: Force Rating-Buttons sichtbar & farbig (nach Reveal)
+// Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events
 function forceRatingButtons() {
-    // Buttons per ID finden
-    const knownBtn = document.getElementById('btnRateKnown');
-    const unsureBtn = document.getElementById('btnRateUnsure');
-    const unknownBtn = document.getElementById('btnRateUnknown');
+    // Buttons per ID finden (falls schon da)
+    let knownBtn = document.getElementById('btnRateKnown');
+    let unsureBtn = document.getElementById('btnRateUnsure');
+    let unknownBtn = document.getElementById('btnRateUnknown');
     
     const buttons = [knownBtn, unsureBtn, unknownBtn].filter(btn => btn);
+    console.log('forceRatingButtons: Gefundene Buttons vor Fix:', buttons.length);
+    
     if (buttons.length !== 3) {
-        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – prüfe enableRating() oder HTML');
-        return;
+        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – Erstelle neue');
+        // Neu erstellen, falls fehlend (z.B. HTML hat sie disabled/hidden)
+        const buttonConfigs = [
+            { id: 'btnRateKnown', text: '✅ Gewusst', class: 'good', bg: '#4CAF50', color: 'white', score: 'known' },
+            { id: 'btnRateUnsure', text: '🤔 Unsicher', class: 'unsure', bg: '#FFEB3B', color: 'black', score: 'unsure' },
+            { id: 'btnRateUnknown', text: '❌ Nicht gewusst', class: 'bad', bg: '#F44336', color: 'white', score: 'unknown' }
+        ];
+        
+        buttonConfigs.forEach(config => {
+            let btn = document.getElementById(config.id);
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.id = config.id;
+                btn.className = `btn rate ${config.class}`;
+                btn.innerHTML = config.text;
+                buttons.push(btn);  // Zur Liste hinzufügen
+                console.log(`Neu erstellt: ${config.id} ("${config.text}")`);
+            }
+        });
     }
     
-    // Nesting fixen (falls Buttons verschachtelt sind, z.B. durch alten Test)
+    // Nesting fixen (falls verschachtelt)
     buttons.forEach(btn => {
         if (btn.parentElement && btn.parentElement.tagName === 'BUTTON') {
             const grandparent = btn.parentElement.parentElement;
@@ -1670,74 +1673,89 @@ function forceRatingButtons() {
                 console.log('Nesting gefixt für', btn.id);
             }
         }
-        // Text bereinigen (Emojis + Text, keine Nested-HTML)
+        // Text bereinigen (Emojis behalten)
         btn.innerHTML = btn.innerHTML.replace(/<[^>]*>.*?<\/[^>]*>/gi, '').trim();
         console.log('Text gefixt:', btn.textContent.trim());
     });
     
-    // Container finden (dein Rate-Bar-Container, z.B. #ratebar oder .rating-container)
-    let container = document.querySelector('#ratebar, .rating-container, .bar.rate-bar') || buttons[0].closest('#card') || buttons[0].parentElement;
+    // Container finden: Zuerst .rating-container, sonst unter #solBox
+    let container = document.querySelector('.rating-container') || document.querySelector('#rateBar');
+    console.log('Container gefunden:', container ? container.id || container.className : 'null');
     
-    // Falls kein guter Container: Neuen erstellen und anhängen (an #card oder body)
+    // Falls kein Container: Neuen unter #solBox erstellen (korrekte Position!)
     if (!container || container.style.display === 'none') {
         container = document.createElement('div');
-        container.id = 'rate-container-forced';
-        container.className = 'bar rate-bar';
-        const card = document.querySelector('#card') || document.body;
-        card.appendChild(container);  // Anhängen unter der Karte
-        console.log('Neuer Container erstellt: #rate-container-forced');
+        container.id = 'rateBar';  // Deine ID
+        container.className = 'rating-container bar rate-bar';  // Deine Klassen
+        console.log('Neuer Container erstellt: #rateBar (.rating-container)');
+        
+        // Position: Direkt unter #solBox (Solution-Box) einfügen – das ist der "Space"!
+        const solBox = document.querySelector('#solBox');
+        if (solBox && solBox.parentNode) {
+            // Einfügen nach #solBox (im Flow der Karte)
+            solBox.parentNode.insertBefore(container, solBox.nextSibling);
+            console.log('Container unter #solBox platziert – Im Space!');
+        } else {
+            // Fallback: An #card oder body (aber priorisiere #card)
+            const card = document.querySelector('#card') || document.body;
+            if (card && card !== document.body) {
+                card.appendChild(container);  // Unter Karte
+                console.log('Container an #card angehängt');
+            } else {
+                document.body.appendChild(container);  // Letzter Fallback (sollte nicht passieren)
+                console.log('Fallback: Container an body');
+            }
+        }
     }
     
-    // Container sichtbar machen (flex für Buttons nebeneinander)
+    // Container sichtbar machen (flex, im Space)
     container.style.setProperty('display', 'flex', 'important');
     container.style.setProperty('flex-direction', 'row', 'important');
     container.style.setProperty('justify-content', 'space-around', 'important');
     container.style.setProperty('align-items', 'center', 'important');
     container.style.setProperty('width', '100%', 'important');
-    container.style.setProperty('height', '52px', 'important');  // Deine Bar-Höhe
+    container.style.setProperty('height', '52px', 'important');
     container.style.setProperty('margin', '16px 0', 'important');
     container.style.setProperty('padding', '4px', 'important');
-    container.style.setProperty('background-color', 'transparent', 'important');  // Oder 'lightblue' für Test
-    container.style.setProperty('border', 'none', 'important');  // Dein Style
+    container.style.setProperty('background-color', 'transparent', 'important');
+    container.style.setProperty('border', 'none', 'important');
     container.style.setProperty('opacity', '1', 'important');
     container.style.setProperty('visibility', 'visible', 'important');
     container.style.setProperty('z-index', '1000', 'important');
+    container.style.setProperty('position', 'relative', 'important');  // Im Flow halten
+    container.style.setProperty('top', '0', 'important');  // Kein Offset
+    console.log('Container im Space: Flex, 52px, transparent');
     
     // Container resetten & Buttons anhängen (nebeneinander)
-    container.innerHTML = '';
+    container.innerHTML = '';  // Alte Kinder löschen
     buttons.forEach(btn => container.appendChild(btn));
     
-    // Buttons stylen (sichtbar, farbig, deine Uniform-Styles)
+    // Buttons stylen (farbig, sichtbar)
     const buttonConfigs = [
-        { id: 'btnRateKnown', text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 1 },
-        { id: 'btnRateUnsure', text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 0.5 },
-        { id: 'btnRateUnknown', text: '❌ Nicht gewusst', bg: '#F44336', color: 'white', score: 0 }
+        { text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 'known' },
+        { text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 'unsure' },
+        { text: '❌ Nicht gewusst', bg: '#F44336', color: 'white', score: 'unknown' }
     ];
     
     buttons.forEach((btn, i) => {
         const config = buttonConfigs[i];
-        btn.innerHTML = config.text;  // Text mit Emoji setzen
-        btn.removeAttribute('style');  // Alte Styles löschen
+        btn.innerHTML = config.text;
+        btn.removeAttribute('style');  // Reset alte Styles
         btn.disabled = false;
         btn.classList.remove('disabled', 'hidden', 'invisible', 'masked');
         btn.classList.add('btn', 'rate', i === 0 ? 'good' : i === 1 ? 'unsure' : 'bad');
         
-        // Deine Uniform-Bar-Styles (falls du setUniformBarStyles hast – anpassen!)
-        if (typeof setUniformBarStyles === 'function') {
-            setUniformBarStyles('ratebar');  // Rufe deine Funktion für Buttons
-        }
-        
-        // Force-Styles (sichtbar & farbig)
+        // Force-Styles (wie vorher)
         btn.style.setProperty('display', 'flex', 'important');
         btn.style.setProperty('align-items', 'center', 'important');
         btn.style.setProperty('justify-content', 'center', 'important');
         btn.style.setProperty('position', 'relative', 'important');
         btn.style.setProperty('flex', '1', 'important');
         btn.style.setProperty('min-width', '80px', 'important');
-        btn.style.setProperty('height', '48px', 'important');  // Passe an deine Höhe an
+        btn.style.setProperty('height', '48px', 'important');
         btn.style.setProperty('margin', '0 4px', 'important');
         btn.style.setProperty('padding', '8px', 'important');
-        btn.style.setProperty('border', '1px solid', 'important');  // Dein Border
+        btn.style.setProperty('border', '1px solid', 'important');
         btn.style.setProperty('border-radius', '4px', 'important');
         btn.style.setProperty('font-size', '14px', 'important');
         btn.style.setProperty('font-weight', 'bold', 'important');
@@ -1748,10 +1766,29 @@ function forceRatingButtons() {
         btn.style.setProperty('visibility', 'visible', 'important');
         btn.style.setProperty('z-index', '1001', 'important');
         
-        console.log(`${config.text} gestylt: Farbig & sichtbar!`);
+        // ← NEU: Events direkt hier setzen (nach Styling – verhindert Verlust)
+        btn.addEventListener('click', (e) => {
+            console.log(`Klick auf ${config.text} erkannt! Score: ${config.score}`);  // DEBUG: Klick-Log
+            stopAutoplayOnUserAction();  // Stoppt Autoplay falls on
+            rate(config.score);  // Deine Funktion aufrufen (known/unsure/unknown)
+            // Nach Klick: Buttons deaktivieren (wie in rate())
+            disableRating();
+            hideRatingButtons();
+        });
+        
+        console.log(`${config.text} gestylt + Event gesetzt: Farbig & klickbar!`);
     });
     
-    console.log('forceRatingButtons: Erfolgreich – 3 Buttons im Container!');
+    // Parent-Container sichtbar machen (z.B. #card, falls hidden)
+    const parent = container.closest('#card, .card-container, main') || document.body;
+    if (parent) {
+        parent.style.setProperty('display', 'block', 'important');
+        parent.style.setProperty('opacity', '1', 'important');
+        parent.style.setProperty('overflow', 'visible', 'important');
+        console.log('Parent-Container (#card etc.) sichtbar gemacht');
+    }
+    
+    console.log('forceRatingButtons: Erfolgreich – 3 Buttons unter #solBox mit Events!');
 }
 
 
