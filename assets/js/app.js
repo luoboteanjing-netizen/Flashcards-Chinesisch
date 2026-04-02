@@ -669,7 +669,6 @@ function showNavButtons() {
 
 
 /* ============================ REVEAL / RATING ============================ */
-/* ============================ REVEAL / RATING ============================ */
 
 function doReveal() {
     $("#solBox").classList.remove("masked");
@@ -813,6 +812,136 @@ function rate(mark) {
 
     nextCard();
 }
+
+/* =======================================================
+   JS-FIX: Einheitliche Controls- & Ratebar (Abstand 16px, Höhe 48px) – KORRIGIERT
+   – ID für Rate-Bar: #ratebar (klein) 
+   – Null-Checks + Logs für Debug (entferne Logs nach Test!)
+======================================================= */
+
+function setUniformBarStyles(barType) {
+    let bar;
+    
+    if (barType === 'controls') {
+        bar = $('.card-controls');  // Container für Nav-Buttons
+        console.log('Controls-Bar Selector:', bar);  // DEBUG: Sollte Element loggen
+    } else if (barType === 'ratebar') {
+        bar = $('#ratebar');  // FIX: Klein geschrieben – passe an HTML an!
+        console.log('Rate-Bar Selector:', bar);  // DEBUG: Wenn null → ID falsch!
+    } else {
+        return;  // Ungültig
+    }
+    
+    if (!bar) {
+        console.error('Bar nicht gefunden für:', barType);  // DEBUG
+        return;
+    }
+    
+    // Mobile-Check
+    const isMobile = window.innerWidth < 768;
+    const marginTop = isMobile ? 12 : 16;
+    const barHeight = isMobile ? 48 : 52;
+    const btnHeight = isMobile ? 44 : 48;
+    const fontSize = isMobile ? 12 : 13;
+    const lineHeight = isMobile ? 1.3 : 1.4;
+    const paddingH = isMobile ? 10 : 12;
+    const gap = isMobile ? '2px' : '4px';
+    
+    // Bar-Styles: Flex, Abstand, Höhe
+    bar.style.display = 'flex';
+    bar.style.flexDirection = 'row';
+    bar.style.justifyContent = 'space-evenly';
+    bar.style.alignItems = 'center';
+    bar.style.width = '100%';
+    bar.style.marginTop = marginTop + 'px';
+    bar.style.marginBottom = '12px';
+    bar.style.padding = '0';
+    bar.style.gap = gap;
+    bar.style.height = barHeight + 'px';
+    bar.style.position = 'relative';
+    bar.style.transition = 'all 0.25s ease';
+    bar.style.boxSizing = 'border-box';
+    bar.style.opacity = '1';  // Explizit sichtbar
+    
+    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px');  // DEBUG
+    
+    // Buttons stylen
+    const buttons = bar.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.style.flex = '1';
+        btn.style.height = btnHeight + 'px';
+        btn.style.padding = '0 ' + paddingH + 'px';
+        btn.style.margin = '0';
+        btn.style.fontSize = fontSize + 'px';
+        btn.style.fontWeight = '600';
+        btn.style.lineHeight = lineHeight;
+        btn.style.borderRadius = '8px';
+        btn.style.whiteSpace = 'nowrap';
+        btn.style.textAlign = 'center';
+        btn.style.overflow = 'hidden';
+        btn.style.textOverflow = 'ellipsis';
+        btn.style.boxSizing = 'border-box';
+        btn.style.borderWidth = '1px';
+        btn.style.minWidth = '0';
+        btn.style.verticalAlign = 'middle';
+        btn.style.transition = 'all 0.2s ease';
+    });
+    
+    // Farben
+    if (barType === 'controls') {
+        const revealBtn = $('#btnReveal');
+        if (revealBtn) {
+            revealBtn.style.background = 'var(--accent)';
+            revealBtn.style.borderColor = 'var(--accent)';
+            revealBtn.style.color = 'var(--accent-text)';
+            revealBtn.style.fontWeight = '700';
+        }
+    } else if (barType === 'ratebar') {
+        const knownBtn = $('#btnRateKnown');
+        if (knownBtn) {
+            knownBtn.style.background = 'var(--good)';
+            knownBtn.style.borderColor = 'var(--good)';
+            knownBtn.style.color = 'var(--accent-text)';
+        }
+        const unsureBtn = $('#btnRateUnsure');
+        if (unsureBtn) {
+            unsureBtn.style.background = 'var(--unsure)';
+            unsureBtn.style.borderColor = 'var(--unsure)';
+            unsureBtn.style.color = 'var(--accent-text)';
+        }
+        const unknownBtn = $('#btnRateUnknown');
+        if (unknownBtn) {
+            unknownBtn.style.background = 'var(--bad)';
+            unknownBtn.style.borderColor = 'var(--bad)';
+            unknownBtn.style.color = 'var(--accent-text)';
+        }
+    }
+}
+
+// Hide-Funktion: Smooth Verstecken
+function hideBarSmooth(barType) {
+    let bar;
+    if (barType === 'controls') {
+        bar = $('.card-controls');
+    } else if (barType === 'ratebar') {
+        bar = $('#ratebar');
+    }
+    if (!bar) {
+        console.error('Hide-Bar nicht gefunden für:', barType);  // DEBUG
+        return;
+    }
+    
+    bar.style.opacity = '0';
+    bar.style.height = '0px';
+    bar.style.marginTop = '0px';
+    bar.style.marginBottom = '0px';
+    bar.style.overflow = 'hidden';
+    bar.style.transform = 'translateY(-4px)';
+    bar.style.transition = 'all 0.25s ease';
+    
+    console.log('Bar versteckt:', barType);  // DEBUG
+}
+
 
 /* ============================ SESSION STATS ============================ */
 
