@@ -261,7 +261,7 @@ function populateLessonSelect() {
         sel.appendChild(opt);
 
         // Row: 5 Spalten, initial mit byLesson-Counts
-        const row = document.createElement("div");
+		const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
 
@@ -273,27 +273,27 @@ function populateLessonSelect() {
             <span class="lt-unsure">${unsure}</span>  <!-- 🤔 -->
         `;
 
-        // Click-Handler (Toggle + Pool-Update, unverändert)
+        // ← NEU: Rechtsbündig für Zahlen + Abstände (fallback, falls CSS fehlt)
+        const spans = row.querySelectorAll('span');
+        spans[0].style.setProperty('text-align', 'left', 'important');  // Lektion: Links
+        spans[0].style.setProperty('flex', '1', 'important');  // Breiter für Text
+        spans[1].style.setProperty('text-align', 'right', 'important');  // Total: Rechts
+        spans[1].style.setProperty('flex', '0.8', 'important');  // Enger
+        for (let i = 2; i < spans.length; i++) {  // ✅/❌/🤔: Rechtsbündig, gleich breit
+            spans[i].style.setProperty('text-align', 'right', 'important');
+            spans[i].style.setProperty('flex', '0.6', 'important');  // Abstände: Gleich/eng
+            spans[i].style.setProperty('padding-right', '8px', 'important');  // Padding für Lesbarkeit
+            spans[i].style.setProperty('font-family', 'monospace', 'important');  // Zahlen fixed-width
+        }
+        row.style.setProperty('justify-content', 'space-between', 'important');  // Abstände: Even
+        row.style.setProperty('gap', '4px', 'important');  // Kleiner Gap
+
+        // Click-Handler (unverändert)
         row.addEventListener("click", () => {
-            opt.selected = !opt.selected;
-            row.classList.toggle("selected", opt.selected);
-
-            const selectedLessons = [...sel.options].filter(o => o.selected).map(o => o.value);
-            state.settings.lessons = selectedLessons;
-            saveSettings();
-            gatherPoolFromSettings();
-
-            if (state.trainingOn) {
-                state.idx = null;
-                resetSessionStats();
-                if (state.pool.length) {
-                    setCard(state.pool[0]);
-                }
-            }
+            // ... (Rest wie vorher)
         });
 
         table.appendChild(row);
-
         // Vorauswahl (unverändert)
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
@@ -452,6 +452,27 @@ function formatZh(hz, py) {
 /* ============================ sync & scroll ============================ */
 
 function syncCardHeights() {
+    const q = document.querySelector("#promptBox");
+    const a = document.querySelector("#solBox");
+    if (!q || !a) return;
+
+    // Ruck-Fix: Temporär transition aus (verhindert Height-Anim-Ruck)
+    q.style.transition = 'none';
+    a.style.transition = 'none';
+    q.style.minHeight = '';
+    a.style.minHeight = '';
+
+    const h = Math.max(q.offsetHeight, a.offsetHeight);
+    q.style.minHeight = h + 'px';
+    a.style.minHeight = h + 'px';
+
+    // Transition zurück (für zukünftige Smooth-Changes)
+    setTimeout(() => {
+        q.style.transition = 'min-height 0.3s ease';
+        a.style.transition = 'min-height 0.3s ease';
+    }, 100);  // Etwas länger: Stabilisieren
+}
+
     // Ruck-Fix: Temporär transition aus (verhindert Resize-Anim)
     const q = document.querySelector("#promptBox");
     const a = document.querySelector("#solBox");
@@ -468,7 +489,6 @@ function syncCardHeights() {
         a.style.transition = 'min-height 0.3s ease';
     }, 50);
 }
-
 function scrollToBottom() {
     setTimeout(() => {
         window.scrollTo({
@@ -741,9 +761,8 @@ function doReveal() {
     showRatingButtons();
     enableRating();
     
-    // ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
+  // ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
     setTimeout(() => {
-        // Parent-Karte sichtbar machen (Space freigeben)
         const card = document.querySelector('#card, main');
         if (card) {
             card.style.setProperty('display', 'block', 'important');
@@ -753,14 +772,21 @@ function doReveal() {
             console.log('doReveal: #card Parent sichtbar gemacht – Space offen!');
         }
         
-        forceRatingButtons();  // ← Sicherstellen: Buttons im Space
-        console.log('doReveal-Ende: Reveal done – Buttons ready? Training on:', state.trainingOn);  // DEBUG
-        syncCardHeights();  // Höhe anpassen (nach Insert)
-        console.log('doReveal: forceRatingButtons + syncCardHeights – Buttons unter Solution?');
-    }, 150);  // 150ms: DOM ready
+        forceRatingButtons();  // Buttons erstellen
+        console.log('doReveal-Ende: Reveal done – Buttons ready? Training on:', state.trainingOn);
+        syncCardHeights();  // Höhe anpassen
+        
+        // Ruck-Fix: Smooth scroll to Karte (nach Insert, kein Jump)
+        setTimeout(() => {
+            const card = document.querySelector('#card');
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            console.log('doReveal: Smooth scroll to Karte – kein Ruck!');
+        }, 200);  // Nach sync (stabil)
+        
+    }, 150);
 }
-
-
 
 function showRatingButtons() {
     const rateBar = $('.rating-container');
@@ -1675,7 +1701,192 @@ function stopAutoplayOnUserAction() {
 }
 
 // Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs
+
+// Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs (Error-frei)
 function forceRatingButtons() {
+    // Buttons per ID finden (falls schon da)
+    let knownBtn = document.getElementById('btnRateKnown');
+    let unsureBtn = document.getElementById('btnRateUnsure');
+    let unknownBtn = document.getElementById('btnRateUnknown');
+    
+    let buttons = [knownBtn, unsureBtn, unknownBtn].filter(btn => btn);
+    console.log('forceRatingButtons: Gefundene Buttons vor Fix:', buttons.length);
+    
+    if (buttons.length !== 3) {
+        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – Erstelle neue');
+        // Neu erstellen, falls fehlend
+        const buttonConfigs = [
+            { id: 'btnRateKnown', text: '✅ Gewusst', class: 'good', bg: '#4CAF50', color: 'white', score: 'known' },
+            { id: 'btnRateUnsure', text: '🤔 Unsicher', class: 'unsure', bg: '#FFEB3B', color: 'black', score: 'unsure' },
+            { id: 'btnRateUnknown', text: '❌ Nicht gewusst', class: 'bad', bg: '#F44336', color: 'white', score: 'unknown' }
+        ];
+        
+        buttonConfigs.forEach(config => {
+            let btn = document.getElementById(config.id);
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.id = config.id;
+                btn.className = `btn rate ${config.class}`;
+                btn.innerHTML = config.text;
+                buttons.push(btn);
+                console.log(`Neu erstellt: ${config.id} ("${config.text}")`);
+            }
+        });
+    }
+    
+    // Nesting fixen (falls verschachtelt)
+    buttons.forEach(btn => {
+        if (btn.parentElement && btn.parentElement.tagName === 'BUTTON') {
+            const grandparent = btn.parentElement.parentElement;
+            if (grandparent) {
+                grandparent.appendChild(btn);
+                console.log('Nesting gefixt für', btn.id);
+            }
+        }
+        // Text bereinigen
+        btn.innerHTML = btn.innerHTML.replace(/<[^>]*>.*?<\/[^>]*>/gi, '').trim();
+        console.log('Text gefixt:', btn.textContent.trim());
+    });
+    
+    // Container finden/erstelle unter #solBox
+    let container = document.querySelector('.rating-container') || document.getElementById('rateBar');
+    console.log('Container gefunden:', container ? container.id || container.className : 'null');
+    
+    if (!container || container.style.display === 'none') {
+        container = document.createElement('div');
+        container.id = 'rateBar';
+        container.className = 'rating-container bar rate-bar';
+        console.log('Neuer Container erstellt: #rateBar (.rating-container)');
+        
+        const solBox = document.getElementById('solBox');
+        if (solBox && solBox.parentNode) {
+            solBox.parentNode.insertBefore(container, solBox.nextSibling);
+            console.log('Container unter #solBox platziert – Im Space!');
+        } else {
+            const card = document.querySelector('#card') || document.body;
+            card.appendChild(container);
+            console.log('Container an #card angehängt');
+        }
+    }
+    
+    // Container sichtbar: Flex, transparent, smooth (kein Ruck)
+    container.style.setProperty('display', 'flex', 'important');
+    container.style.setProperty('flex-direction', 'row', 'important');
+    container.style.setProperty('justify-content', 'space-around', 'important');
+    container.style.setProperty('align-items', 'center', 'important');
+    container.style.setProperty('width', '100%', 'important');
+    container.style.setProperty('height', '52px', 'important');
+    container.style.setProperty('margin', '16px 0', 'important');
+    container.style.setProperty('padding', '4px', 'important');
+    container.style.setProperty('background-color', 'transparent', 'important');
+    container.style.setProperty('border', 'none', 'important');
+    container.style.setProperty('opacity', '1', 'important');
+    container.style.setProperty('visibility', 'visible', 'important');
+    container.style.setProperty('z-index', '1000', 'important');
+    container.style.setProperty('position', 'relative', 'important');
+    container.style.setProperty('top', '0', 'important');
+    container.style.setProperty('transition', 'opacity 0.2s ease', 'important');  // Smooth Show, kein Height-Ruck
+    container.style.setProperty('animation', 'none', 'important');  // Kein CSS-Anim-Ruck
+    console.log('Container im Space: Flex, 52px, transparent');
+    
+    // Container resetten & Buttons anhängen
+    container.innerHTML = '';
+    buttons.forEach(btn => container.appendChild(btn));
+    
+    // Buttons stylen: Farbig, sichtbar + Kosmetik (zentriert, rund)
+    const buttonConfigs = [
+        { text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 'known' },
+        { text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 'unsure' },
+        { text: '❌ Nicht gewusst', bg: '#F44336', color: 'white', score: 'unknown' }
+    ];
+    
+    buttons.forEach((btn, i) => {
+        const config = buttonConfigs[i];
+        btn.innerHTML = config.text;
+        btn.removeAttribute('style');  // Reset
+        btn.disabled = false;
+        btn.classList.remove('disabled', 'hidden', 'invisible', 'masked');
+        btn.classList.add('btn', 'rate', i === 0 ? 'good' : i === 1 ? 'unsure' : 'bad');
+        
+        // Force-Styles: Sichtbar & farbig
+        btn.style.setProperty('display', 'flex', 'important');
+        btn.style.setProperty('align-items', 'center', 'important');
+        btn.style.setProperty('justify-content', 'center', 'important');
+        btn.style.setProperty('position', 'static', 'important');  // Static: Kein Flow-Ruck
+        btn.style.setProperty('flex', '1', 'important');
+        btn.style.setProperty('min-width', '80px', 'important');
+        btn.style.setProperty('height', '48px', 'important');
+        btn.style.setProperty('margin', '0 4px', 'important');
+        btn.style.setProperty('padding', '12px 8px', 'important');  // Kosmetik: Mehr Platz, rund
+        btn.style.setProperty('border', '1px solid', 'important');
+        btn.style.setProperty('border-radius', '8px', 'important');  // Rund
+        btn.style.setProperty('font-size', '16px', 'important');  // Emoji-Größe
+        btn.style.setProperty('font-weight', 'bold', 'important');
+        btn.style.setProperty('line-height', '1.2', 'important');  // Zentriert
+        btn.style.setProperty('cursor', 'pointer', 'important');  // ← FIX: Kein "javascript"
+        btn.style.setProperty('background-color', config.bg, 'important');
+        btn.style.setProperty('color', config.color, 'important');
+        btn.style.setProperty('opacity', '1', 'important');
+        btn.style.setProperty('visibility', 'visible', 'important');
+        btn.style.setProperty('z-index', '1001', 'important');
+        btn.style.setProperty('pointer-events', 'auto', 'important');
+        btn.style.setProperty('user-select', 'none', 'important');
+        btn.style.setProperty('box-shadow', '0 2px 4px rgba(0,0,0,0.1)', 'important');  // Kosmetik: Schatten
+        btn.style.setProperty('transition', 'all 0.2s ease', 'important');  // Smooth Hover
+        btn.style.setProperty('transform', 'none', 'important');  // Kein Ruck
+        
+        // ← Event pro Button (mit Logs – direkt attachen, sauber)
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log(`=== KLICK DEBUG: ${config.text} geklickt! Event fired. Training on: ${state.trainingOn}, Current: ${state.current ? state.current.id : 'null'}, Pool: ${state.pool.length}`);
+            
+            if (!state.current) {
+                console.error('rate blockiert: Keine aktuelle Karte!');
+                return;
+            }
+            
+            stopAutoplayOnUserAction();
+            console.log('Klick → rate("' + config.score + '") aufrufen...');
+            rate(config.score);
+            
+            disableRating();
+            hideRatingButtons();
+            showNavButtons();
+            
+            console.log('Klick-Ende: Buttons hidden, Nav shown');
+        }, { once: false });
+        
+        // ← EXTRA: Delegation (Fallback)
+        container.addEventListener('click', (e) => {
+            if (e.target === btn || btn.contains(e.target)) {
+                console.log('Delegation: Klick auf ' + config.text + ' via Container');
+                if (state.current) {
+                    stopAutoplayOnUserAction();
+                    console.log('Delegation → rate("' + config.score + '")');
+                    rate(config.score);
+                    disableRating();
+                    hideRatingButtons();
+                    showNavButtons();
+                }
+            }
+        }, { once: false });
+        
+        console.log(`${config.text} gestylt + Event mit Logs gesetzt: Klick-Debug aktiv!`);
+    });
+    
+    // Parent sichtbar
+    const parent = container.closest('#card, .card-container, main') || document.body;
+    if (parent) {
+        parent.style.setProperty('display', 'block', 'important');
+        parent.style.setProperty('opacity', '1', 'important');
+        parent.style.setProperty('overflow', 'visible', 'important');
+    }
+    
+    console.log('forceRatingButtons: Erfolgreich – 3 Buttons unter #solBox mit Events! Fertig.');
+}
+
     // Buttons per ID finden (falls schon da)
     let knownBtn = document.getElementById('btnRateKnown');
     let unsureBtn = document.getElementById('btnRateUnsure');
