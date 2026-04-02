@@ -525,8 +525,18 @@ function setCard(entry, fromHistory = false) {
     state.revealedAt = null;
 
     /* -------- Titel (Lektion / ID) -------- */
-    const cardTitle  = document.querySelector("#cardTitle");
-    const cardLesson = document.querySelector("#cardLesson");
+ /* -------- Titel: links Lektion + ID, rechts Leitner-Status -------- */
+const cardTitle = document.querySelector("#cardTitle");
+
+if (cardTitle) {
+    const p = ensureCardProgress(entry);
+    const ascii = getLeitnerAscii(p.box);
+
+    cardTitle.innerHTML = `
+        <span class="card-title-left">Lektion ${entry.id}</span>
+        <span class="card-title-right leitner-ascii">${ascii}</span>
+    `;
+}
 
   
 	if (cardTitle) {
