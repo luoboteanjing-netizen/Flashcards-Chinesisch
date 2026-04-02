@@ -818,22 +818,49 @@ function rate(mark) {
    – ID für Rate-Bar: #rateBar (klein) 
    – Null-Checks + Logs für Debug (entferne Logs nach Test!)
 ======================================================= */
+// Show Rating: Display flex + explizit sichtbar machen
+function showRatingButtons() {
+    const rateBar = $('.rating-container');  // FIX: Klasse statt ID (sicherer)
+    if (rateBar) {
+        rateBar.style.display = 'flex';
+        rateBar.style.opacity = '1';           // Explizit sichtbar (gegen CSS-Transition)
+        rateBar.style.height = 'auto';         // Lasse Inhalt bestimmen (vor Styling)
+        rateBar.style.overflow = 'visible';    // Zeige Buttons (gegen hidden)
+        console.log('Rate-Bar Selector (show):', rateBar);  // DEBUG: Sollte <div class="rating-container"> loggen
+    }
+    
+    // Styles setzen (Höhe, Abstand, Farben)
+    setUniformBarStyles('ratebar');
+}
 
+// Hide Rating: Smooth verstecken
+function hideRatingButtons() {
+    const rateBar = $('.rating-container');  // FIX: Klasse
+    if (rateBar) {
+        rateBar.style.display = 'none';        // Verstecken
+        console.log('Rate-Bar hidden');        // DEBUG
+    }
+    
+    // Smooth Hide (height=0 etc.)
+    hideBarSmooth('ratebar');
+}
+
+// Einheitliche Styles: Mit Klasse + expliziter Overflow/Height-Fix
 function setUniformBarStyles(barType) {
     let bar;
     
     if (barType === 'controls') {
-        bar = $('.card-controls');  // Container für Nav-Buttons
-        console.log('Controls-Bar Selector:', bar);  // DEBUG: Sollte Element loggen
+        bar = $('.card-controls');
+        console.log('Controls-Bar Selector:', bar);
     } else if (barType === 'ratebar') {
-        bar = $('#rateBar');  // FIX: Klein geschrieben – passe an HTML an!
-        console.log('Rate-Bar Selector:', bar);  // DEBUG: Wenn null → ID falsch!
+        bar = $('.rating-container');  // FIX: Klasse – passt zu HTML!
+        console.log('Rate-Bar Selector:', bar);  // DEBUG: Jetzt nicht null!
     } else {
-        return;  // Ungültig
+        return;
     }
     
     if (!bar) {
-        console.error('Bar nicht gefunden für:', barType);  // DEBUG
+        console.error('Bar nicht gefunden für:', barType);
         return;
     }
     
@@ -847,7 +874,7 @@ function setUniformBarStyles(barType) {
     const paddingH = isMobile ? 10 : 12;
     const gap = isMobile ? '2px' : '4px';
     
-    // Bar-Styles: Flex, Abstand, Höhe
+    // Bar: Flex + SICHTBARKEIT FIXEN (gegen overflow/opacity)
     bar.style.display = 'flex';
     bar.style.flexDirection = 'row';
     bar.style.justifyContent = 'space-evenly';
@@ -857,15 +884,18 @@ function setUniformBarStyles(barType) {
     bar.style.marginBottom = '12px';
     bar.style.padding = '0';
     bar.style.gap = gap;
-    bar.style.height = barHeight + 'px';
+    bar.style.height = barHeight + 'px';           // Explizit Höhe (gegen 0)
+    bar.style.minHeight = barHeight + 'px';        // Fallback
+    bar.style.overflow = 'visible';                // FIX: Buttons zeigen!
+    bar.style.opacity = '1';                       // Explizit sichtbar
     bar.style.position = 'relative';
     bar.style.transition = 'all 0.25s ease';
     bar.style.boxSizing = 'border-box';
-    bar.style.opacity = '1';  // Explizit sichtbar
+    bar.style.flexWrap = 'nowrap';                 // Kein Wrap (wie HTML)
     
-    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px');  // DEBUG
+    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px', 'Overflow:', bar.style.overflow);  // DEBUG
     
-    // Buttons stylen
+    // Buttons stylen (passt zu btn-good etc.)
     const buttons = bar.querySelectorAll('.btn');
     buttons.forEach(btn => {
         btn.style.flex = '1';
@@ -878,16 +908,17 @@ function setUniformBarStyles(barType) {
         btn.style.borderRadius = '8px';
         btn.style.whiteSpace = 'nowrap';
         btn.style.textAlign = 'center';
-        btn.style.overflow = 'hidden';
+        btn.style.overflow = 'visible';            // FIX: Text sichtbar
         btn.style.textOverflow = 'ellipsis';
         btn.style.boxSizing = 'border-box';
         btn.style.borderWidth = '1px';
         btn.style.minWidth = '0';
         btn.style.verticalAlign = 'middle';
         btn.style.transition = 'all 0.2s ease';
+        btn.style.opacity = '1';                   // Buttons explizit sichtbar
     });
     
-    // Farben
+    // Farben (übersteuert btn-good etc., aber konsistent)
     if (barType === 'controls') {
         const revealBtn = $('#btnReveal');
         if (revealBtn) {
@@ -897,6 +928,7 @@ function setUniformBarStyles(barType) {
             revealBtn.style.fontWeight = '700';
         }
     } else if (barType === 'ratebar') {
+        // Rating-Farben (passt zu Klassen btn-good/bad)
         const knownBtn = $('#btnRateKnown');
         if (knownBtn) {
             knownBtn.style.background = 'var(--good)';
@@ -918,16 +950,16 @@ function setUniformBarStyles(barType) {
     }
 }
 
-// Hide-Funktion: Smooth Verstecken
+// Smooth Hide: Mit Klasse + Transition
 function hideBarSmooth(barType) {
     let bar;
     if (barType === 'controls') {
         bar = $('.card-controls');
     } else if (barType === 'ratebar') {
-        bar = $('#rateBar');
+        bar = $('.rating-container');  // FIX: Klasse
     }
     if (!bar) {
-        console.error('Hide-Bar nicht gefunden für:', barType);  // DEBUG
+        console.error('Hide-Bar nicht gefunden für:', barType);
         return;
     }
     
@@ -938,10 +970,10 @@ function hideBarSmooth(barType) {
     bar.style.overflow = 'hidden';
     bar.style.transform = 'translateY(-4px)';
     bar.style.transition = 'all 0.25s ease';
+    bar.style.flexWrap = 'nowrap';  // Konsistent
     
     console.log('Bar versteckt:', barType);  // DEBUG
 }
-
 
 /* ============================ SESSION STATS ============================ */
 
