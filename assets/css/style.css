@@ -952,3 +952,13 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     padding-top: 14px;
     padding-bottom: 14px;
 }
+/* ============================================================
+   Navigationsbuttons: alle gleich fingerfreundlich
+   (inkl. Aufdecken)
+============================================================ */
+
+.card-controls .btn,
+#btnReveal {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+}
