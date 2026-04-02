@@ -946,9 +946,12 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     text-align: right !important;
     font-variant-numeric: tabular-nums; /* sorgt für perfekte Spaltenausrichtung */
 }
+
 /* ============================================================
    Navigation & Rating: gleicher Abstand zum Kartenrand oben
    ============================================================ */
 
 .card-controls,
-#rateBar
+#rateBar {
+    margin-top: 10px !important;   /* gewünschter Abstand */
+}
