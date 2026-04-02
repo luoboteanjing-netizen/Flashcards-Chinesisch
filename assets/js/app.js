@@ -525,19 +525,17 @@ function setCard(entry, fromHistory = false) {
     state.revealedAt = null;
 
     /* -------- Titel (Lektion / ID) -------- */
- /* -------- Titel: links Lektion + ID, rechts Leitner-Status -------- */
-const cardTitle = document.querySelector("#cardTitle");
+    const cardTitle  = document.querySelector("#cardTitle");
+    const cardLesson = document.querySelector("#cardLesson");
 
-if (cardTitle) {
-    const p = ensureCardProgress(entry);
-    const ascii = getLeitnerAscii(p.box);
+  
+	if (cardTitle) {
+		const p = ensureCardProgress(entry);
+		const ascii = getLeitnerAscii(p.box);
+		cardTitle.innerHTML = `Karte (ID ${entry.id}) <span class="leitner-ascii">${ascii}</span>`;
+	}
 
-    cardTitle.innerHTML = `
-        <span class="card-title-left">Lektion ${entry.id}</span>
-        <span class="card-title-right leitner-ascii">${ascii}</span>
-    `;
-}
-
+    if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
 // ----------------------------------------------------------
 // Fortschrittsbalken (Leitner) – von links nach rechts:
