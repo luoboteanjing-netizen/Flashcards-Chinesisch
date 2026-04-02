@@ -675,34 +675,37 @@ function doReveal() {
     state.revealedAt = Date.now();
 	
 	// =====================================================
-// LEITNER: Erste Sichtung → Box 0 → Box 1
-// =====================================================
-const p = ensureCardProgress(state.current);
-if (p.box === 0) {
-    p.box = 1;                 // neu → schwach
-    p.lastReview = Date.now();
-    saveProgress();
-    updateLessonStatsUI();
-}
+	// LEITNER: Erste Sichtung → Box 0 → Box 1
+	// =====================================================
+	const p = ensureCardProgress(state.current);
+	if (p.box === 0) {
+	    p.box = 1;                 // neu → schwach
+	    p.lastReview = Date.now();
+	    saveProgress();
+	    updateLessonStatsUI();
+	}
 
 	if (state.delayedSentenceTimer) {
-    clearTimeout(state.delayedSentenceTimer);
-    state.delayedSentenceTimer = null;
-}	
-    if (!state.autoplay.on) hideNavButtons();
+	    clearTimeout(state.delayedSentenceTimer);
+	    state.delayedSentenceTimer = null;
+	}
 	
-      // FIX: Smooth Hide der Controls-Bar (vor Ratebar-Show)
-        setTimeout(() => {
-            const controlsBar = $('.card-controls');
-            if (controlsBar) {
-                controlsBar.style.opacity = '0';
-                controlsBar.style.height = '0px';
-            }
-        }, 10);  // Kurze Verzögerung für Transition
-    }
-    showRatingButtons();
-    enableRating();
-    syncCardHeights();
+	if (!state.autoplay.on) {
+	    hideNavButtons();
+	    
+	    // FIX: Smooth Hide der Controls-Bar (vor Ratebar-Show)
+	    setTimeout(() => {
+	        const controlsBar = $('.card-controls');
+	        if (controlsBar) {
+	            controlsBar.style.opacity = '0';
+	            controlsBar.style.height = '0px';
+	        }
+	    }, 10);  // Kurze Verzögerung für Transition
+	}
+	
+	showRatingButtons();
+	enableRating();
+	syncCardHeights();
 }
 
 function showRatingButtons() {
