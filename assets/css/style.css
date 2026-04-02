@@ -944,3 +944,11 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     letter-spacing: 3px;      /* etwas mehr Luft zwischen Kästchen */
     line-height: 1;           /* verhindert vertikales Verrutschen */
 }
+/* ============================================================
+   Navigations-Buttons fingerfreundlicher machen
+   ============================================================ */
+
+.card-controls .btn {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
