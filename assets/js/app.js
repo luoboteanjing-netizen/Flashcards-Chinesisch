@@ -722,25 +722,32 @@ function hideRatingButtons() {
     hideBarSmooth('ratebar');
 }
 
-
-
+// Enable/Disable Rating: Mit Null-Checks (verhindert Klick-Errors)
 function enableRating() {
-    $("#btnRateKnown").disabled = false;
-    $("#btnRateUnsure").disabled = false;
-    $("#btnRateUnknown").disabled = false;
+    const known = $("#btnRateKnown");
+    const unsure = $("#btnRateUnsure");
+    const unknown = $("#btnRateUnknown");
+    
+    if (known) known.disabled = false;
+    if (unsure) unsure.disabled = false;
+    if (unknown) unknown.disabled = false;
+    
+    console.log('Rating enabled:', {known: !!known, unsure: !!unsure, unknown: !!unknown});  // DEBUG
 }
 
 function disableRating() {
-    $("#btnRateKnown").disabled = true;
-    $("#btnRateUnsure").disabled = true;
-    $("#btnRateUnknown").disabled = true;
+    const known = $("#btnRateKnown");
+    const unsure = $("#btnRateUnsure");
+    const unknown = $("#btnRateUnknown");
+    
+    if (known) known.disabled = true;
+    if (unsure) unsure.disabled = true;
+    if (unknown) unknown.disabled = true;
+    
+    console.log('Rating disabled');  // DEBUG
 }
 
-function rate(mark) {
-
-    if (!state.current) return;
-	
-	// =====================================================
+// =====================================================
 // LEITNER: Bewertung
 // =====================================================
 const p = ensureCardProgress(state.current);
@@ -812,14 +819,19 @@ function setUniformBarStyles(barType) {
     let bar;
     
     if (barType === 'controls') {
-        bar = $('.card-controls');  // Container für Nav-Buttons
+        bar = $('.card-controls');  // Container für Nav-Buttons (funktioniert schon)
+        console.log('Controls-Bar Selector:', bar);  // DEBUG: Sollte Element loggen
     } else if (barType === 'ratebar') {
-        bar = $('#rateBar');  // Deine ID aus dem Code
+        bar = $('#ratebar');  // FIX: Klein geschrieben – passe an dein HTML an!
+        console.log('Rate-Bar Selector:', bar);  // DEBUG: Wenn null → ID falsch!
     } else {
         return;  // Ungültig
     }
     
-    if (!bar) return;  // Nicht gefunden? Abbrechen
+    if (!bar) {
+        console.error('Bar nicht gefunden für:', barType);  // DEBUG: Zeigt Problem
+        return;  // Abbrechen, ohne Error
+    }
     
     // Mobile-Check (wie in Screenshots)
     const isMobile = window.innerWidth < 768;
@@ -845,6 +857,9 @@ function setUniformBarStyles(barType) {
     bar.style.position = 'relative';
     bar.style.transition = 'all 0.25s ease';    // Smooth Wechsel
     bar.style.boxSizing = 'border-box';
+    bar.style.opacity = '1';  // Explizit sichtbar machen (Fallback)
+    
+    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px');  // DEBUG: Bestätigung
     
     // Alle Buttons in der Bar: Feste Höhe (Controls dehnt sich!)
     const buttons = bar.querySelectorAll('.btn');
@@ -902,15 +917,18 @@ function setUniformBarStyles(barType) {
     }
 }
 
-// Hide-Funktion: Smooth Verstecken (height=0, opacity=0)
+// Hide-Funktion: Smooth Verstecken (height=0, opacity=0) – KORRIGIERT
 function hideBarSmooth(barType) {
     let bar;
     if (barType === 'controls') {
         bar = $('.card-controls');
     } else if (barType === 'ratebar') {
-        bar = $('#rateBar');
+        bar = $('#ratebar');  // FIX: Klein geschrieben
     }
-    if (!bar) return;
+    if (!bar) {
+        console.error('Hide-Bar nicht gefunden für:', barType);  // DEBUG
+        return;
+    }
     
     bar.style.opacity = '0';
     bar.style.height = '0px';
@@ -919,6 +937,8 @@ function hideBarSmooth(barType) {
     bar.style.overflow = 'hidden';
     bar.style.transform = 'translateY(-4px)';  // Leichter Slide-Up
     bar.style.transition = 'all 0.25s ease';
+    
+    console.log('Bar versteckt:', barType);  // DEBUG
 }
 
 
@@ -1586,6 +1606,8 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     state.pitchZh = state.settings.pitchZh;
 
     renderModeUI();
+	// FIX: Sofortiges Styling der Controls-Bar (vor Training, optional)
+	setUniformBarStyles('controls');  // Macht Nav-Bar gleich dick, auch disabled
 
     /* ============================================================
        CSV LADEN
