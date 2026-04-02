@@ -481,6 +481,27 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 4px;
 }
 
+/* ===============================================
+   6-Spalten-Layout (Lektion / Total / ✅ / 🤔️ / ❌ / %)
+================================================= */
+
+.lt-row {
+    display: grid;
+    grid-template-columns:
+        80px   /* Lektion */
+        40px   /* Total */
+        30px   /* strong (✅) */
+        30px   /* weak   (🤔️) */
+        30px   /* unknown (❌) */
+        40px;  /* % */
+    gap: 8px;
+    padding: 4px 6px;
+    font-size: 14px;
+    align-items: center;
+    background: var(--card);
+    border-radius: 6px;
+    cursor: pointer;
+}
 
 .lt-head {
     background: #283344;
@@ -539,19 +560,17 @@ html:not(.light) .lt-row.selected {
     display: grid;
     grid-template-columns:
         80px   /* Lektion */
-        35px   /* Karten */
-        35px   /* strong (✅) */
-        35px   /* weak   (🤔) */
-        35px;  /* unknown (❌) */
-
+        35px    /* Karten */
+        35px    /* ✅ */
+        35px    /* unsure */
+        35px;   /* weak */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
     align-items: center;
-    background: var(--card);
+    background: #1b2330;
     border-radius: 6px;
     cursor: pointer;
-	
 }
 
 /* ✅ Sticky Header oben fixiert */
