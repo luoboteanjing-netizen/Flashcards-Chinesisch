@@ -709,15 +709,15 @@ function doReveal() {
 }
 
 function showRatingButtons() {
-    const rateBar = $("#ratebar");  // FIX: Klein geschrieben für Konsistenz
+    const rateBar = $("#rateBar");  // FIX: Klein geschrieben für Konsistenz
     if (rateBar) rateBar.style.display = "flex";  // Null-Check
     
     // FIX: Setze einheitliche Styles (Höhe, Abstand, Flex, Farben)
-    setUniformBarStyles('ratebar');
+    setUniformBarStyles('rateBar');
 }
 
 function hideRatingButtons() {
-    const rateBar = $("#ratebar");  // FIX: Klein
+    const rateBar = $("#rateBar");  // FIX: Klein
     if (rateBar) rateBar.style.display = "none";  // Null-Check
     
     // FIX: Smooth hide für Ratebar
@@ -815,7 +815,7 @@ function rate(mark) {
 
 /* =======================================================
    JS-FIX: Einheitliche Controls- & Ratebar (Abstand 16px, Höhe 48px) – KORRIGIERT
-   – ID für Rate-Bar: #ratebar (klein) 
+   – ID für Rate-Bar: #rateBar (klein) 
    – Null-Checks + Logs für Debug (entferne Logs nach Test!)
 ======================================================= */
 
@@ -826,7 +826,7 @@ function setUniformBarStyles(barType) {
         bar = $('.card-controls');  // Container für Nav-Buttons
         console.log('Controls-Bar Selector:', bar);  // DEBUG: Sollte Element loggen
     } else if (barType === 'ratebar') {
-        bar = $('#ratebar');  // FIX: Klein geschrieben – passe an HTML an!
+        bar = $('#rateBar');  // FIX: Klein geschrieben – passe an HTML an!
         console.log('Rate-Bar Selector:', bar);  // DEBUG: Wenn null → ID falsch!
     } else {
         return;  // Ungültig
@@ -924,7 +924,7 @@ function hideBarSmooth(barType) {
     if (barType === 'controls') {
         bar = $('.card-controls');
     } else if (barType === 'ratebar') {
-        bar = $('#ratebar');
+        bar = $('#rateBar');
     }
     if (!bar) {
         console.error('Hide-Bar nicht gefunden für:', barType);  // DEBUG
