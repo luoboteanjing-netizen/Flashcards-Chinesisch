@@ -705,6 +705,11 @@ function doReveal() {
 	
 	showRatingButtons();
 	enableRating();
+	// ← Optional: Extra Force (falls showRatingButtons zu früh)
+setTimeout(() => {
+    forceRatingButtons();  // Sicherstellen nach full Render
+    console.log('doReveal: Extra forceRatingButtons – Buttons im Space?');
+}, 150);
 	
 	// FIX: syncCardHeights mit Delay (nach Styles, gegen Hängen)
 	setTimeout(() => {
@@ -750,16 +755,33 @@ function hideRatingButtons() {
     hideBarSmooth('ratebar');
 }
 
-// Enable/Disable Rating: Mit Null-Checks (verhindert Klick-Errors)
+// Enable/Disable Rating: Mit Null-Checks (verhindert Klick-Errors) – KORRIGIERT
 function enableRating() {
     const knownBtn = document.getElementById('btnRateKnown');
     const unsureBtn = document.getElementById('btnRateUnsure');
     const unknownBtn = document.getElementById('btnRateUnknown');
-    if (knownBtn) knownBtn.addEventListener('click', () => rateCard(1));  // Gewusst: Score 1
-    if (unsureBtn) unsureBtn.addEventListener('click', () => rateCard(0.5));  // Unsicher: Score 0.5
-    if (unknownBtn) unknownBtn.addEventListener('click', () => rateCard(0));  // Nicht gewusst: Score 0
     
-    console.log('enableRating: Buttons aktiviert & Events gesetzt');
+    // Events setzen (Strings für deine rate("known") Funktion)
+    if (knownBtn) {
+        knownBtn.addEventListener('click', () => {
+            stopAutoplayOnUserAction();  // Falls Autoplay läuft
+            rate("known");  // ← Fix: String statt Number (passt zu deiner rate-Funktion)
+        });
+    }
+    if (unsureBtn) {
+        unsureBtn.addEventListener('click', () => {
+            stopAutoplayOnUserAction();
+            rate("unsure");  // ← Fix
+        });
+    }
+    if (unknownBtn) {
+        unknownBtn.addEventListener('click', () => {
+            stopAutoplayOnUserAction();
+            rate("unknown");  // ← Fix
+        });
+    }
+    
+    console.log('enableRating: Events für rate("known"/"unsure"/"unknown") gesetzt');
 }
 
 function disableRating() {
@@ -845,46 +867,54 @@ function rate(mark) {
 ======================================================= */
 // Show Rating: Display flex + explizit sichtbar machen
 function showRatingButtons() {
-    const rateBar = $('.rating-container');  // FIX: Klasse statt ID (sicherer)
+    const rateBar = $('.rating-container');  // Dein Selector – falls HTML hat
     if (rateBar) {
         rateBar.style.display = 'flex';
-        rateBar.style.opacity = '1';           // Explizit sichtbar (gegen CSS-Transition)
-        rateBar.style.height = 'auto';         // Lasse Inhalt bestimmen (vor Styling)
-        rateBar.style.overflow = 'visible';    // Zeige Buttons (gegen hidden)
-        console.log('Rate-Bar Selector (show):', rateBar);  // DEBUG: Sollte <div class="rating-container"> loggen
+        rateBar.style.opacity = '1';
+        rateBar.style.height = 'auto';
+        rateBar.style.overflow = 'visible';
+        rateBar.style.zIndex = '10';
+        console.log('Rate-Bar (.rating-container) sichtbar gemacht');
+    } else {
+        console.log('Kein .rating-container gefunden – forceRatingButtons erstellt einen');
     }
     
-    // Styles setzen (Höhe, Abstand, Farben)
     setUniformBarStyles('ratebar');
-}
-
-// Hide Rating: Smooth verstecken
-function hideRatingButtons() {
-    const rateBar = $('.rating-container');  // FIX: Klasse
-    if (rateBar) {
-        rateBar.style.display = 'none';        // Verstecken
-        console.log('Rate-Bar hidden');        // DEBUG
-    }
     
-    // Smooth Hide (height=0 etc.)
-    hideBarSmooth('ratebar');
+    // Force Buttons sichtbar (integriert – erstellt Container/Buttons falls fehlend)
+    setTimeout(() => {
+        forceRatingButtons();  // ← Hier aufrufen: Macht 3 farbige Buttons im Space
+        console.log('forceRatingButtons nach Delay aufgerufen – Buttons farbig?');
+    }, 100);  // Etwas länger: Wartet auf DOM
+    
+    // Buttons explizit sichtbar (Fallback)
+    const buttons = document.querySelectorAll('.rating-container .btn, #btnRateKnown, #btnRateUnsure, #btnRateUnknown');
+    buttons.forEach(btn => {
+        btn.style.display = 'flex';
+        btn.style.opacity = '1';
+        btn.style.visibility = 'visible';
+        btn.style.position = 'relative';
+        btn.style.zIndex = '11';
+    });
+    console.log('Buttons nach Delay sichtbar (Fallback)');
 }
 
 // setUniformBarStyles: Buttons explizit sichtbar + Farben hardcode (falls --good fehlt)
 // Einheitliche Styles: Mit Null-Check für revealBtn + Button-Position-Fix
+// setUniformBarStyles: Buttons explizit sichtbar + Farben – KORRIGIERT (keine Duplikate)
 function setUniformBarStyles(barType) {
-    console.log('setUniformBarStyles aufgerufen mit barType:', barType);  // DEBUG: Case prüfen (ratebar vs. Ratebar?)
+    console.log('setUniformBarStyles aufgerufen mit barType:', barType);  // DEBUG
     
     let bar;
     
     if (barType === 'controls') {
         bar = $('.card-controls');
         console.log('Controls-Bar Selector:', bar);
-    } else if (barType === 'ratebar') {  // Case-sensitive – stelle sicher 'ratebar' klein
+    } else if (barType === 'ratebar') {
         bar = $('.rating-container');
         console.log('Rate-Bar Selector:', bar);
     } else {
-        console.error('Ungültiger barType:', barType);  // DEBUG
+        console.error('Ungültiger barType:', barType);
         return;
     }
     
@@ -893,7 +923,7 @@ function setUniformBarStyles(barType) {
         return;
     }
     
-    // Mobile-Check
+    // Mobile-Check (wie in deiner JS)
     const isMobile = window.innerWidth < 768;
     const marginTop = isMobile ? 12 : 16;
     const barHeight = isMobile ? 48 : 52;
@@ -903,7 +933,7 @@ function setUniformBarStyles(barType) {
     const paddingH = isMobile ? 10 : 12;
     const gap = isMobile ? '2px' : '4px';
     
-    // Bar: Sichtbar
+    // Bar: Sichtbar (wie in deiner JS)
     bar.style.display = 'flex';
     bar.style.flexDirection = 'row';
     bar.style.justifyContent = 'space-evenly';
@@ -922,13 +952,13 @@ function setUniformBarStyles(barType) {
     bar.style.boxSizing = 'border-box';
     bar.style.flexWrap = 'nowrap';
     bar.style.visibility = 'visible';
-    bar.style.zIndex = '10';  // FIX: Über andere Elemente
+    bar.style.zIndex = '10';
     
-    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px', 'Overflow:', bar.style.overflow);
+    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px');
     
-    // Buttons: Explizit sichtbar + Position (gegen CSS-Hide)
+    // Buttons: Explizit sichtbar (wie in deiner JS)
     const buttons = bar.querySelectorAll('.btn');
-    console.log('Gefundene Buttons:', buttons.length);  // DEBUG: 3?
+    console.log('Gefundene Buttons:', buttons.length);
     buttons.forEach((btn, index) => {
         btn.style.flex = '1';
         btn.style.height = btnHeight + 'px';
@@ -949,65 +979,59 @@ function setUniformBarStyles(barType) {
         btn.style.transition = 'all 0.2s ease';
         btn.style.opacity = '1';
         btn.style.visibility = 'visible';
-        btn.style.display = 'flex';  // FIX: Flex für Buttons (statt inline-flex)
-        btn.style.alignItems = 'center';  // Zentriert Text
+        btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
         btn.style.justifyContent = 'center';
-        btn.style.position = 'relative';  // FIX: Relativ, nicht absolute
-        btn.style.left = '0';             // FIX: Kein Offset
+        btn.style.position = 'relative';
+        btn.style.left = '0';
         btn.style.top = '0';
-        btn.style.zIndex = '11';          // FIX: Über Bar
-        btn.style.width = 'auto';         // FIX: Natürliche Breite
+        btn.style.zIndex = '11';
+        btn.style.width = 'auto';
         btn.style.backgroundColor = 'white';  // Fallback
         btn.style.color = 'black';
         btn.style.borderStyle = 'solid';
         btn.style.borderColor = '#ccc';
-        console.log(`Button ${index} gestylt: "${btn.textContent}" Opacity: ${btn.style.opacity}, Display: ${btn.style.display}`);  // DEBUG pro Button
+        console.log(`Button ${index} gestylt: "${btn.textContent}" Opacity: ${btn.style.opacity}`);
     });
     
-    // Rate-Bar Farben (wenn barType ratebar)
+    // Rate-Bar Farben (wie in deiner JS)
     if (barType === 'ratebar') {
         const knownBtn = $('#btnRateKnown');
         if (knownBtn) {
-            knownBtn.style.backgroundColor = '#4CAF50';  // Grün
+            knownBtn.style.backgroundColor = '#4CAF50';
             knownBtn.style.borderColor = '#4CAF50';
             knownBtn.style.color = 'white';
-            console.log('Bekannt-Button grün gesetzt');
+            console.log('Gewusst-Button grün gesetzt');
         }
         const unsureBtn = $('#btnRateUnsure');
         if (unsureBtn) {
-            unsureBtn.style.backgroundColor = '#FFEB3B';  // Gelb
+            unsureBtn.style.backgroundColor = '#FFEB3B';
             unsureBtn.style.borderColor = '#FFEB3B';
             unsureBtn.style.color = 'black';
             console.log('Unsicher-Button gelb gesetzt');
         }
         const unknownBtn = $('#btnRateUnknown');
         if (unknownBtn) {
-            unknownBtn.style.backgroundColor = '#F44336';  // Rot
+            unknownBtn.style.backgroundColor = '#F44336';
             unknownBtn.style.borderColor = '#F44336';
             unknownBtn.style.color = 'white';
-            console.log('Unknown-Button rot gesetzt');
+            console.log('Nicht-Button rot gesetzt');
         }
+        
+        // ← HIER: forceRatingButtons() aufrufen (einmalig, integriert)
+        forceRatingButtons();  // Macht Emojis/Text/Farben + Container-Fix
+        console.log('setUniformBarStyles: Rate-Bar uniform + forceRatingButtons aufgerufen');
     } 
-    // Controls Farben (nur wenn barType controls – mit Null-Check!)
+    // Controls (wie in deiner JS)
     else if (barType === 'controls') {
         const revealBtn = $('#btnReveal');
-        if (revealBtn) {  // FIX: Null-Check – verhindert Error!
+        if (revealBtn) {
             revealBtn.style.background = 'var(--accent)';
             revealBtn.style.borderColor = 'var(--accent)';
             revealBtn.style.color = 'var(--accent-text)';
             revealBtn.style.fontWeight = '700';
             console.log('Reveal-Button gestylt');
-        } else {
-            console.log('revealBtn null – skip Controls-Farben');  // DEBUG: Nach Hide normal
         }
-    }
-	if (barType === 'ratebar' || barType.includes('rate')) {
-        forceRatingButtons();  // ← Automatisch Buttons stylen
-        console.log('setUniformBarStyles: Rate-Bar uniform + farbig');
-    }
-	    if (barType === 'ratebar' || barType.includes('rate')) {
-        forceRatingButtons();  // ← Automatisch Buttons stylen
-        console.log('setUniformBarStyles: Rate-Bar uniform + farbig');
     }
 }
 
