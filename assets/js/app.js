@@ -669,6 +669,7 @@ function showNavButtons() {
 
 
 /* ============================ REVEAL / RATING ============================ */
+/* ============================ REVEAL / RATING ============================ */
 
 function doReveal() {
     $("#solBox").classList.remove("masked");
@@ -709,14 +710,16 @@ function doReveal() {
 }
 
 function showRatingButtons() {
-    $("#rateBar").style.display = "flex";
+    const rateBar = $("#ratebar");  // FIX: Klein geschrieben für Konsistenz
+    if (rateBar) rateBar.style.display = "flex";  // Null-Check
     
     // FIX: Setze einheitliche Styles (Höhe, Abstand, Flex, Farben)
     setUniformBarStyles('ratebar');
 }
 
 function hideRatingButtons() {
-    $("#rateBar").style.display = "none";
+    const rateBar = $("#ratebar");  // FIX: Klein
+    if (rateBar) rateBar.style.display = "none";  // Null-Check
     
     // FIX: Smooth hide für Ratebar
     hideBarSmooth('ratebar');
@@ -747,40 +750,43 @@ function disableRating() {
     console.log('Rating disabled');  // DEBUG
 }
 
-// =====================================================
-// LEITNER: Bewertung
-// =====================================================
-const p = ensureCardProgress(state.current);
+function rate(mark) {
+    if (!state.current) return;
+	
+	// =====================================================
+	// LEITNER: Bewertung
+	// =====================================================
+	const p = ensureCardProgress(state.current);
 
-// Falls die Karte noch nie gesehen wurde:
-if (p.box === 0) p.box = 1;
+	// Falls die Karte noch nie gesehen wurde:
+	if (p.box === 0) p.box = 1;
 
-// Bewertung anwenden:
-if (mark === "known") {
-    // richtig → bei erster Bewertung → Box 2
-    // danach normales Leitner: 2→3→4→5
-    if (p.box === 1) p.box = 2;
-    else p.box = Math.min(p.box + 1, 5);
+	// Bewertung anwenden:
+	if (mark === "known") {
+	    // richtig → bei erster Bewertung → Box 2
+	    // danach normales Leitner: 2→3→4→5
+	    if (p.box === 1) p.box = 2;
+	    else p.box = Math.min(p.box + 1, 5);
 
-    p.timesCorrect++;
-}
+	    p.timesCorrect++;
+	}
 
-else if (mark === "unsure") {
-    // unsicher → immer Box 2 oder 3
-    if (p.box < 2) p.box = 2;
-    else if (p.box === 2) p.box = 3;
-    p.timesWrong++;
-}
+	else if (mark === "unsure") {
+	    // unsicher → immer Box 2 oder 3
+	    if (p.box < 2) p.box = 2;
+	    else if (p.box === 2) p.box = 3;
+	    p.timesWrong++;
+	}
 
-else if (mark === "unknown") {
-    // falsch → zurück auf Box 1
-    p.box = 1;
-    p.timesWrong++;
-}
+	else if (mark === "unknown") {
+	    // falsch → zurück auf Box 1
+	    p.box = 1;
+	    p.timesWrong++;
+	}
 
-p.lastReview = Date.now();
-saveProgress();
-updateLessonStatsUI();
+	p.lastReview = Date.now();
+	saveProgress();
+	updateLessonStatsUI();
 
     state.session.done++;
 
@@ -807,140 +813,6 @@ updateLessonStatsUI();
 
     nextCard();
 }
-
-/* =======================================================
-   JS-FIX: Einheitliche Controls- & Ratebar (Abstand 16px, Höhe 48px)
-   – Inline-Styles beim Zeigen: Controls-Bar nicht flach, Ratebar nicht tiefer
-   – Aufruf: Aus showNavButtons() & showRatingButtons()
-   – Mobile: Automatisch anpassen (window.innerWidth < 768)
-======================================================= */
-
-function setUniformBarStyles(barType) {
-    let bar;
-    
-    if (barType === 'controls') {
-        bar = $('.card-controls');  // Container für Nav-Buttons (funktioniert schon)
-        console.log('Controls-Bar Selector:', bar);  // DEBUG: Sollte Element loggen
-    } else if (barType === 'ratebar') {
-        bar = $('#ratebar');  // FIX: Klein geschrieben – passe an dein HTML an!
-        console.log('Rate-Bar Selector:', bar);  // DEBUG: Wenn null → ID falsch!
-    } else {
-        return;  // Ungültig
-    }
-    
-    if (!bar) {
-        console.error('Bar nicht gefunden für:', barType);  // DEBUG: Zeigt Problem
-        return;  // Abbrechen, ohne Error
-    }
-    
-    // Mobile-Check (wie in Screenshots)
-    const isMobile = window.innerWidth < 768;
-    const marginTop = isMobile ? 12 : 16;  // Abstand zur SolBox
-    const barHeight = isMobile ? 48 : 52;  // Bar-Höhe (Buttons + Gap)
-    const btnHeight = isMobile ? 44 : 48;  // Button-Höhe
-    const fontSize = isMobile ? 12 : 13;
-    const lineHeight = isMobile ? 1.3 : 1.4;
-    const paddingH = isMobile ? 10 : 12;
-    const gap = isMobile ? '2px' : '4px';
-    
-    // Bar: Flex, Abstand, feste Höhe (gleich für beide!)
-    bar.style.display = 'flex';
-    bar.style.flexDirection = 'row';
-    bar.style.justifyContent = 'space-evenly';  // Gleichmäßiger Abstand
-    bar.style.alignItems = 'center';
-    bar.style.width = '100%';
-    bar.style.marginTop = marginTop + 'px';     // Gleich Abstand zur SolBox!
-    bar.style.marginBottom = '12px';
-    bar.style.padding = '0';
-    bar.style.gap = gap;
-    bar.style.height = barHeight + 'px';        // Feste Bar-Höhe (keine Variation)
-    bar.style.position = 'relative';
-    bar.style.transition = 'all 0.25s ease';    // Smooth Wechsel
-    bar.style.boxSizing = 'border-box';
-    bar.style.opacity = '1';  // Explizit sichtbar machen (Fallback)
-    
-    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px');  // DEBUG: Bestätigung
-    
-    // Alle Buttons in der Bar: Feste Höhe (Controls dehnt sich!)
-    const buttons = bar.querySelectorAll('.btn');
-    buttons.forEach(btn => {
-        btn.style.flex = '1';
-        btn.style.height = btnHeight + 'px';
-        btn.style.padding = '0 ' + paddingH + 'px';  // Nur horizontal
-        btn.style.margin = '0';
-        btn.style.fontSize = fontSize + 'px';
-        btn.style.fontWeight = '600';
-        btn.style.lineHeight = lineHeight;
-        btn.style.borderRadius = '8px';
-        btn.style.whiteSpace = 'nowrap';
-        btn.style.textAlign = 'center';
-        btn.style.overflow = 'hidden';
-        btn.style.textOverflow = 'ellipsis';  // Langer Text (z.B. "Nicht gekannt")
-        btn.style.boxSizing = 'border-box';
-        btn.style.borderWidth = '1px';
-        btn.style.minWidth = '0';
-        btn.style.verticalAlign = 'middle';
-        btn.style.transition = 'all 0.2s ease';
-    });
-    
-    // Spezielle Farben
-    if (barType === 'controls') {
-        // Reveal-Button (Accent-Farbe)
-        const revealBtn = $('#btnReveal');
-        if (revealBtn) {
-            revealBtn.style.background = 'var(--accent)';
-            revealBtn.style.borderColor = 'var(--accent)';
-            revealBtn.style.color = 'var(--accent-text)';
-            revealBtn.style.fontWeight = '700';
-        }
-        // Prev/Next: Neutral (aus CSS)
-    } else if (barType === 'ratebar') {
-        // Rating-Farben
-        const knownBtn = $('#btnRateKnown');
-        if (knownBtn) {
-            knownBtn.style.background = 'var(--good)';
-            knownBtn.style.borderColor = 'var(--good)';
-            knownBtn.style.color = 'var(--accent-text)';
-        }
-        const unsureBtn = $('#btnRateUnsure');
-        if (unsureBtn) {
-            unsureBtn.style.background = 'var(--unsure)';
-            unsureBtn.style.borderColor = 'var(--unsure)';
-            unsureBtn.style.color = 'var(--accent-text)';
-        }
-        const unknownBtn = $('#btnRateUnknown');
-        if (unknownBtn) {
-            unknownBtn.style.background = 'var(--bad)';
-            unknownBtn.style.borderColor = 'var(--bad)';
-            unknownBtn.style.color = 'var(--accent-text)';
-        }
-    }
-}
-
-// Hide-Funktion: Smooth Verstecken (height=0, opacity=0) – KORRIGIERT
-function hideBarSmooth(barType) {
-    let bar;
-    if (barType === 'controls') {
-        bar = $('.card-controls');
-    } else if (barType === 'ratebar') {
-        bar = $('#ratebar');  // FIX: Klein geschrieben
-    }
-    if (!bar) {
-        console.error('Hide-Bar nicht gefunden für:', barType);  // DEBUG
-        return;
-    }
-    
-    bar.style.opacity = '0';
-    bar.style.height = '0px';
-    bar.style.marginTop = '0px';
-    bar.style.marginBottom = '0px';
-    bar.style.overflow = 'hidden';
-    bar.style.transform = 'translateY(-4px)';  // Leichter Slide-Up
-    bar.style.transition = 'all 0.25s ease';
-    
-    console.log('Bar versteckt:', barType);  // DEBUG
-}
-
 
 /* ============================ SESSION STATS ============================ */
 
