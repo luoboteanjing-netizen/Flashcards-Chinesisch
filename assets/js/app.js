@@ -538,14 +538,6 @@ if (cardTitle) {
     `;
 }
 
-  
-	if (cardTitle) {
-		const p = ensureCardProgress(entry);
-		const ascii = getLeitnerAscii(p.box);
-		cardTitle.innerHTML = `Karte (ID ${entry.id}) <span class="leitner-ascii">${ascii}</span>`;
-	}
-
-    if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
 // ----------------------------------------------------------
 // Fortschrittsbalken (Leitner) – von links nach rechts:
