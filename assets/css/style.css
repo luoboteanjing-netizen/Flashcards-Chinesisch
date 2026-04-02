@@ -938,40 +938,9 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     color: var(--good);   /* grün */
     white-space: nowrap;
 }
-/* ============================================================
-   Kartentitel: links Titel, rechts Leitner-Status
-   ============================================================ */
-
-#cardTitle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.card-title-left {
-    font-weight: 700;
-}
-
-.card-title-right {
-    flex-shrink: 0;
-    text-align: right;
-}
-/* ============================================================
-   Kartentitel: echte Links-/Rechtsausrichtung
-   ============================================================ */
-
-#cardTitle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: left;         /* <— DAS ist der entscheidende Fix */
-}
-
-.card-title-left {
-    text-align: left;
-}
-
-.card-title-right {
-    text-align: right;
+/* Leitner-ASCII im Kartentitel größer darstellen */
+.leitner-ascii {
+    font-size: 18px;          /* vorher ca. 14px */
+    letter-spacing: 3px;      /* etwas mehr Luft zwischen Kästchen */
+    line-height: 1;           /* verhindert vertikales Verrutschen */
 }
