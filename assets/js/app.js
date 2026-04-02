@@ -467,6 +467,12 @@ function formatZh(hz, py) {
         : hz || "—";
 }
 
+function getLeitnerAscii(box) {
+    // Box 0–5 → 0–5 gefüllte Kästchen
+    const filled = Math.max(0, Math.min(box, 5));
+    return "■".repeat(filled) + "□".repeat(5 - filled);
+}
+
 /* ========================================================================== */
 /*                                ENDE TEIL 1                                 */
 /* ========================================================================== */
@@ -522,7 +528,13 @@ function setCard(entry, fromHistory = false) {
     const cardTitle  = document.querySelector("#cardTitle");
     const cardLesson = document.querySelector("#cardLesson");
 
-    if (cardTitle)  cardTitle.textContent  = `Karte (ID ${entry.id})`;
+  
+	if (cardTitle) {
+		const p = ensureCardProgress(entry);
+		const ascii = getLeitnerAscii(p.box);
+		cardTitle.innerHTML = `Karte (ID ${entry.id}) <span class="leitner-ascii">${ascii}</span>`;
+	}
+
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
 // ----------------------------------------------------------
