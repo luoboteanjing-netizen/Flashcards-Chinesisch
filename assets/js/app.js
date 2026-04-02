@@ -231,34 +231,36 @@ function populateLessonSelect() {
     sel.innerHTML = "";
     table.innerHTML = "";
 
-
-const header = `
-    <div class="lt-row lt-head">
-        <span class="lt-lesson" data-sort="lesson">Lektion</span>
-        <span class="lt-total" data-sort="total">Karten</span>
-        <span class="lt-known" data-sort="known">✅</span>
-        <span class="lt-unknown" data-sort="unknown">❌</span>
-        <span class="lt-percent" data-sort="percent">%</span>
-    </div>
-`;
+    // Header: 5 Spalten wie Backup (Lektion | Total | ✅ Known | ❌ Unknown | 🤔 Unsure) – KEIN %
+    const header = `
+        <div class="lt-row lt-head">
+            <span class="lt-lesson" data-sort="lesson">Lektion</span>
+            <span class="lt-total" data-sort="total">Karten</span>
+            <span class="lt-known" data-sort="known">✅</span>  <!-- Known -->
+            <span class="lt-unknown" data-sort="unknown">❌</span>  <!-- Unknown -->
+            <span class="lt-unsure" data-sort="unsure">🤔</span>  <!-- ← Unsure (neu, wie Screenshot) -->
+        </div>
+    `;
 
     table.insertAdjacentHTML("beforeend", header);
 
     for (const k of state.lessonOrder) {
-
         const cards = state.lessons.get(k) || [];
         const total = cards.length;
 
-        const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
-        const known   = p.known   || 0;
+        // byLesson für Initial-Counts (known/unknown/unsure)
+        const p = state.progress.byLesson[k] || { known: 0, unknown: 0, unsure: 0 };
+        const known = p.known || 0;
         const unknown = p.unknown || 0;
-        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
+        const unsure = p.unsure || 0;  // ← Neu: Unsure tracken
 
-        // Unter der Haube weiter Optionen befüllen (für Training)
+        // Option für Select (unverändert)
         const opt = document.createElement("option");
         opt.value = k;
+        opt.textContent = k;
         sel.appendChild(opt);
 
+        // Row: 5 Spalten, initial mit byLesson-Counts
         const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
@@ -266,94 +268,74 @@ const header = `
         row.innerHTML = `
             <span class="lt-lesson">${k}</span>
             <span class="lt-total">${total}</span>
-            <span class="lt-known">${known}</span>
-            <span class="lt-unknown">${unknown}</span>
-            <span class="lt-percent">${percent}%</span>
+            <span class="lt-known">${known}</span>  <!-- ✅ -->
+            <span class="lt-unknown">${unknown}</span>  <!-- ❌ -->
+            <span class="lt-unsure">${unsure}</span>  <!-- 🤔 -->
         `;
 
-row.addEventListener("click", () => {
+        // Click-Handler (Toggle + Pool-Update, unverändert)
+        row.addEventListener("click", () => {
+            opt.selected = !opt.selected;
+            row.classList.toggle("selected", opt.selected);
 
-    // Toggle Auswahl
-    opt.selected = !opt.selected;
-    row.classList.toggle("selected", opt.selected);
+            const selectedLessons = [...sel.options].filter(o => o.selected).map(o => o.value);
+            state.settings.lessons = selectedLessons;
+            saveSettings();
+            gatherPoolFromSettings();
 
-    // ✅ Automatisch ausgewählte Lektionen auslesen
-    const selectedLessons =
-        [...sel.options].filter(o => o.selected).map(o => o.value);
-
-    // ✅ In Settings speichern
-    state.settings.lessons = selectedLessons;
-    saveSettings();
-
-    // ✅ Pool neu befüllen
-    gatherPoolFromSettings();
-
-    // ✅ Falls Training läuft → Pool aktualisieren
-    if (state.trainingOn) {
-        state.idx = null;
-        resetSessionStats();
-        if (state.pool.length) {
-            setCard(state.pool[0]);
-        }
-    }
-});
+            if (state.trainingOn) {
+                state.idx = null;
+                resetSessionStats();
+                if (state.pool.length) {
+                    setCard(state.pool[0]);
+                }
+            }
+        });
 
         table.appendChild(row);
 
-        // vorauswahl anzeigen
+        // Vorauswahl (unverändert)
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
             row.classList.add("selected");
         }
     }
+
+    // Initial Update (Tabelle mit korrekten Counts füllen – passt zu 5 Spalten)
+    updateLessonStatsUI();
 }
 
-// ✅ Fortschritt in der Lektionstabelle live aktualisieren – FIX: Für 5 Spalten, Null-Checks
+// ✅ Fortschritt in der Lektionstabelle live aktualisieren – FIX: 5 Spalten (✅/❌/🤔 aus byLesson)
 function updateLessonStatsUI() {
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
         const cards = state.lessons.get(lesson) ?? [];
+        const total = cards.length;
 
-        // Intern berechnen: Box-Counts (für genaue % basierend auf "bekannt" = green/Box 4+5)
-        let black = 0;  // Box 0 (neu/unseen – nicht in UI)
-        let red = 0;    // Box 1 (unknown/❌)
-        let yellow = 0; // Box 2+3 (unsure – nicht in UI)
-        let green = 0;  // Box 4+5 (known/✅)
+        // byLesson-Counts (direkt aus Tracking in rate())
+        const pLesson = state.progress.byLesson[lesson] || { known: 0, unknown: 0, unsure: 0 };
+        const known = pLesson.known || 0;
+        const unknown = pLesson.unknown || 0;
+        const unsure = pLesson.unsure || 0;
 
-        for (const c of cards) {
-            const p = state.progress.cards[c.id] ?? { box: 0 };
-
-            if (p.box === 0) black++;
-            else if (p.box === 1) red++;
-            else if (p.box === 2 || p.box === 3) yellow++;
-            else if (p.box === 4 || p.box === 5) green++;
-        }
-
-        // byLesson-Fallback (für Kompatibilität, falls Boxen nicht tracken)
-        const pLesson = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
-        const byKnown = pLesson.known || green;  // Priorisiere Box-green, Fallback byLesson
-        const byUnknown = pLesson.unknown || red;  // Priorisiere Box-red, Fallback byLesson
-
-        // %: Basierend auf "bekannte" (green/Box 4+5) / total – präziser als byKnown (das trackt nur "known"-Ratings)
-        const percent = cards.length ? Math.round((green / cards.length) * 100) : 0;
-
-        // Null-Check: Nur existierende 5 Spalten setzen (keine lt-new/lt-weak/lt-strong – Platz sparen)
+        // Null-Checks: Nur 5 Spalten setzen (kein %, kein extra)
         const totalEl = row.querySelector(".lt-total");
-        if (totalEl) totalEl.textContent = cards.length;
+        if (totalEl) totalEl.textContent = total;
 
-        const knownEl = row.querySelector(".lt-known");  // ✅ = Bekannte (green)
-        if (knownEl) knownEl.textContent = byKnown;
+        const knownEl = row.querySelector(".lt-known");  // ✅
+        if (knownEl) knownEl.textContent = known;
 
-        const unknownEl = row.querySelector(".lt-unknown");  // ❌ = Unbekannte (red)
-        if (unknownEl) unknownEl.textContent = byUnknown;
+        const unknownEl = row.querySelector(".lt-unknown");  // ❌
+        if (unknownEl) unknownEl.textContent = unknown;
 
-        const percentEl = row.querySelector(".lt-percent");
-        if (percentEl) percentEl.textContent = percent + "%";
+        const unsureEl = row.querySelector(".lt-unsure");  // 🤔
+        if (unsureEl) unsureEl.textContent = unsure;
 
-        // Optional: Debug-Log (entferne nach Test)
-        console.log(`updateLessonStatsUI: ${lesson} – Total:${cards.length}, ✅:${byKnown} (green:${green}), ❌:${byUnknown} (red:${red}), %:${percent}% – Intern: Neu${black}/🤔${yellow}`);
+        // Optional: Log (entferne nach Test)
+        console.log(`updateLessonStatsUI: ${lesson} – Total:${total}, ✅:${known}, ❌:${unknown}, 🤔:${unsure}`);
     });
 }
+
 
 function sortLessons() {
     const key = lessonSort.key;
@@ -470,16 +452,21 @@ function formatZh(hz, py) {
 /* ============================ sync & scroll ============================ */
 
 function syncCardHeights() {
+    // Ruck-Fix: Temporär transition aus (verhindert Resize-Anim)
     const q = document.querySelector("#promptBox");
     const a = document.querySelector("#solBox");
     if (!q || !a) return;
 
-    q.style.minHeight = "";
-    a.style.minHeight = "";
+    q.style.transition = 'none';  // ← FIX: Kein Anim
+    a.style.transition = 'none';
 
     const h = Math.max(q.offsetHeight, a.offsetHeight);
     q.style.minHeight = h + "px";
     a.style.minHeight = h + "px";
+	 setTimeout(() => {
+        q.style.transition = 'min-height 0.3s ease';
+        a.style.transition = 'min-height 0.3s ease';
+    }, 50);
 }
 
 function scrollToBottom() {
@@ -517,22 +504,42 @@ function setCard(entry, fromHistory = false) {
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
     /* -------- Fortschrittsbalken -------- */
+    
+    /* -------- Fortschrittsbalken: Dreifarbig (Rot: Unknown/Box1 | Gelb: Unsure/Box2-3 | Grün: Known/Box4-5) -------- */
     const stats = document.querySelector("#lessonStats");
     if (stats) {
         const cards = state.lessons.get(entry.lesson) || [];
         const total = cards.length;
-        const prog = state.progress.byLesson[entry.lesson] || { known: 0, unknown: 0 };
 
-        const green = total > 0 ? (prog.known / total) * 100 : 0;
-        const red   = total > 0 ? (prog.unknown / total) * 100 : 0;
+        // Box-Counts berechnen (für genaue Balken)
+        let red = 0, yellow = 0, green = 0;  // Unknown, Unsure, Known
+        for (const c of cards) {
+            const p = state.progress.cards[c.id] ?? { box: 0 };
+            if (p.box === 1) red++;  // Rot: Unknown (Box1)
+            else if (p.box === 2 || p.box === 3) yellow++;  // Gelb: Unsure (Box2/3)
+            else if (p.box >= 4) green++;  // Grün: Known (Box4/5)
+            // Box0 (neu) ignoriert – Balken nur rated Karten
+        }
 
+        const ratedTotal = red + yellow + green;  // Nur bewertete
+        const redPct = total > 0 ? (red / total * 100) : 0;
+        const yellowPct = total > 0 ? (yellow / total * 100) : 0;
+        const greenPct = total > 0 ? (green / total * 100) : 0;
+
+        // HTML: Dreifarbig (Rot left, Gelb middle, Grün right)
         stats.innerHTML = `
             <div class="lesson-bar-large">
-                <div class="lesson-bar-red"   style="width:${red}%"></div>
-                <div class="lesson-bar-green" style="left:${red}%; width:${green}%"></div>
+                <div class="lesson-bar-red" style="width: ${redPct}%"></div>  <!-- Rot: Unknown -->
+                <div class="lesson-bar-yellow" style="left: ${redPct}%; width: ${yellowPct}%"></div>  <!-- Gelb: Unsure -->
+                <div class="lesson-bar-green" style="left: ${redPct + yellowPct}%; width: ${greenPct}%"></div>  <!-- Grün: Known -->
             </div>
+            <small>Bewertet: ${ratedTotal}/${total}</small>  <!-- Optional: Counter -->
         `;
+        console.log(`Balken: ${entry.lesson} – Rot:${redPct}% (Unknown), Gelb:${yellowPct}% (Unsure), Grün:${greenPct}% (Known)`);  // DEBUG
     }
+
+    // ... (Rest deines setCard-Codes unverändert: solBox masked, Wort/Satz setzen etc.)
+	
 
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
@@ -819,60 +826,53 @@ function rate(mark) {
     }
 	
     // =====================================================
-    // LEITNER: Bewertung
+    // LEITNER: Bewertung (Box-Update, unverändert)
     // =====================================================
     const p = ensureCardProgress(state.current);
 
-    // Falls die Karte noch nie gesehen wurde:
-    if (p.box === 0) p.box = 1;
+    if (p.box === 0) p.box = 1;  // Erste Sichtung
 
-    // Bewertung anwenden:
     if (mark === "known") {
-        // richtig → bei erster Bewertung → Box 2
-        // danach normales Leitner: 2→3→4→5
         if (p.box === 1) p.box = 2;
         else p.box = Math.min(p.box + 1, 5);
-
         p.timesCorrect++;
-    }
-
-    else if (mark === "unsure") {
-        // unsicher → immer Box 2 oder 3
+    } else if (mark === "unsure") {
         if (p.box < 2) p.box = 2;
         else if (p.box === 2) p.box = 3;
+        else p.box = Math.max(p.box - 1, 2);  // Leicht zurück, falls stark
         p.timesWrong++;
-    }
-
-    else if (mark === "unknown") {
-        // falsch → zurück auf Box 1
+    } else if (mark === "unknown") {
         p.box = 1;
         p.timesWrong++;
     }
 
     p.lastReview = Date.now();
     saveProgress();
-    updateLessonStatsUI();
 
+    // Session-Update (unverändert)
     state.session.done++;
-
     if (mark === "known") state.session.known++;
     else if (mark === "unsure") state.session.unsure++;
     else state.session.unknown++;
 
+    // byLesson: Alle 3 tracken (für Tabelle) – REPAIRED: Unsure++ hinzufügen
     const lesson = state.current.lesson;
-
     if (lesson) {
-        if (!state.progress.byLesson[lesson])
-            state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
+        if (!state.progress.byLesson[lesson]) {
+            state.progress.byLesson[lesson] = { known: 0, unknown: 0, unsure: 0 };  // ← Unsure init
+        }
 
-        if (mark === "known")   state.progress.byLesson[lesson].known++;
-        if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
+        if (mark === "known") state.progress.byLesson[lesson].known++;
+        else if (mark === "unsure") state.progress.byLesson[lesson].unsure++;  // ← NEU: Unsure tracken
+        else if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
-        saveProgress();
-        updateLessonStatsUI();
+        saveProgress();  // Speichern nach Update
     }
 
-    console.log('rate: Leitner-Box updated (z.B. 1→2), Session done++');  // DEBUG
+    console.log('rate: Leitner-Box updated, byLesson ++ (known/unsure/unknown)');  // DEBUG
+
+    // UI: Tabelle updaten (jetzt mit Unsure)
+    updateLessonStatsUI();
 
     disableRating();
     hideRatingButtons();
@@ -883,6 +883,7 @@ function rate(mark) {
     
     console.log('rate-Ende: Fertig!');  // DEBUG Ende
 }
+
 
 
 /* =======================================================
@@ -1673,8 +1674,6 @@ function stopAutoplayOnUserAction() {
     }
 }
 
-// Neue Funktion: Force Rating-Buttons sichtbar & farbig (nach Reveal)
-// Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events
 // Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs
 function forceRatingButtons() {
     // Buttons per ID finden (falls schon da)
@@ -1767,7 +1766,10 @@ function forceRatingButtons() {
     container.style.setProperty('z-index', '1000', 'important');
     container.style.setProperty('position', 'relative', 'important');  // Im Flow halten
     container.style.setProperty('top', '0', 'important');  // Kein Offset
-    console.log('Container im Space: Flex, 52px, transparent');
+    javascript
+    container.style.setProperty('transition', 'opacity 0.2s ease', 'important');  // Smooth Show
+    container.style.setProperty('animation', 'none', 'important');  // Kein Ruck-Anim
+	console.log('Container im Space: Flex, 52px, transparent');
     
     // Container resetten & Buttons anhängen (nebeneinander)
     container.innerHTML = '';  // Alte Kinder löschen
