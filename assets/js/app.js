@@ -752,15 +752,14 @@ function hideRatingButtons() {
 
 // Enable/Disable Rating: Mit Null-Checks (verhindert Klick-Errors)
 function enableRating() {
-    const known = $("#btnRateKnown");
-    const unsure = $("#btnRateUnsure");
-    const unknown = $("#btnRateUnknown");
+    const knownBtn = document.getElementById('btnRateKnown');
+    const unsureBtn = document.getElementById('btnRateUnsure');
+    const unknownBtn = document.getElementById('btnRateUnknown');
+    if (knownBtn) knownBtn.addEventListener('click', () => rateCard(1));  // Gewusst: Score 1
+    if (unsureBtn) unsureBtn.addEventListener('click', () => rateCard(0.5));  // Unsicher: Score 0.5
+    if (unknownBtn) unknownBtn.addEventListener('click', () => rateCard(0));  // Nicht gewusst: Score 0
     
-    if (known) known.disabled = false;
-    if (unsure) unsure.disabled = false;
-    if (unknown) unknown.disabled = false;
-    
-    console.log('Rating enabled:', {known: !!known, unsure: !!unsure, unknown: !!unknown});  // DEBUG
+    console.log('enableRating: Buttons aktiviert & Events gesetzt');
 }
 
 function disableRating() {
@@ -1001,6 +1000,14 @@ function setUniformBarStyles(barType) {
         } else {
             console.log('revealBtn null – skip Controls-Farben');  // DEBUG: Nach Hide normal
         }
+    }
+	if (barType === 'ratebar' || barType.includes('rate')) {
+        forceRatingButtons();  // ← Automatisch Buttons stylen
+        console.log('setUniformBarStyles: Rate-Bar uniform + farbig');
+    }
+	    if (barType === 'ratebar' || barType.includes('rate')) {
+        forceRatingButtons();  // ← Automatisch Buttons stylen
+        console.log('setUniformBarStyles: Rate-Bar uniform + farbig');
     }
 }
 
@@ -1615,6 +1622,112 @@ function stopAutoplayOnUserAction() {
         state.autoplay.timers.forEach(id => clearTimeout(id));
         state.autoplay.timers = [];
     }
+}
+
+// Neue Funktion: Force Rating-Buttons sichtbar & farbig (nach Reveal)
+function forceRatingButtons() {
+    // Buttons per ID finden
+    const knownBtn = document.getElementById('btnRateKnown');
+    const unsureBtn = document.getElementById('btnRateUnsure');
+    const unknownBtn = document.getElementById('btnRateUnknown');
+    
+    const buttons = [knownBtn, unsureBtn, unknownBtn].filter(btn => btn);
+    if (buttons.length !== 3) {
+        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – prüfe enableRating() oder HTML');
+        return;
+    }
+    
+    // Nesting fixen (falls Buttons verschachtelt sind, z.B. durch alten Test)
+    buttons.forEach(btn => {
+        if (btn.parentElement && btn.parentElement.tagName === 'BUTTON') {
+            const grandparent = btn.parentElement.parentElement;
+            if (grandparent) {
+                grandparent.appendChild(btn);
+                console.log('Nesting gefixt für', btn.id);
+            }
+        }
+        // Text bereinigen (Emojis + Text, keine Nested-HTML)
+        btn.innerHTML = btn.innerHTML.replace(/<[^>]*>.*?<\/[^>]*>/gi, '').trim();
+        console.log('Text gefixt:', btn.textContent.trim());
+    });
+    
+    // Container finden (dein Rate-Bar-Container, z.B. #ratebar oder .rating-container)
+    let container = document.querySelector('#ratebar, .rating-container, .bar.rate-bar') || buttons[0].closest('#card') || buttons[0].parentElement;
+    
+    // Falls kein guter Container: Neuen erstellen und anhängen (an #card oder body)
+    if (!container || container.style.display === 'none') {
+        container = document.createElement('div');
+        container.id = 'rate-container-forced';
+        container.className = 'bar rate-bar';
+        const card = document.querySelector('#card') || document.body;
+        card.appendChild(container);  // Anhängen unter der Karte
+        console.log('Neuer Container erstellt: #rate-container-forced');
+    }
+    
+    // Container sichtbar machen (flex für Buttons nebeneinander)
+    container.style.setProperty('display', 'flex', 'important');
+    container.style.setProperty('flex-direction', 'row', 'important');
+    container.style.setProperty('justify-content', 'space-around', 'important');
+    container.style.setProperty('align-items', 'center', 'important');
+    container.style.setProperty('width', '100%', 'important');
+    container.style.setProperty('height', '52px', 'important');  // Deine Bar-Höhe
+    container.style.setProperty('margin', '16px 0', 'important');
+    container.style.setProperty('padding', '4px', 'important');
+    container.style.setProperty('background-color', 'transparent', 'important');  // Oder 'lightblue' für Test
+    container.style.setProperty('border', 'none', 'important');  // Dein Style
+    container.style.setProperty('opacity', '1', 'important');
+    container.style.setProperty('visibility', 'visible', 'important');
+    container.style.setProperty('z-index', '1000', 'important');
+    
+    // Container resetten & Buttons anhängen (nebeneinander)
+    container.innerHTML = '';
+    buttons.forEach(btn => container.appendChild(btn));
+    
+    // Buttons stylen (sichtbar, farbig, deine Uniform-Styles)
+    const buttonConfigs = [
+        { id: 'btnRateKnown', text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 1 },
+        { id: 'btnRateUnsure', text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 0.5 },
+        { id: 'btnRateUnknown', text: '❌ Nicht gewusst', bg: '#F44336', color: 'white', score: 0 }
+    ];
+    
+    buttons.forEach((btn, i) => {
+        const config = buttonConfigs[i];
+        btn.innerHTML = config.text;  // Text mit Emoji setzen
+        btn.removeAttribute('style');  // Alte Styles löschen
+        btn.disabled = false;
+        btn.classList.remove('disabled', 'hidden', 'invisible', 'masked');
+        btn.classList.add('btn', 'rate', i === 0 ? 'good' : i === 1 ? 'unsure' : 'bad');
+        
+        // Deine Uniform-Bar-Styles (falls du setUniformBarStyles hast – anpassen!)
+        if (typeof setUniformBarStyles === 'function') {
+            setUniformBarStyles('ratebar');  // Rufe deine Funktion für Buttons
+        }
+        
+        // Force-Styles (sichtbar & farbig)
+        btn.style.setProperty('display', 'flex', 'important');
+        btn.style.setProperty('align-items', 'center', 'important');
+        btn.style.setProperty('justify-content', 'center', 'important');
+        btn.style.setProperty('position', 'relative', 'important');
+        btn.style.setProperty('flex', '1', 'important');
+        btn.style.setProperty('min-width', '80px', 'important');
+        btn.style.setProperty('height', '48px', 'important');  // Passe an deine Höhe an
+        btn.style.setProperty('margin', '0 4px', 'important');
+        btn.style.setProperty('padding', '8px', 'important');
+        btn.style.setProperty('border', '1px solid', 'important');  // Dein Border
+        btn.style.setProperty('border-radius', '4px', 'important');
+        btn.style.setProperty('font-size', '14px', 'important');
+        btn.style.setProperty('font-weight', 'bold', 'important');
+        btn.style.setProperty('cursor', 'pointer', 'important');
+        btn.style.setProperty('background-color', config.bg, 'important');
+        btn.style.setProperty('color', config.color, 'important');
+        btn.style.setProperty('opacity', '1', 'important');
+        btn.style.setProperty('visibility', 'visible', 'important');
+        btn.style.setProperty('z-index', '1001', 'important');
+        
+        console.log(`${config.text} gestylt: Farbig & sichtbar!`);
+    });
+    
+    console.log('forceRatingButtons: Erfolgreich – 3 Buttons im Container!');
 }
 
 
