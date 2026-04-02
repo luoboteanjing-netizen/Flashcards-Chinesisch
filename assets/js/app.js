@@ -22,7 +22,8 @@ const csvParam = params.get("csv");
 // Sonst → Standarddatei verwenden
 const CSV_URL = csvParam 
     ? `./data/${csvParam}`
-    : "./data/Long-Chinesisch_Lektionen.csv";
+    : "./data/HSK-Chinesisch_Lektionen.csv",
+	  "./data/Long-Chinesisch_Lektionen.csv";
 
 const LS_KEYS = {
     settings: "fc_settings_v1",
