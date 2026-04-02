@@ -22,7 +22,7 @@ const csvParam = params.get("csv");
 // Sonst → Standarddatei verwenden
 const CSV_URL = csvParam 
     ? `./data/${csvParam}`
-    : "./data/Long-Chinesisch_Lektionen.csv";
+    : "./data/HSK-Chinesisch_Lektionen.csv";
 
 const LS_KEYS = {
     settings: "fc_settings_v1",
@@ -54,8 +54,8 @@ const state = {
     historyPos: -1,
 
     current: null,
-    delayedSentenceTimer: null,
-    sentenceDelay: 3000,  // in Millisekunden
+	delayedSentenceTimer: null,
+	sentenceDelay: 3000,  // in Millisekunden
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -175,6 +175,7 @@ async function loadCSV() {
 }
 
 function parseCSV(text) {
+
     state.lessons.clear();
     state.lessonOrder = [];
 
@@ -182,6 +183,7 @@ function parseCSV(text) {
     if (lines.length < 2) return;
 
     for (let i = 1; i < lines.length; i++) {
+
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
 
@@ -229,36 +231,34 @@ function populateLessonSelect() {
     sel.innerHTML = "";
     table.innerHTML = "";
 
-    // Header: 5 Spalten wie Backup (Lektion | Total | ✅ Known | ❌ Unknown | 🤔 Unsure) – KEIN %
-    const header = `
-        <div class="lt-row lt-head">
-            <span class="lt-lesson" data-sort="lesson">Lektion</span>
-            <span class="lt-total" data-sort="total">Karten</span>
-            <span class="lt-known" data-sort="known">✅</span>  <!-- Known -->
-            <span class="lt-unknown" data-sort="unknown">❌</span>  <!-- Unknown -->
-            <span class="lt-unsure" data-sort="unsure">🤔</span>  <!-- ← Unsure (neu, wie Screenshot) -->
-        </div>
-    `;
+
+const header = `
+    <div class="lt-row lt-head">
+        <span class="lt-lesson" data-sort="lesson">Lektion</span>
+        <span class="lt-total" data-sort="total">Karten</span>
+        <span class="lt-strong"  data-sort="strong">✅</span>    <!-- Box 4+5 -->
+        <span class="lt-weak"    data-sort="weak">🤔</span>      <!-- Box 2+3 -->
+		<span class="lt-unknown" data-sort="unknown">❌</span>   <!-- Box 1 -->
+	</div>
+`;
 
     table.insertAdjacentHTML("beforeend", header);
 
     for (const k of state.lessonOrder) {
+
         const cards = state.lessons.get(k) || [];
         const total = cards.length;
 
-        // byLesson für Initial-Counts (known/unknown/unsure)
-        const p = state.progress.byLesson[k] || { known: 0, unknown: 0, unsure: 0 };
-        const known = p.known || 0;
+        const p = state.progress.byLesson[k] || { known: 0, unknown: 0 };
+        const known   = p.known   || 0;
         const unknown = p.unknown || 0;
-        const unsure = p.unsure || 0;  // ← Neu: Unsure tracken
+        const percent = total > 0 ? Math.round((known / total) * 100) : 0;
 
-        // Option für Select (unverändert)
+        // Unter der Haube weiter Optionen befüllen (für Training)
         const opt = document.createElement("option");
         opt.value = k;
-        opt.textContent = k;
         sel.appendChild(opt);
 
-        // Row: 5 Spalten, initial mit byLesson-Counts
         const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
@@ -266,104 +266,71 @@ function populateLessonSelect() {
         row.innerHTML = `
             <span class="lt-lesson">${k}</span>
             <span class="lt-total">${total}</span>
-            <span class="lt-known">${known}</span>  <!-- ✅ -->
-            <span class="lt-unknown">${unknown}</span>  <!-- ❌ -->
-            <span class="lt-unsure">${unsure}</span>  <!-- 🤔 -->
+			<span class="lt-strong">0</span>
+			<span class="lt-weak">0</span>
+			<span class="lt-unknown">0</span>
         `;
 
-        // ← NEU: Rechtsbündig für Zahlen + Abstände (fallback, falls CSS fehlt)
-        const spans = row.querySelectorAll('span');
-        if (spans.length >= 5) {
-            spans[0].style.setProperty('text-align', 'left', 'important');  // Lektion: Links
-            spans[0].style.setProperty('flex', '1', 'important');  // Breiter für Text
-            spans[1].style.setProperty('text-align', 'right', 'important');  // Total: Rechts
-            spans[1].style.setProperty('flex', '0.8', 'important');  // Enger
-            for (let i = 2; i < spans.length; i++) {  // ✅/❌/🤔: Rechtsbündig, gleich breit
-                spans[i].style.setProperty('text-align', 'right', 'important');
-                spans[i].style.setProperty('flex', '0.6', 'important');  // Abstände: Gleich/eng
-                spans[i].style.setProperty('padding-right', '8px', 'important');  // Padding für Lesbarkeit
-                spans[i].style.setProperty('font-family', 'monospace', 'important');  // Zahlen fixed-width
-            }
-            row.style.setProperty('justify-content', 'space-between', 'important');  // Abstände: Even
-            row.style.setProperty('gap', '4px', 'important');  // Kleiner Gap
+row.addEventListener("click", () => {
+
+    // Toggle Auswahl
+    opt.selected = !opt.selected;
+    row.classList.toggle("selected", opt.selected);
+
+    // ✅ Automatisch ausgewählte Lektionen auslesen
+    const selectedLessons =
+        [...sel.options].filter(o => o.selected).map(o => o.value);
+
+    // ✅ In Settings speichern
+    state.settings.lessons = selectedLessons;
+    saveSettings();
+
+    // ✅ Pool neu befüllen
+    gatherPoolFromSettings();
+
+    // ✅ Falls Training läuft → Pool aktualisieren
+    if (state.trainingOn) {
+        state.idx = null;
+        resetSessionStats();
+        if (state.pool.length) {
+            setCard(state.pool[0]);
         }
-
-        // Click-Handler: Vollständig (Toggle + Pool-Update, aus vorheriger Version)
-        row.addEventListener("click", () => {
-            opt.selected = !opt.selected;
-            row.classList.toggle("selected", opt.selected);
-
-            // Automatisch ausgewählte Lektionen auslesen
-            const selectedLessons = [...sel.options].filter(o => o.selected).map(o => o.value);
-
-            // In Settings speichern
-            state.settings.lessons = selectedLessons;
-            saveSettings();
-
-            // Pool neu befüllen
-            gatherPoolFromSettings();
-
-            // Falls Training läuft → Pool aktualisieren
-            if (state.trainingOn) {
-                state.idx = null;
-                resetSessionStats();
-                if (state.pool.length) {
-                    setCard(state.pool[0]);
-                }
-            }
-        });
+    }
+});
 
         table.appendChild(row);
 
-        // Vorauswahl anzeigen
+        // vorauswahl anzeigen
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
             row.classList.add("selected");
         }
     }
-
-    // Initial Update (Tabelle mit korrekten Counts füllen – passt zu 5 Spalten)
-    updateLessonStatsUI();
 }
 
-// ✅ Fortschritt in der Lektionstabelle live aktualisieren – FIX: 5 Spalten (✅/❌/🤔 aus byLesson)
+// ✅ Fortschritt in der Lektionstabelle live aktualisieren
+
 function updateLessonStatsUI() {
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
         const cards = state.lessons.get(lesson) ?? [];
-        const total = cards.length;
 
-        // byLesson-Counts (direkt aus Tracking in rate())
-        const pLesson = state.progress.byLesson[lesson] || { known: 0, unknown: 0, unsure: 0 };
-        const known = pLesson.known || 0;
-        const unknown = pLesson.unknown || 0;
-        const unsure = pLesson.unsure || 0;
+        let red = 0;      // Box 1 (falsch/schwach)
+        let yellow = 0;   // Box 2 + 3 (unsicher)
+        let green = 0;    // Box 4 + 5 (sicher)
 
-        // Null-Checks: Nur 5 Spalten setzen (kein %, kein extra)
-        const totalEl = row.querySelector(".lt-total");
-        if (totalEl) totalEl.textContent = total;
+        for (const c of cards) {
+            const p = state.progress.cards[c.id] ?? { box: 0 };
 
-        const knownEl = row.querySelector(".lt-known");  // ✅
-        if (knownEl) knownEl.textContent = known;
-
-        const unknownEl = row.querySelector(".lt-unknown");  // ❌
-        if (unknownEl) unknownEl.textContent = unknown;
-
-        const unsureEl = row.querySelector(".lt-unsure");  // 🤔
-        if (unsureEl) unsureEl.textContent = unsure;
-
-        // Rechtsbündig updaten (wie in populate)
-        const spans = row.querySelectorAll('span');
-        if (spans.length >= 5) {
-            spans[1].style.setProperty('text-align', 'right', 'important');
-            for (let i = 2; i < spans.length; i++) {
-                spans[i].style.setProperty('text-align', 'right', 'important');
-                spans[i].style.setProperty('font-family', 'monospace', 'important');
-            }
+            if (p.box === 1) red++;
+            else if (p.box === 2 || p.box === 3) yellow++;
+            else if (p.box === 4 || p.box === 5) green++;
         }
 
-        // Optional: Log (entferne nach Test)
-        console.log(`updateLessonStatsUI: ${lesson} – Total:${total}, ✅:${known}, ❌:${unknown}, 🤔:${unsure}`);
+        row.querySelector(".lt-total").textContent   = cards.length;
+        row.querySelector(".lt-unknown").textContent = red;
+        row.querySelector(".lt-weak").textContent    = yellow;
+        row.querySelector(".lt-strong").textContent  = green;
     });
 }
 
@@ -414,18 +381,16 @@ function getLessonStats(lessonName) {
     const cards = state.lessons.get(lessonName) || [];
     const total = cards.length;
 
-    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0, unsure: 0 };
+    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0 };
     const known = p.known || 0;
     const unknown = p.unknown || 0;
-    const unsure = p.unsure || 0;
-    const percent = total ? Math.round(((known + unsure) / total) * 100) : 0;  // Angepasst: Known + Unsure als "bekannt"
+    const percent = total ? Math.round((known / total) * 100) : 0;
 
     return {
         lesson: lessonName,
         total,
         known,
         unknown,
-        unsure,
         percent
     };
 }
@@ -488,21 +453,12 @@ function syncCardHeights() {
     const a = document.querySelector("#solBox");
     if (!q || !a) return;
 
-    // Ruck-Fix: Temporär transition aus (verhindert Height-Anim-Ruck)
-    q.style.transition = 'none';
-    a.style.transition = 'none';
-    q.style.minHeight = '';
-    a.style.minHeight = '';
+    q.style.minHeight = "";
+    a.style.minHeight = "";
 
     const h = Math.max(q.offsetHeight, a.offsetHeight);
-    q.style.minHeight = h + 'px';
-    a.style.minHeight = h + 'px';
-
-    // Transition zurück (für zukünftige Smooth-Changes)
-    setTimeout(() => {
-        q.style.transition = 'min-height 0.3s ease';
-        a.style.transition = 'min-height 0.3s ease';
-    }, 100);  // Etwas länger: Stabilisieren
+    q.style.minHeight = h + "px";
+    a.style.minHeight = h + "px";
 }
 
 function scrollToBottom() {
@@ -516,7 +472,6 @@ function scrollToBottom() {
 
 
 /* ============================ CARD RENDERING ============================ */
-
 
 function setCard(entry, fromHistory = false) {
 
@@ -539,39 +494,47 @@ function setCard(entry, fromHistory = false) {
     if (cardTitle)  cardTitle.textContent  = `Karte (ID ${entry.id})`;
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
-    /* -------- Fortschrittsbalken: Dreifarbig (Rot: Unknown/Box1 | Gelb: Unsure/Box2-3 | Grün: Known/Box4-5) -------- */
-    const stats = document.querySelector("#lessonStats");
-    if (stats) {
-        const cards = state.lessons.get(entry.lesson) || [];
-        const total = cards.length;
+// ----------------------------------------------------------
+// Fortschrittsbalken (Leitner) – von links nach rechts:
+// Grün (4+5) → Gelb (2+3) → Rot (1) → Grau (0)
+// ----------------------------------------------------------
+const stats = document.querySelector("#lessonStats");
+if (stats) {
+    const cards = state.lessons.get(entry.lesson) ?? [];
+    const total = cards.length;
 
-        // Box-Counts berechnen (für genaue Balken)
-        let red = 0, yellow = 0, green = 0;  // Unknown, Unsure, Known
-        for (const c of cards) {
-            const p = state.progress.cards[c.id] ?? { box: 0 };
-            if (p.box === 1) red++;  // Rot: Unknown (Box1)
-            else if (p.box === 2 || p.box === 3) yellow++;  // Gelb: Unsure (Box2/3)
-            else if (p.box >= 4) green++;  // Grün: Known (Box4/5)
-            // Box0 (neu) ignoriert – Balken nur rated Karten
-        }
+    let green = 0;   // Box 4 + 5
+    let yellow = 0;  // Box 2 + 3
+    let red   = 0;   // Box 1
+    let grey  = 0;   // Box 0
 
-        const ratedTotal = red + yellow + green;  // Nur bewertete
-        const redPct = total > 0 ? (red / total * 100) : 0;
-        const yellowPct = total > 0 ? (yellow / total * 100) : 0;
-        const greenPct = total > 0 ? (green / total * 100) : 0;
+    for (const c of cards) {
+        const p = state.progress.cards[c.id] ?? { box: 0 };
 
-        // HTML: Dreifarbig (Rot left, Gelb middle, Grün right)
-        stats.innerHTML = `
-            <div class="lesson-bar-large">
-                <div class="lesson-bar-red" style="width: ${redPct}%"></div>  <!-- Rot: Unknown -->
-                <div class="lesson-bar-yellow" style="left: ${redPct}%; width: ${yellowPct}%"></div>  <!-- Gelb: Unsure -->
-                <div class="lesson-bar-green" style="left: ${redPct + yellowPct}%; width: ${greenPct}%"></div>  <!-- Grün: Known -->
-            </div>
-            <small>Bewertet: ${ratedTotal}/${total}</small>  <!-- Optional: Counter -->
-        `;
-        console.log(`Balken: ${entry.lesson} – Rot:${redPct}% (Unknown), Gelb:${yellowPct}% (Unsure), Grün:${greenPct}% (Known)`);  // DEBUG
+        if (p.box === 0) grey++;
+        else if (p.box === 1) red++;
+        else if (p.box === 2 || p.box === 3) yellow++;
+        else if (p.box === 4 || p.box === 5) green++;
     }
 
+    const greenPct  = total ? (green  / total) * 100 : 0;
+    const yellowPct = total ? (yellow / total) * 100 : 0;
+    const redPct    = total ? (red    / total) * 100 : 0;
+    const greyPct   = total ? (grey   / total) * 100 : 0;
+
+    const leftYellow = greenPct;
+    const leftRed    = greenPct + yellowPct;
+    const leftGrey   = greenPct + yellowPct + redPct;
+
+    stats.innerHTML = `
+        <div class="lesson-bar-large">
+            <div class="lesson-bar-green"  style="left:0%;           width:${greenPct}%"></div>
+            <div class="lesson-bar-yellow" style="left:${leftYellow}%;width:${yellowPct}%"></div>
+            <div class="lesson-bar-red"    style="left:${leftRed}%;   width:${redPct}%"></div>
+            <div class="lesson-bar-grey"   style="left:${leftGrey}%;  width:${greyPct}%"></div>
+        </div>
+    `;
+}
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
     sol.classList.add("masked");
@@ -642,7 +605,7 @@ function ensureCardProgress(entry) {
     const id = entry.id;
     if (!state.progress.cards[id]) {
         state.progress.cards[id] = {
-            box: 0,          // 0 = völlig neu, noch NIE aufgedeckt
+            box: 0,          // 0 = neu (noch nie gesehen)
             timesCorrect: 0,
             timesWrong: 0,
             lastReview: 0
@@ -667,37 +630,28 @@ function updateNavButtons() {
 }
 
 function nextCard() {
-    console.log('=== NEXTCARD DEBUG: nextCard() gestartet! Pool:', state.pool.length, 'Training on:', state.trainingOn, 'Idx:', state.idx, 'HistoryPos:', state.historyPos);  // DEBUG: Start
-    
-    if (!state.pool.length) {
-        console.log('nextCard: Pool leer – return');  // DEBUG
-        return;
-    }
+
+    if (!state.pool.length) return;
 
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
-        const next = state.history[state.historyPos];
-        console.log('nextCard: History – Nächste ID:', next ? next.id : 'null');  // DEBUG
-        setCard(next, true);
+        setCard(state.history[state.historyPos], true);
         syncCardHeights();
         return;
     }
 
     let next;
+
     if (state.order === "seq") {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
         next = state.pool[state.idx];
-        console.log('nextCard: Seq – Nächste ID:', next ? next.id : 'null');  // DEBUG
     } else {
         next = state.pool[Math.floor(Math.random() * state.pool.length)];
-        console.log('nextCard: Random – Nächste ID:', next ? next.id : 'null');  // DEBUG
     }
 
     setCard(next);
     syncCardHeights();
-    
-    console.log('nextCard-Ende: Neue Karte geladen!');  // DEBUG: Ende
 }
 
 function prevCard() {
@@ -717,406 +671,130 @@ function hideNavButtons() {
     $("#btnPrev").style.display = "none";
     $("#btnReveal").style.display = "none";
     $("#btnNext").style.display = "none";
-    
-    // FIX: Smooth hide für Controls-Bar
-    hideBarSmooth('controls');
 }
 
 function showNavButtons() {
     $("#btnPrev").style.display = "";
     $("#btnReveal").style.display = "";
     $("#btnNext").style.display = "";
-    
-    // FIX: Setze einheitliche Styles (Höhe, Abstand, Flex)
-    setUniformBarStyles('controls');
 }
 
 
 /* ============================ REVEAL / RATING ============================ */
 
-// doReveal: Anti-Hängen – setTimeout für sync + Checks
 function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
-	
+
+    // -----------------------------------------
     // LEITNER: Erste Sichtung → Box 0 → Box 1
+    // -----------------------------------------
     const p = ensureCardProgress(state.current);
     if (p.box === 0) {
-        p.box = 1;
+        p.box = 1;                    // neu → schwach
         p.lastReview = Date.now();
         saveProgress();
         updateLessonStatsUI();
     }
 
+    // -----------------------------------------
+    // Timer abbrechen
+    // -----------------------------------------
     if (state.delayedSentenceTimer) {
         clearTimeout(state.delayedSentenceTimer);
         state.delayedSentenceTimer = null;
     }
-	
-    if (!state.autoplay.on) {
-        hideNavButtons();
-        
-        // Smooth Hide Controls (mit längerer Delay, gegen Hängen)
-        setTimeout(() => {
-            const controlsBar = $('.card-controls');
-            if (controlsBar) {
-                controlsBar.style.opacity = '0';
-                controlsBar.style.height = '0px';
-                console.log('Controls smooth hidden');  // DEBUG
-            }
-        }, 50);  // Länger: 50ms (gegen Render-Block)
-    }
-	
+
+    // -----------------------------------------
+    // Buttons anzeigen
+    // -----------------------------------------
+    if (!state.autoplay.on) hideNavButtons();
     showRatingButtons();
     enableRating();
-    
-    // ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
-    setTimeout(() => {
-        const card = document.querySelector('#card, main');
-        if (card) {
-            card.style.setProperty('display', 'block', 'important');
-            card.style.setProperty('height', 'auto', 'important');
-            card.style.setProperty('overflow', 'visible', 'important');
-            card.style.setProperty('opacity', '1', 'important');
-            console.log('doReveal: #card Parent sichtbar gemacht – Space offen!');
-        }
-        
-        forceRatingButtons();  // Buttons erstellen
-        console.log('doReveal-Ende: Reveal done – Buttons ready? Training on:', state.trainingOn);
-        syncCardHeights();  // Höhe anpassen
-        
-        // Ruck-Fix: Smooth scroll to Karte (nach Insert, kein Jump)
-        setTimeout(() => {
-            const card = document.querySelector('#card');
-            if (card) {
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            console.log('doReveal: Smooth scroll to Karte – kein Ruck!');
-        }, 200);  // Nach sync (stabil)
-        
-    }, 150);
+    syncCardHeights();
 }
 
 function showRatingButtons() {
-    const rateBar = $('.rating-container');
-    if (rateBar) {
-        rateBar.style.display = 'flex';
-        rateBar.style.opacity = '1';
-        rateBar.style.height = 'auto';
-        rateBar.style.overflow = 'visible';
-        rateBar.style.zIndex = '10';  // FIX
-        console.log('Rate-Bar Selector (show):', rateBar);
-    }
-    
-    setUniformBarStyles('ratebar');
-    
-    // FIX: Render-Delay für Buttons (gegen CSS-Override)
-    setTimeout(() => {
-        const buttons = document.querySelectorAll('.rating-container .btn');
-        buttons.forEach(btn => {
-            btn.style.display = 'flex';
-            btn.style.opacity = '1';
-            btn.style.visibility = 'visible';
-            btn.style.position = 'relative';
-            btn.style.zIndex = '11';
-        });
-        console.log('Buttons nach Delay sichtbar gemacht');  // DEBUG
-    }, 50);  // 50ms – DOM/Styles anwenden
+    $("#rateBar").style.display = "flex";
 }
-
 
 function hideRatingButtons() {
-    const rateBar = $("#rateBar");  // FIX: Klein
-    if (rateBar) rateBar.style.display = "none";  // Null-Check
-    
-    // FIX: Smooth hide für Ratebar
-    hideBarSmooth('ratebar');
+    $("#rateBar").style.display = "none";
 }
 
-// Enable/Disable Rating: Mit Null-Checks (verhindert Klick-Errors) – KORRIGIERT
-
 function enableRating() {
-    // Events werden jetzt in forceRatingButtons() gesetzt – hier nur Log
-    console.log('enableRating: Aufgerufen – Training on?', state.trainingOn, 'Pool:', state.pool.length);  // ← DEBUG
+    $("#btnRateKnown").disabled = false;
+    $("#btnRateUnsure").disabled = false;
+    $("#btnRateUnknown").disabled = false;
 }
 
 function disableRating() {
-    const known = $("#btnRateKnown");
-    const unsure = $("#btnRateUnsure");
-    const unknown = $("#btnRateUnknown");
-    
-    if (known) known.disabled = true;
-    if (unsure) unsure.disabled = true;
-    if (unknown) unknown.disabled = true;
-    
-    console.log('Rating disabled');  // DEBUG
+    $("#btnRateKnown").disabled = true;
+    $("#btnRateUnsure").disabled = true;
+    $("#btnRateUnknown").disabled = true;
 }
 
 function rate(mark) {
-    console.log('=== RATE DEBUG: rate("' + mark + '") aufgerufen! Mark:', mark, 'Current:', state.current ? state.current.id : 'null', 'Training on:', state.trainingOn);  // DEBUG Start
-    
-    if (!state.current) {
-        console.error('rate: Keine Karte – return');
-        return;
-    }
-	
-    // =====================================================
-    // LEITNER: Bewertung (Box-Update, unverändert)
-    // =====================================================
+    if (!state.current) return;
+
+    // -----------------------------------------
+    // LEITNER: Bewertung
+    // -----------------------------------------
     const p = ensureCardProgress(state.current);
 
-    if (p.box === 0) p.box = 1;  // Erste Sichtung
+    // Falls Karte gerade erst zum ersten Mal aufgedeckt wurde:
+    if (p.box === 0) p.box = 1;
 
     if (mark === "known") {
+        // richtig:
+        // - Box 1 → Box 2 (erste korrekte Antwort)
+        // - danach normale Leiter hoch
         if (p.box === 1) p.box = 2;
         else p.box = Math.min(p.box + 1, 5);
+
         p.timesCorrect++;
-    } else if (mark === "unsure") {
-        if (p.box < 2) p.box = 2;
-        else if (p.box === 2) p.box = 3;
-        else p.box = Math.max(p.box - 1, 2);  // Leicht zurück, falls stark
+    }
+    else if (mark === "unsure") {
+        // unsicher → 2 oder 3
+        if (p.box < 2)      p.box = 2;   // 1 → 2
+        else if (p.box === 2) p.box = 3; // 2 → 3
+
         p.timesWrong++;
-    } else if (mark === "unknown") {
+    }
+    else if (mark === "unknown") {
+        // falsch → zurück zu 1
         p.box = 1;
         p.timesWrong++;
     }
 
     p.lastReview = Date.now();
     saveProgress();
+    updateLessonStatsUI();
 
-    // Session-Update (unverändert)
+    // -----------------------------------------
+    // DEIN ORIGINALER CODE (unverändert)
+    // -----------------------------------------
     state.session.done++;
     if (mark === "known") state.session.known++;
     else if (mark === "unsure") state.session.unsure++;
     else state.session.unknown++;
 
-    // byLesson: Alle 3 tracken (für Tabelle) – REPAIRED: Unsure++ hinzufügen
     const lesson = state.current.lesson;
     if (lesson) {
-        if (!state.progress.byLesson[lesson]) {
-            state.progress.byLesson[lesson] = { known: 0, unknown: 0, unsure: 0 };  // ← Unsure init
-        }
+        if (!state.progress.byLesson[lesson])
+            state.progress.byLesson[lesson] = { known: 0, unknown: 0 };
 
-        if (mark === "known") state.progress.byLesson[lesson].known++;
-        else if (mark === "unsure") state.progress.byLesson[lesson].unsure++;  // ← NEU: Unsure tracken
-        else if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
+        if (mark === "known")   state.progress.byLesson[lesson].known++;
+        if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
-        saveProgress();  // Speichern nach Update
+        saveProgress();
+        updateLessonStatsUI();
     }
-
-    console.log('rate: Leitner-Box updated, byLesson ++ (known/unsure/unknown)');  // DEBUG
-
-    // UI: Tabelle updaten (jetzt mit Unsure)
-    updateLessonStatsUI();
 
     disableRating();
     hideRatingButtons();
     showNavButtons();
-
-    console.log('rate: Vor nextCard() – Pool:', state.pool.length, 'Idx:', state.idx);  // DEBUG
     nextCard();
-    
-    console.log('rate-Ende: Fertig!');  // DEBUG Ende
-}
-
-/* =======================================================
-   JS-FIX: Einheitliche Controls- & Ratebar (Abstand 16px, Höhe 48px) – KORRIGIERT
-   – ID für Rate-Bar: #rateBar (klein) 
-   – Null-Checks + Logs für Debug (entferne Logs nach Test!)
-======================================================= */
-// Show Rating: Display flex + explizit sichtbar machen
-function showRatingButtons() {
-    const rateBar = $('.rating-container');  // Dein Selector – falls HTML hat
-    if (rateBar) {
-        rateBar.style.display = 'flex';
-        rateBar.style.opacity = '1';
-        rateBar.style.height = 'auto';
-        rateBar.style.overflow = 'visible';
-        rateBar.style.zIndex = '10';
-        console.log('Rate-Bar (.rating-container) sichtbar gemacht');
-    } else {
-        console.log('Kein .rating-container gefunden – forceRatingButtons erstellt einen');
-    }
-    
-    setUniformBarStyles('ratebar');
-    
-    // Force Buttons sichtbar (integriert – erstellt Container/Buttons falls fehlend)
-    setTimeout(() => {
-        forceRatingButtons();  // ← Hier aufrufen: Macht 3 farbige Buttons im Space
-        console.log('forceRatingButtons nach Delay aufgerufen – Buttons farbig?');
-    }, 100);  // Etwas länger: Wartet auf DOM
-    
-    // Buttons explizit sichtbar (Fallback)
-    const buttons = document.querySelectorAll('.rating-container .btn, #btnRateKnown, #btnRateUnsure, #btnRateUnknown');
-    buttons.forEach(btn => {
-        btn.style.display = 'flex';
-        btn.style.opacity = '1';
-        btn.style.visibility = 'visible';
-        btn.style.position = 'relative';
-        btn.style.zIndex = '11';
-    });
-    console.log('Buttons nach Delay sichtbar (Fallback)');
-}
-
-// setUniformBarStyles: Buttons explizit sichtbar + Farben hardcode (falls --good fehlt)
-// Einheitliche Styles: Mit Null-Check für revealBtn + Button-Position-Fix
-// setUniformBarStyles: Buttons explizit sichtbar + Farben – KORRIGIERT (keine Duplikate)
-function setUniformBarStyles(barType) {
-    console.log('setUniformBarStyles aufgerufen mit barType:', barType);  // DEBUG
-    
-    let bar;
-    
-    if (barType === 'controls') {
-        bar = $('.card-controls');
-        console.log('Controls-Bar Selector:', bar);
-    } else if (barType === 'ratebar') {
-        bar = $('.rating-container');
-        console.log('Rate-Bar Selector:', bar);
-    } else {
-        console.error('Ungültiger barType:', barType);
-        return;
-    }
-    
-    if (!bar) {
-        console.error('Bar nicht gefunden für:', barType);
-        return;
-    }
-    
-    // Mobile-Check (wie in deiner JS)
-    const isMobile = window.innerWidth < 768;
-    const marginTop = isMobile ? 12 : 16;
-    const barHeight = isMobile ? 48 : 52;
-    const btnHeight = isMobile ? 44 : 48;
-    const fontSize = isMobile ? 12 : 13;
-    const lineHeight = isMobile ? 1.3 : 1.4;
-    const paddingH = isMobile ? 10 : 12;
-    const gap = isMobile ? '2px' : '4px';
-    
-    // Bar: Sichtbar (wie in deiner JS)
-    bar.style.display = 'flex';
-    bar.style.flexDirection = 'row';
-    bar.style.justifyContent = 'space-evenly';
-    bar.style.alignItems = 'center';
-    bar.style.width = '100%';
-    bar.style.marginTop = marginTop + 'px';
-    bar.style.marginBottom = '12px';
-    bar.style.padding = '0';
-    bar.style.gap = gap;
-    bar.style.height = barHeight + 'px';
-    bar.style.minHeight = barHeight + 'px';
-    bar.style.overflow = 'visible';
-    bar.style.opacity = '1';
-    bar.style.position = 'relative';
-    bar.style.transition = 'all 0.25s ease';
-    bar.style.boxSizing = 'border-box';
-    bar.style.flexWrap = 'nowrap';
-    bar.style.visibility = 'visible';
-    bar.style.zIndex = '10';
-    
-    console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px');
-    
-    // Buttons: Explizit sichtbar (wie in deiner JS)
-    const buttons = bar.querySelectorAll('.btn');
-    console.log('Gefundene Buttons:', buttons.length);
-    buttons.forEach((btn, index) => {
-        btn.style.flex = '1';
-        btn.style.height = btnHeight + 'px';
-        btn.style.padding = '0 ' + paddingH + 'px';
-        btn.style.margin = '0';
-        btn.style.fontSize = fontSize + 'px';
-        btn.style.fontWeight = '600';
-        btn.style.lineHeight = lineHeight;
-        btn.style.borderRadius = '8px';
-        btn.style.whiteSpace = 'nowrap';
-        btn.style.textAlign = 'center';
-        btn.style.overflow = 'visible';
-        btn.style.textOverflow = 'ellipsis';
-        btn.style.boxSizing = 'border-box';
-        btn.style.borderWidth = '1px';
-        btn.style.minWidth = '0';
-        btn.style.verticalAlign = 'middle';
-        btn.style.transition = 'all 0.2s ease';
-        btn.style.opacity = '1';
-        btn.style.visibility = 'visible';
-        btn.style.display = 'flex';
-        btn.style.alignItems = 'center';
-        btn.style.justifyContent = 'center';
-        btn.style.position = 'relative';
-        btn.style.left = '0';
-        btn.style.top = '0';
-        btn.style.zIndex = '11';
-        btn.style.width = 'auto';
-        btn.style.backgroundColor = 'white';  // Fallback
-        btn.style.color = 'black';
-        btn.style.borderStyle = 'solid';
-        btn.style.borderColor = '#ccc';
-        console.log(`Button ${index} gestylt: "${btn.textContent}" Opacity: ${btn.style.opacity}`);
-    });
-    
-    // Rate-Bar Farben (wie in deiner JS)
-    if (barType === 'ratebar') {
-        const knownBtn = $('#btnRateKnown');
-        if (knownBtn) {
-            knownBtn.style.backgroundColor = '#4CAF50';
-            knownBtn.style.borderColor = '#4CAF50';
-            knownBtn.style.color = 'white';
-            console.log('Gewusst-Button grün gesetzt');
-        }
-        const unsureBtn = $('#btnRateUnsure');
-        if (unsureBtn) {
-            unsureBtn.style.backgroundColor = '#FFEB3B';
-            unsureBtn.style.borderColor = '#FFEB3B';
-            unsureBtn.style.color = 'black';
-            console.log('Unsicher-Button gelb gesetzt');
-        }
-        const unknownBtn = $('#btnRateUnknown');
-        if (unknownBtn) {
-            unknownBtn.style.backgroundColor = '#F44336';
-            unknownBtn.style.borderColor = '#F44336';
-            unknownBtn.style.color = 'white';
-            console.log('Nicht-Button rot gesetzt');
-        }
-        
-        // ← HIER: forceRatingButtons() aufrufen (einmalig, integriert)
-        forceRatingButtons();  // Macht Emojis/Text/Farben + Container-Fix
-        console.log('setUniformBarStyles: Rate-Bar uniform + forceRatingButtons aufgerufen');
-    } 
-    // Controls (wie in deiner JS)
-    else if (barType === 'controls') {
-        const revealBtn = $('#btnReveal');
-        if (revealBtn) {
-            revealBtn.style.background = 'var(--accent)';
-            revealBtn.style.borderColor = 'var(--accent)';
-            revealBtn.style.color = 'var(--accent-text)';
-            revealBtn.style.fontWeight = '700';
-            console.log('Reveal-Button gestylt');
-        }
-    }
-}
-
-// Smooth Hide: Mit Klasse + Transition
-function hideBarSmooth(barType) {
-    let bar;
-    if (barType === 'controls') {
-        bar = $('.card-controls');
-    } else if (barType === 'ratebar') {
-        bar = $('.rating-container');  // FIX: Klasse
-    }
-    if (!bar) {
-        console.error('Hide-Bar nicht gefunden für:', barType);
-        return;
-    }
-    
-    bar.style.opacity = '0';
-    bar.style.height = '0px';
-    bar.style.marginTop = '0px';
-    bar.style.marginBottom = '0px';
-    bar.style.overflow = 'hidden';
-    bar.style.transform = 'translateY(-4px)';
-    bar.style.transition = 'all 0.25s ease';
-    bar.style.flexWrap = 'nowrap';  // Konsistent
-    
-    console.log('Bar versteckt:', barType);  // DEBUG
 }
 
 /* ============================ SESSION STATS ============================ */
@@ -1193,7 +871,7 @@ function stopTraining() {
 
     disableRating();
     hideRatingButtons();
-    updateLessonStatsUI();
+	updateLessonStatsUI();
 
     $("#solBox").classList.add("masked");
 }
@@ -1707,190 +1385,6 @@ function stopAutoplayOnUserAction() {
     }
 }
 
-// Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs (Error-frei)
-function forceRatingButtons() {
-    // Buttons per ID finden (falls schon da)
-    let knownBtn = document.getElementById('btnRateKnown');
-    let unsureBtn = document.getElementById('btnRateUnsure');
-    let unknownBtn = document.getElementById('btnRateUnknown');
-    
-    let buttons = [knownBtn, unsureBtn, unknownBtn].filter(btn => btn);
-    console.log('forceRatingButtons: Gefundene Buttons vor Fix:', buttons.length);
-    
-    if (buttons.length !== 3) {
-        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – Erstelle neue');
-        // Neu erstellen, falls fehlend
-        const buttonConfigs = [
-            { id: 'btnRateKnown', text: '✅ Gewusst', class: 'good', bg: '#4CAF50', color: 'white', score: 'known' },
-            { id: 'btnRateUnsure', text: '🤔 Unsicher', class: 'unsure', bg: '#FFEB3B', color: 'black', score: 'unsure' },
-            { id: 'btnRateUnknown', text: '❌ Nicht gewusst', class: 'bad', bg: '#F44336', color: 'white', score: 'unknown' }
-        ];
-        
-        buttonConfigs.forEach(config => {
-            let btn = document.getElementById(config.id);
-            if (!btn) {
-                btn = document.createElement('button');
-                btn.id = config.id;
-                btn.className = `btn rate ${config.class}`;
-                btn.innerHTML = config.text;
-                buttons.push(btn);
-                console.log(`Neu erstellt: ${config.id} ("${config.text}")`);
-            }
-        });
-    }
-    
-    // Nesting fixen (falls verschachtelt)
-    buttons.forEach(btn => {
-        if (btn.parentElement && btn.parentElement.tagName === 'BUTTON') {
-            const grandparent = btn.parentElement.parentElement;
-            if (grandparent) {
-                grandparent.appendChild(btn);
-                console.log('Nesting gefixt für', btn.id);
-            }
-        }
-        // Text bereinigen
-        btn.innerHTML = btn.innerHTML.replace(/<[^>]*>.*?<\/[^>]*>/gi, '').trim();
-        console.log('Text gefixt:', btn.textContent.trim());
-    });
-    
-    // Container finden/erstelle unter #solBox
-    let container = document.querySelector('.rating-container') || document.getElementById('rateBar');
-    console.log('Container gefunden:', container ? container.id || container.className : 'null');
-    
-    if (!container || container.style.display === 'none') {
-        container = document.createElement('div');
-        container.id = 'rateBar';
-        container.className = 'rating-container bar rate-bar';
-        console.log('Neuer Container erstellt: #rateBar (.rating-container)');
-        
-        const solBox = document.getElementById('solBox');
-        if (solBox && solBox.parentNode) {
-            solBox.parentNode.insertBefore(container, solBox.nextSibling);
-            console.log('Container unter #solBox platziert – Im Space!');
-        } else {
-            const card = document.querySelector('#card') || document.body;
-            card.appendChild(container);
-            console.log('Container an #card angehängt');
-        }
-    }
-    
-    // Container sichtbar: Flex, transparent, smooth (kein Ruck)
-    container.style.setProperty('display', 'flex', 'important');
-    container.style.setProperty('flex-direction', 'row', 'important');
-    container.style.setProperty('justify-content', 'space-around', 'important');
-    container.style.setProperty('align-items', 'center', 'important');
-    container.style.setProperty('width', '100%', 'important');
-    container.style.setProperty('height', '52px', 'important');
-    container.style.setProperty('margin', '16px 0', 'important');
-    container.style.setProperty('padding', '4px', 'important');
-    container.style.setProperty('background-color', 'transparent', 'important');
-    container.style.setProperty('border', 'none', 'important');
-    container.style.setProperty('opacity', '1', 'important');
-    container.style.setProperty('visibility', 'visible', 'important');
-    container.style.setProperty('z-index', '1000', 'important');
-    container.style.setProperty('position', 'relative', 'important');
-    container.style.setProperty('top', '0', 'important');
-    container.style.setProperty('transition', 'opacity 0.2s ease', 'important');  // Smooth Show, kein Height-Ruck
-    container.style.setProperty('animation', 'none', 'important');  // Kein CSS-Anim-Ruck
-    console.log('Container im Space: Flex, 52px, transparent');
-    
-    // Container resetten & Buttons anhängen
-    container.innerHTML = '';
-    buttons.forEach(btn => container.appendChild(btn));
-    
-    // Buttons stylen: Farbig, sichtbar + Kosmetik (zentriert, rund)
-    const buttonConfigs = [
-        { text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 'known' },
-        { text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 'unsure' },
-        { text: '❌ Nicht gewusst', bg: '#F44336', color: 'white', score: 'unknown' }
-    ];
-    
-    buttons.forEach((btn, i) => {
-        const config = buttonConfigs[i];
-        btn.innerHTML = config.text;
-        btn.removeAttribute('style');  // Reset
-        btn.disabled = false;
-        btn.classList.remove('disabled', 'hidden', 'invisible', 'masked');
-        btn.classList.add('btn', 'rate', i === 0 ? 'good' : i === 1 ? 'unsure' : 'bad');
-        
-        // Force-Styles: Sichtbar & farbig
-        btn.style.setProperty('display', 'flex', 'important');
-        btn.style.setProperty('align-items', 'center', 'important');
-        btn.style.setProperty('justify-content', 'center', 'important');
-        btn.style.setProperty('position', 'static', 'important');  // Static: Kein Flow-Ruck
-        btn.style.setProperty('flex', '1', 'important');
-        btn.style.setProperty('min-width', '80px', 'important');
-        btn.style.setProperty('height', '48px', 'important');
-        btn.style.setProperty('margin', '0 4px', 'important');
-        btn.style.setProperty('padding', '12px 8px', 'important');  // Kosmetik: Mehr Platz, rund
-        btn.style.setProperty('border', '1px solid', 'important');
-        btn.style.setProperty('border-radius', '8px', 'important');  // Rund
-        btn.style.setProperty('font-size', '16px', 'important');  // Emoji-Größe
-        btn.style.setProperty('font-weight', 'bold', 'important');
-        btn.style.setProperty('line-height', '1.2', 'important');  // Zentriert
-        btn.style.setProperty('cursor', 'pointer', 'important');  // ← FIX: Kein "javascript"
-        btn.style.setProperty('background-color', config.bg, 'important');
-        btn.style.setProperty('color', config.color, 'important');
-        btn.style.setProperty('opacity', '1', 'important');
-        btn.style.setProperty('visibility', 'visible', 'important');
-        btn.style.setProperty('z-index', '1001', 'important');
-        btn.style.setProperty('pointer-events', 'auto', 'important');
-        btn.style.setProperty('user-select', 'none', 'important');
-        btn.style.setProperty('box-shadow', '0 2px 4px rgba(0,0,0,0.1)', 'important');  // Kosmetik: Schatten
-        btn.style.setProperty('transition', 'all 0.2s ease', 'important');  // Smooth Hover
-        btn.style.setProperty('transform', 'none', 'important');  // Kein Ruck
-        
-        // ← Event pro Button (mit Logs – direkt attachen, sauber)
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log(`=== KLICK DEBUG: ${config.text} geklickt! Event fired. Training on: ${state.trainingOn}, Current: ${state.current ? state.current.id : 'null'}, Pool: ${state.pool.length}`);
-            
-            if (!state.current) {
-                console.error('rate blockiert: Keine aktuelle Karte!');
-                return;
-            }
-            
-            stopAutoplayOnUserAction();
-            console.log('Klick → rate("' + config.score + '") aufrufen...');
-            rate(config.score);
-            
-            disableRating();
-            hideRatingButtons();
-            showNavButtons();
-            
-            console.log('Klick-Ende: Buttons hidden, Nav shown');
-        }, { once: false });
-        
-        // ← EXTRA: Delegation (Fallback)
-        container.addEventListener('click', (e) => {
-            if (e.target === btn || btn.contains(e.target)) {
-                console.log('Delegation: Klick auf ' + config.text + ' via Container');
-                if (state.current) {
-                    stopAutoplayOnUserAction();
-                    console.log('Delegation → rate("' + config.score + '")');
-                    rate(config.score);
-                    disableRating();
-                    hideRatingButtons();
-                    showNavButtons();
-                }
-            }
-        }, { once: false });
-        
-        console.log(`${config.text} gestylt + Event mit Logs gesetzt: Klick-Debug aktiv!`);
-    });
-    
-    // Parent sichtbar
-    const parent = container.closest('#card, .card-container, main') || document.body;
-    if (parent) {
-        parent.style.setProperty('display', 'block', 'important');
-        parent.style.setProperty('opacity', '1', 'important');
-        parent.style.setProperty('overflow', 'visible', 'important');
-    }
-    
-    console.log('forceRatingButtons: Erfolgreich – 3 Buttons unter #solBox mit Events! Fertig.');
-}
 
 /* ========================================================================== */
 /*                                ENDE TEIL 3                                 */
@@ -1967,13 +1461,13 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     state.pitchZh = state.settings.pitchZh;
 
     renderModeUI();
-	// FIX: Sofortiges Styling der Controls-Bar (vor Training, optional)
-	setUniformBarStyles('controls');  // Macht Nav-Bar gleich dick, auch disabled
 
     /* ============================================================
        CSV LADEN
        ============================================================ */
-    loadCSV();
+    loadCSV().then(() => {
+    updateLessonStatsUI();
+});
 
     /* ============================================================
        STIMMEN LADEN
@@ -2198,20 +1692,20 @@ if (overlay) {
        RATING
        ============================================================ */
 
- //   $("#btnRateKnown").addEventListener("click", () => {
-  //      stopAutoplayOnUserAction();
-  //      rate("known");
- //   });
+    $("#btnRateKnown").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("known");
+    });
 
- //   $("#btnRateUnsure").addEventListener("click", () => {
-  //      stopAutoplayOnUserAction();
- //       rate("unsure");
- //   });
+    $("#btnRateUnsure").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unsure");
+    });
 
-  //  $("#btnRateUnknown").addEventListener("click", () => {
- //       stopAutoplayOnUserAction();
-  //      rate("unknown");
- //   });
+    $("#btnRateUnknown").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        rate("unknown");
+    });
 
   
     /* ============================================================
