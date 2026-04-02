@@ -308,16 +308,17 @@ row.addEventListener("click", () => {
     }
 }
 
-// ✅ Fortschritt in der Lektionstabelle live aktualisieren
+// ✅ Fortschritt in der Lektionstabelle live aktualisieren – FIX: Für 5 Spalten, Null-Checks
 function updateLessonStatsUI() {
     document.querySelectorAll(".lt-row:not(.lt-head)").forEach(row => {
         const lesson = row.dataset.lesson;
         const cards = state.lessons.get(lesson) ?? [];
 
-        let black = 0;  // Box 0 (unseen)
-        let red   = 0;  // Box 1
-        let yellow = 0; // Box 2 + Box 3
-        let green = 0;  // Box 4 + Box 5
+        // Intern berechnen: Box-Counts (für genaue % basierend auf "bekannt" = green/Box 4+5)
+        let black = 0;  // Box 0 (neu/unseen – nicht in UI)
+        let red = 0;    // Box 1 (unknown/❌)
+        let yellow = 0; // Box 2+3 (unsure – nicht in UI)
+        let green = 0;  // Box 4+5 (known/✅)
 
         for (const c of cards) {
             const p = state.progress.cards[c.id] ?? { box: 0 };
@@ -328,13 +329,29 @@ function updateLessonStatsUI() {
             else if (p.box === 4 || p.box === 5) green++;
         }
 
-        row.querySelector(".lt-total").textContent   = cards.length;
-        row.querySelector(".lt-unknown").textContent = red;     // rot
-        row.querySelector(".lt-weak").textContent    = yellow;  // gelb
-        row.querySelector(".lt-strong").textContent  = green;   // grün
-        row.querySelector(".lt-new").textContent     = black;   // schwarz
-        row.querySelector(".lt-percent").textContent =
-            cards.length ? Math.round((green / cards.length) * 100) + "%" : "0%";
+        // byLesson-Fallback (für Kompatibilität, falls Boxen nicht tracken)
+        const pLesson = state.progress.byLesson[lesson] || { known: 0, unknown: 0 };
+        const byKnown = pLesson.known || green;  // Priorisiere Box-green, Fallback byLesson
+        const byUnknown = pLesson.unknown || red;  // Priorisiere Box-red, Fallback byLesson
+
+        // %: Basierend auf "bekannte" (green/Box 4+5) / total – präziser als byKnown (das trackt nur "known"-Ratings)
+        const percent = cards.length ? Math.round((green / cards.length) * 100) : 0;
+
+        // Null-Check: Nur existierende 5 Spalten setzen (keine lt-new/lt-weak/lt-strong – Platz sparen)
+        const totalEl = row.querySelector(".lt-total");
+        if (totalEl) totalEl.textContent = cards.length;
+
+        const knownEl = row.querySelector(".lt-known");  // ✅ = Bekannte (green)
+        if (knownEl) knownEl.textContent = byKnown;
+
+        const unknownEl = row.querySelector(".lt-unknown");  // ❌ = Unbekannte (red)
+        if (unknownEl) unknownEl.textContent = byUnknown;
+
+        const percentEl = row.querySelector(".lt-percent");
+        if (percentEl) percentEl.textContent = percent + "%";
+
+        // Optional: Debug-Log (entferne nach Test)
+        console.log(`updateLessonStatsUI: ${lesson} – Total:${cards.length}, ✅:${byKnown} (green:${green}), ❌:${byUnknown} (red:${red}), %:${percent}% – Intern: Neu${black}/🤔${yellow}`);
     });
 }
 
