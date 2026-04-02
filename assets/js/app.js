@@ -612,31 +612,39 @@ function updateNavButtons() {
 }
 
 function nextCard() {
-  console.log('=== NEXTCARD DEBUG: nextCard() gestartet! Pool:', state.pool.length, 'Training on:', state.trainingOn, 'Idx:', state.idx, 'HistoryPos:', state.historyPos);  // ← NEU: Log
+    console.log('=== NEXTCARD DEBUG: nextCard() gestartet! Pool:', state.pool.length, 'Training on:', state.trainingOn, 'Idx:', state.idx, 'HistoryPos:', state.historyPos);  // DEBUG: Start
     
     if (!state.pool.length) {
-    if (!state.pool.length) return;
+        console.log('nextCard: Pool leer – return');  // DEBUG
+        return;
+    }
 
     if (state.historyPos < state.history.length - 1) {
         state.historyPos++;
-        setCard(state.history[state.historyPos], true);
+        const next = state.history[state.historyPos];
+        console.log('nextCard: History – Nächste ID:', next ? next.id : 'null');  // DEBUG
+        setCard(next, true);
         syncCardHeights();
         return;
     }
 
     let next;
-
     if (state.order === "seq") {
         if (state.idx == null) state.idx = 0;
         else state.idx = (state.idx + 1) % state.pool.length;
         next = state.pool[state.idx];
+        console.log('nextCard: Seq – Nächste ID:', next ? next.id : 'null');  // DEBUG
     } else {
         next = state.pool[Math.floor(Math.random() * state.pool.length)];
+        console.log('nextCard: Random – Nächste ID:', next ? next.id : 'null');  // DEBUG
     }
 
     setCard(next);
     syncCardHeights();
+    
+    console.log('nextCard-Ende: Neue Karte geladen!');  // DEBUG: Ende
 }
+
 
 function prevCard() {
     if (state.historyPos > 0) {
@@ -673,58 +681,61 @@ function showNavButtons() {
 /* ============================ REVEAL / RATING ============================ */
 
 // doReveal: Anti-Hängen – setTimeout für sync + Checks
+// doReveal: Anti-Hängen – setTimeout für sync + Checks
 function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
 	
-	// LEITNER: Erste Sichtung → Box 0 → Box 1
-	const p = ensureCardProgress(state.current);
-	if (p.box === 0) {
-	    p.box = 1;
-	    p.lastReview = Date.now();
-	    saveProgress();
-	    updateLessonStatsUI();
-	}
-
-	if (state.delayedSentenceTimer) {
-	    clearTimeout(state.delayedSentenceTimer);
-	    state.delayedSentenceTimer = null;
-	}
-	
-	if (!state.autoplay.on) {
-	    hideNavButtons();
-	    
-	    // Smooth Hide Controls (mit längerer Delay, gegen Hängen)
-	    setTimeout(() => {
-	        const controlsBar = $('.card-controls');
-	        if (controlsBar) {
-	            controlsBar.style.opacity = '0';
-	            controlsBar.style.height = '0px';
-	            console.log('Controls smooth hidden');  // DEBUG
-	        }
-	    }, 50);  // Länger: 50ms (gegen Render-Block)
-	}
-	
-	showRatingButtons();
-	enableRating();
-// ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
-setTimeout(() => {
-    // Parent-Karte sichtbar machen (Space freigeben)
-    const card = document.querySelector('#card, main');
-    if (card) {
-        card.style.setProperty('display', 'block', 'important');
-        card.style.setProperty('height', 'auto', 'important');
-        card.style.setProperty('overflow', 'visible', 'important');
-        card.style.setProperty('opacity', '1', 'important');
-        console.log('doReveal: #card Parent sichtbar gemacht – Space offen!');
+    // LEITNER: Erste Sichtung → Box 0 → Box 1
+    const p = ensureCardProgress(state.current);
+    if (p.box === 0) {
+        p.box = 1;
+        p.lastReview = Date.now();
+        saveProgress();
+        updateLessonStatsUI();
     }
+
+    if (state.delayedSentenceTimer) {
+        clearTimeout(state.delayedSentenceTimer);
+        state.delayedSentenceTimer = null;
+    }
+	
+    if (!state.autoplay.on) {
+        hideNavButtons();
+        
+        // Smooth Hide Controls (mit längerer Delay, gegen Hängen)
+        setTimeout(() => {
+            const controlsBar = $('.card-controls');
+            if (controlsBar) {
+                controlsBar.style.opacity = '0';
+                controlsBar.style.height = '0px';
+                console.log('Controls smooth hidden');  // DEBUG
+            }
+        }, 50);  // Länger: 50ms (gegen Render-Block)
+    }
+	
+    showRatingButtons();
+    enableRating();
     
-    forceRatingButtons();  // ← Sicherstellen: Buttons im Space
-	console.log('doReveal-Ende: Reveal done – Buttons ready? Training on:', state.trainingOn);  // ← DEBUG
-    syncCardHeights();  // Höhe anpassen (nach Insert)
-    console.log('doReveal: forceRatingButtons + syncCardHeights – Buttons unter Solution?');
-}, 150);  // 150ms: DOM ready
+    // ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
+    setTimeout(() => {
+        // Parent-Karte sichtbar machen (Space freigeben)
+        const card = document.querySelector('#card, main');
+        if (card) {
+            card.style.setProperty('display', 'block', 'important');
+            card.style.setProperty('height', 'auto', 'important');
+            card.style.setProperty('overflow', 'visible', 'important');
+            card.style.setProperty('opacity', '1', 'important');
+            console.log('doReveal: #card Parent sichtbar gemacht – Space offen!');
+        }
+        
+        forceRatingButtons();  // ← Sicherstellen: Buttons im Space
+        console.log('doReveal-Ende: Reveal done – Buttons ready? Training on:', state.trainingOn);  // DEBUG
+        syncCardHeights();  // Höhe anpassen (nach Insert)
+        console.log('doReveal: forceRatingButtons + syncCardHeights – Buttons unter Solution?');
+    }, 150);  // 150ms: DOM ready
 }
+
 
 
 function showRatingButtons() {
@@ -783,43 +794,47 @@ function disableRating() {
 }
 
 function rate(mark) {
-     console.log('=== RATE DEBUG: rate("' + mark + '") aufgerufen! Mark:', mark, 'Current:', state.current ? state.current.id : 'null', 'Training on:', state.trainingOn);  // ← NEU: Log Start
-	if (!state.current) return;
+    console.log('=== RATE DEBUG: rate("' + mark + '") aufgerufen! Mark:', mark, 'Current:', state.current ? state.current.id : 'null', 'Training on:', state.trainingOn);  // DEBUG Start
+    
+    if (!state.current) {
+        console.error('rate: Keine Karte – return');
+        return;
+    }
 	
-	// =====================================================
-	// LEITNER: Bewertung
-	// =====================================================
-	const p = ensureCardProgress(state.current);
+    // =====================================================
+    // LEITNER: Bewertung
+    // =====================================================
+    const p = ensureCardProgress(state.current);
 
-	// Falls die Karte noch nie gesehen wurde:
-	if (p.box === 0) p.box = 1;
+    // Falls die Karte noch nie gesehen wurde:
+    if (p.box === 0) p.box = 1;
 
-	// Bewertung anwenden:
-	if (mark === "known") {
-	    // richtig → bei erster Bewertung → Box 2
-	    // danach normales Leitner: 2→3→4→5
-	    if (p.box === 1) p.box = 2;
-	    else p.box = Math.min(p.box + 1, 5);
+    // Bewertung anwenden:
+    if (mark === "known") {
+        // richtig → bei erster Bewertung → Box 2
+        // danach normales Leitner: 2→3→4→5
+        if (p.box === 1) p.box = 2;
+        else p.box = Math.min(p.box + 1, 5);
 
-	    p.timesCorrect++;
-	}
+        p.timesCorrect++;
+    }
 
-	else if (mark === "unsure") {
-	    // unsicher → immer Box 2 oder 3
-	    if (p.box < 2) p.box = 2;
-	    else if (p.box === 2) p.box = 3;
-	    p.timesWrong++;
-	}
+    else if (mark === "unsure") {
+        // unsicher → immer Box 2 oder 3
+        if (p.box < 2) p.box = 2;
+        else if (p.box === 2) p.box = 3;
+        p.timesWrong++;
+    }
 
-	else if (mark === "unknown") {
-	    // falsch → zurück auf Box 1
-	    p.box = 1;
-	    p.timesWrong++;
-	}
+    else if (mark === "unknown") {
+        // falsch → zurück auf Box 1
+        p.box = 1;
+        p.timesWrong++;
+    }
 
-	p.lastReview = Date.now();
-	saveProgress();
-	updateLessonStatsUI();
+    p.lastReview = Date.now();
+    saveProgress();
+    updateLessonStatsUI();
 
     state.session.done++;
 
@@ -837,15 +852,21 @@ function rate(mark) {
         if (mark === "unknown") state.progress.byLesson[lesson].unknown++;
 
         saveProgress();
-		updateLessonStatsUI();
+        updateLessonStatsUI();
     }
+
+    console.log('rate: Leitner-Box updated (z.B. 1→2), Session done++');  // DEBUG
 
     disableRating();
     hideRatingButtons();
     showNavButtons();
 
+    console.log('rate: Vor nextCard() – Pool:', state.pool.length, 'Idx:', state.idx);  // DEBUG
     nextCard();
+    
+    console.log('rate-Ende: Fertig!');  // DEBUG Ende
 }
+
 
 /* =======================================================
    JS-FIX: Einheitliche Controls- & Ratebar (Abstand 16px, Höhe 48px) – KORRIGIERT
@@ -1637,13 +1658,105 @@ function stopAutoplayOnUserAction() {
 
 // Neue Funktion: Force Rating-Buttons sichtbar & farbig (nach Reveal)
 // Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events
-// Force Rating-Buttons – ERWEITERT: Events mit Logs + Click-Delegation (robust)
+// Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs
 function forceRatingButtons() {
-    // ... (der gesamte obere Teil bleibt gleich: Buttons finden/erstellt, Nesting fix, Container unter #solBox, Styling) ...
+    // Buttons per ID finden (falls schon da)
+    let knownBtn = document.getElementById('btnRateKnown');
+    let unsureBtn = document.getElementById('btnRateUnsure');
+    let unknownBtn = document.getElementById('btnRateUnknown');
     
-    // (Kopiere den oberen Code bis vor "buttons.forEach((btn, i) => {", und dann ersetze den forEach-Block:)
+    let buttons = [knownBtn, unsureBtn, unknownBtn].filter(btn => btn);
+    console.log('forceRatingButtons: Gefundene Buttons vor Fix:', buttons.length);
     
-    // Buttons stylen & Events (wie vorher, aber mit Debug-Logs + Delegation)
+    if (buttons.length !== 3) {
+        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – Erstelle neue');
+        // Neu erstellen, falls fehlend (z.B. HTML hat sie disabled/hidden)
+        const buttonConfigs = [
+            { id: 'btnRateKnown', text: '✅ Gewusst', class: 'good', bg: '#4CAF50', color: 'white', score: 'known' },
+            { id: 'btnRateUnsure', text: '🤔 Unsicher', class: 'unsure', bg: '#FFEB3B', color: 'black', score: 'unsure' },
+            { id: 'btnRateUnknown', text: '❌ Nicht gewusst', class: 'bad', bg: '#F44336', color: 'white', score: 'unknown' }
+        ];
+        
+        buttonConfigs.forEach(config => {
+            let btn = document.getElementById(config.id);
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.id = config.id;
+                btn.className = `btn rate ${config.class}`;
+                btn.innerHTML = config.text;
+                buttons.push(btn);  // Zur Liste hinzufügen
+                console.log(`Neu erstellt: ${config.id} ("${config.text}")`);
+            }
+        });
+    }
+    
+    // Nesting fixen (falls verschachtelt)
+    buttons.forEach(btn => {
+        if (btn.parentElement && btn.parentElement.tagName === 'BUTTON') {
+            const grandparent = btn.parentElement.parentElement;
+            if (grandparent) {
+                grandparent.appendChild(btn);
+                console.log('Nesting gefixt für', btn.id);
+            }
+        }
+        // Text bereinigen (Emojis behalten)
+        btn.innerHTML = btn.innerHTML.replace(/<[^>]*>.*?<\/[^>]*>/gi, '').trim();
+        console.log('Text gefixt:', btn.textContent.trim());
+    });
+    
+    // Container finden: Zuerst .rating-container, sonst unter #solBox
+    let container = document.querySelector('.rating-container') || document.querySelector('#rateBar');
+    console.log('Container gefunden:', container ? container.id || container.className : 'null');
+    
+    // Falls kein Container: Neuen unter #solBox erstellen (korrekte Position!)
+    if (!container || container.style.display === 'none') {
+        container = document.createElement('div');
+        container.id = 'rateBar';  // Deine ID
+        container.className = 'rating-container bar rate-bar';  // Deine Klassen
+        console.log('Neuer Container erstellt: #rateBar (.rating-container)');
+        
+        // Position: Direkt unter #solBox (Solution-Box) einfügen – das ist der "Space"!
+        const solBox = document.querySelector('#solBox');
+        if (solBox && solBox.parentNode) {
+            // Einfügen nach #solBox (im Flow der Karte)
+            solBox.parentNode.insertBefore(container, solBox.nextSibling);
+            console.log('Container unter #solBox platziert – Im Space!');
+        } else {
+            // Fallback: An #card oder body (aber priorisiere #card)
+            const card = document.querySelector('#card') || document.body;
+            if (card && card !== document.body) {
+                card.appendChild(container);  // Unter Karte
+                console.log('Container an #card angehängt');
+            } else {
+                document.body.appendChild(container);  // Letzter Fallback (sollte nicht passieren)
+                console.log('Fallback: Container an body');
+            }
+        }
+    }
+    
+    // Container sichtbar machen (flex, im Space)
+    container.style.setProperty('display', 'flex', 'important');
+    container.style.setProperty('flex-direction', 'row', 'important');
+    container.style.setProperty('justify-content', 'space-around', 'important');
+    container.style.setProperty('align-items', 'center', 'important');
+    container.style.setProperty('width', '100%', 'important');
+    container.style.setProperty('height', '52px', 'important');
+    container.style.setProperty('margin', '16px 0', 'important');
+    container.style.setProperty('padding', '4px', 'important');
+    container.style.setProperty('background-color', 'transparent', 'important');
+    container.style.setProperty('border', 'none', 'important');
+    container.style.setProperty('opacity', '1', 'important');
+    container.style.setProperty('visibility', 'visible', 'important');
+    container.style.setProperty('z-index', '1000', 'important');
+    container.style.setProperty('position', 'relative', 'important');  // Im Flow halten
+    container.style.setProperty('top', '0', 'important');  // Kein Offset
+    console.log('Container im Space: Flex, 52px, transparent');
+    
+    // Container resetten & Buttons anhängen (nebeneinander)
+    container.innerHTML = '';  // Alte Kinder löschen
+    buttons.forEach(btn => container.appendChild(btn));
+    
+    // Buttons stylen (farbig, sichtbar)
     const buttonConfigs = [
         { text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 'known' },
         { text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 'unsure' },
@@ -1653,23 +1766,40 @@ function forceRatingButtons() {
     buttons.forEach((btn, i) => {
         const config = buttonConfigs[i];
         btn.innerHTML = config.text;
-        btn.removeAttribute('style');
+        btn.removeAttribute('style');  // Reset alte Styles
         btn.disabled = false;
         btn.classList.remove('disabled', 'hidden', 'invisible', 'masked');
         btn.classList.add('btn', 'rate', i === 0 ? 'good' : i === 1 ? 'unsure' : 'bad');
         
-        // Styles (wie vorher – kopiere die setProperty-Zeilen)
+        // Force-Styles (sichtbar & farbig)
         btn.style.setProperty('display', 'flex', 'important');
-        // ... (alle anderen Styles wie in meiner letzten Antwort)
-        btn.style.setProperty('pointer-events', 'auto', 'important');  // ← NEU: Klicks erlauben (gegen CSS-Block)
+        btn.style.setProperty('align-items', 'center', 'important');
+        btn.style.setProperty('justify-content', 'center', 'important');
+        btn.style.setProperty('position', 'relative', 'important');
+        btn.style.setProperty('flex', '1', 'important');
+        btn.style.setProperty('min-width', '80px', 'important');
+        btn.style.setProperty('height', '48px', 'important');
+        btn.style.setProperty('margin', '0 4px', 'important');
+        btn.style.setProperty('padding', '8px', 'important');
+        btn.style.setProperty('border', '1px solid', 'important');
+        btn.style.setProperty('border-radius', '4px', 'important');
+        btn.style.setProperty('font-size', '14px', 'important');
+        btn.style.setProperty('font-weight', 'bold', 'important');
+        btn.style.setProperty('cursor', 'pointer', 'important');
+        btn.style.setProperty('background-color', config.bg, 'important');
+        btn.style.setProperty('color', config.color, 'important');
+        btn.style.setProperty('opacity', '1', 'important');
+        btn.style.setProperty('visibility', 'visible', 'important');
+        btn.style.setProperty('z-index', '1001', 'important');
+        btn.style.setProperty('pointer-events', 'auto', 'important');  // ← NEU: Klicks erlauben
         btn.style.setProperty('user-select', 'none', 'important');
         
         // ← Event pro Button (mit Logs – direkt attachen)
         btn.addEventListener('click', (e) => {
-            e.preventDefault();  // ← NEU: Verhindert Default (z.B. Form-Submit)
-            e.stopPropagation();  // ← NEU: Stoppt Bubbling (kein Parent-Klick)
+            e.preventDefault();  // Verhindert Default
+            e.stopPropagation();  // Stoppt Bubbling
             
-            console.log(`=== KLICK DEBUG: ${config.text} geklickt! Event fired. Training on: ${state.trainingOn}, Current: ${state.current ? state.current.id : 'null'}, Pool: ${state.pool.length}`);  // ← DEBUG: Alles loggen
+            console.log(`=== KLICK DEBUG: ${config.text} geklickt! Event fired. Training on: ${state.trainingOn}, Current: ${state.current ? state.current.id : 'null'}, Pool: ${state.pool.length}`);  // DEBUG
             
             if (!state.current) {
                 console.error('rate blockiert: Keine aktuelle Karte!');
@@ -1688,13 +1818,12 @@ function forceRatingButtons() {
             showNavButtons();  // Nav zeigen (Next/Prev)
             
             console.log('Klick-Ende: Buttons hidden, Nav shown');
-        }, { once: false });  // ← NEU: Erlaube mehrmals (nicht only once)
+        }, { once: false });  // Erlaube mehrmals
         
         // ← EXTRA: Delegation über Container (Fallback, falls Button-Event fehlschlägt)
         container.addEventListener('click', (e) => {
             if (e.target === btn || btn.contains(e.target)) {
                 console.log('Delegation: Klick auf ' + config.text + ' via Container');  // DEBUG Fallback
-                // Gleicher Code wie oben (rate etc.)
                 if (state.current) {
                     stopAutoplayOnUserAction();
                     console.log('Delegation → rate("' + config.score + '")');
@@ -1709,11 +1838,17 @@ function forceRatingButtons() {
         console.log(`${config.text} gestylt + Event mit Logs gesetzt: Klick-Debug aktiv!`);
     });
     
-    // ... (Rest: Parent sichtbar, console.log('forceRatingButtons: Erfolgreich...'))
+    // Parent-Container sichtbar machen (z.B. #card, falls hidden)
+    const parent = container.closest('#card, .card-container, main') || document.body;
+    if (parent) {
+        parent.style.setProperty('display', 'block', 'important');
+        parent.style.setProperty('opacity', '1', 'important');
+        parent.style.setProperty('overflow', 'visible', 'important');
+        console.log('Parent-Container (#card etc.) sichtbar gemacht');
+    }
     
-    console.log('forceRatingButtons: Fertig – Events mit full Debug! Klick auf Grün → Console checken.');
+    console.log('forceRatingButtons: Erfolgreich – 3 Buttons unter #solBox mit Events! Fertig.');
 }
-
 
 /* ========================================================================== */
 /*                                ENDE TEIL 3                                 */
