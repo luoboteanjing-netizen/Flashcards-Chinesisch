@@ -293,8 +293,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .card-controls .btn { flex: 1 1 0; max-width:none; text-align:center; }
 .card-controls, .ratebar { justify-content:center; display:flex; }
 .card-controls .btn, .ratebar .btn { min-width:100px; }
-.ratebar { gap:12px; }
-.card-controls { gap:12px; }
+.ratebar { gap:8px; }
+.card-controls { gap:8px; }
 /* ================== JETZT AUFDECKEN in blau ================== */
 
 #btnReveal {
@@ -919,4 +919,168 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* Optional (falls nötig): Karte selbst oben etwas kompakter */
 .card {
     padding-top: 10px !important;    /* vorher 14px */
+}
+
+.lesson-bar-green,
+.lesson-bar-red,
+.lesson-bar-yellow,
+.lesson-bar-grey {
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+.lesson-bar-green  { background: #2ecc71; z-index: 4; }
+.lesson-bar-red    { background: #e74c3c; z-index: 3; }
+.lesson-bar-yellow { background: #ffcc33; z-index: 2; }
+.lesson-bar-grey   { background: #99999966; z-index: 1; }
+
+/* ============================================================
+   FIX: Alle Nummern in der Lektionsliste rechtsbündig ausrichten
+   ============================================================ */
+
+.lt-total,
+.lt-unknown,
+.lt-weak,
+.lt-strong {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums; /* sorgt für perfekte Spaltenausrichtung */
+}
+
+/* ============================================================
+   Navigation & Rating: gleicher Abstand zum Kartenrand oben
+   ============================================================ */
+
+.card-controls,
+#rateBar {
+    margin-top: 10px !important;   /* gewünschter Abstand */
+}
+
+
+/* ============================================================
+   Fix: Rating-Buttons exakt wie Navigation ausrichten
+   (gleiche innere Vertikalausrichtung)
+   ============================================================ */
+
+#rateBar {
+    align-items: center !important;
+}
+
+/* =======================================================
+   FIX: Einheitliche Navigation & Rating Bars
+   – Gleiche Größe (3 Buttons flex:1), gleiche Position (margin-top:12px unter #solBox)
+   – Symmetrisch, touch-freundlich, smooth Wechsel
+======================================================= */
+
+/* Gemeinsamer Wrapper-Stil für beide Bars: Position & Übergang */
+.card-controls,
+#ratebar {
+    display: flex !important;                /* Flex-Row für beide (überschreibt Grid in .card-controls) */
+    flex-direction: row;                     /* Horizontal */
+    justify-content: space-around;           /* Gleichmäßiger Abstand, Buttons zentriert */
+    align-items: center;                     /* Vertikal zentriert */
+    width: 100%;                             /* Volle Breite unter der Karte */
+    margin: 12px 0 0 0 !important;           /* Einheitlicher Abstand oben (12px zur #solBox), kein Bottom-Margin */
+    padding: 0;                              /* Kein extra Padding im Container */
+    gap: 8px;                                /* Kleiner Gap zwischen Buttons (anpassbar) */
+    transition: opacity 0.2s ease, transform 0.2s ease;  /* Smooth Hide/Show (z.B. opacity:0 bei hide) */
+    box-sizing: border-box;                  /* Padding/Margin inklusive */
+}
+
+/* Buttons in beiden Bars: Einheitliche Größe & Stil */
+.card-controls .btn,
+#ratebar .btn {
+    flex: 1 !important;                      /* Jeder Button nimmt 1/3 der Breite ein – perfekt symmetrisch */
+    max-width: none !important;              /* Keine Breitenbeschränkung */
+    min-width: 0;                            /* Ermöglicht Schrumpfen auf Mobile */
+    padding: 12px 16px !important;           /* Einheitliches Padding: 12px vertikal (Höhe), 16px horizontal (Breite) */
+    font-size: 14px !important;              /* Einheitliche Schriftgröße */
+    font-weight: 600;                        /* Leicht bold für Klarheit */
+    border-radius: 8px;                      /* Rundung konsistent */
+    min-height: 44px;                        /* Mindesthöhe für Touch (iOS-Standard) */
+    white-space: nowrap;                     /* Kein Text-Wrap */
+    text-align: center;                      /* Text zentriert */
+    transition: all 0.2s ease;               /* Smooth Hover/Fokus */
+    box-sizing: border-box;                  /* Padding zählt zur Breite */
+}
+
+/* Speziell für Reveal-Button (bleibt kompakt, aber passt zur Größe) */
+#btnReveal {
+    flex: 1 !important;                      /* Jetzt auch flex:1, nicht auto */
+    padding: 12px 16px !important;           /* Gleiches Padding wie andere */
+    min-height: 44px;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent-text) !important;
+    font-weight: 700 !important;             /* Etwas bolder für Hervorhebung */
+}
+
+/* Speziell für Prev/Next: Links/Rechts ausrichten (falls Icons/Text variieren) */
+#btnPrev,
+#btnNext {
+    flex: 1 !important;
+    justify-content: center;                 /* Zentriert Inhalt */
+}
+
+/* Rating-Buttons: Spezielle Farben beibehalten, aber Größe angleichen */
+#btnRateKnown {
+    background: var(--good) !important;
+    border-color: var(--good) !important;
+    color: var(--accent-text) !important;
+}
+
+#btnRateUnsure {
+    background: var(--unsure) !important;
+    border-color: var(--unsure) !important;
+    color: var(--accent-text) !important;
+}
+
+#btnRateUnknown {
+    background: var(--bad) !important;
+    border-color: var(--bad) !important;
+    color: var(--accent-text) !important;
+}
+
+/* Hide/Show: Opacity für smoothen Wechsel (JS setzt display:none, aber opacity hilft bei Transition) */
+.card-controls[style*="display: none"],
+#ratebar[style*="display: none"] {
+    opacity: 0;
+    transform: translateY(4px);              /* Leichter Slide-Down-Effekt beim Verstecken */
+}
+
+.card-controls,
+#ratebar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsiveness: Auf Mobile kleineres Padding, aber gleiches Layout */
+@media (max-width: 480px) {
+    .card-controls,
+    #ratebar {
+        margin-top: 8px !important;          /* Etwas weniger Abstand auf kleinen Screens */
+        gap: 6px;                            /* Kleinerer Gap */
+    }
+    
+    .card-controls .btn,
+    #ratebar .btn {
+        padding: 10px 12px !important;       /* Kompakter auf Mobile */
+        font-size: 13px !important;          /* Etwas kleinere Schrift */
+        min-height: 40px;                    /* Immer noch touch-freundlich */
+    }
+    
+    #btnReveal {
+        padding: 10px 12px !important;
+        min-width: 80px;                     /* Kompakt, aber nicht zu klein */
+    }
+}
+
+/* Light-Mode-Anpassungen: Buttons etwas heller für Kontrast */
+:root.light .card-controls .btn,
+:root.light #ratebar .btn {
+    color: #222 !important;                  /* Dunkler Text im Light-Mode */
+}
+
+:root.light #btnReveal {
+    color: #fff !important;                  /* Weißer Text auf Accent */
 }
