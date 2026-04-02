@@ -670,16 +670,15 @@ function showNavButtons() {
 
 /* ============================ REVEAL / RATING ============================ */
 
+// doReveal: Anti-Hängen – setTimeout für sync + Checks
 function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
 	
-	// =====================================================
 	// LEITNER: Erste Sichtung → Box 0 → Box 1
-	// =====================================================
 	const p = ensureCardProgress(state.current);
 	if (p.box === 0) {
-	    p.box = 1;                 // neu → schwach
+	    p.box = 1;
 	    p.lastReview = Date.now();
 	    saveProgress();
 	    updateLessonStatsUI();
@@ -693,20 +692,27 @@ function doReveal() {
 	if (!state.autoplay.on) {
 	    hideNavButtons();
 	    
-	    // FIX: Smooth Hide der Controls-Bar (vor Ratebar-Show)
+	    // Smooth Hide Controls (mit längerer Delay, gegen Hängen)
 	    setTimeout(() => {
 	        const controlsBar = $('.card-controls');
 	        if (controlsBar) {
 	            controlsBar.style.opacity = '0';
 	            controlsBar.style.height = '0px';
+	            console.log('Controls smooth hidden');  // DEBUG
 	        }
-	    }, 10);  // Kurze Verzögerung für Transition
+	    }, 50);  // Länger: 50ms (gegen Render-Block)
 	}
 	
 	showRatingButtons();
 	enableRating();
-	syncCardHeights();
+	
+	// FIX: syncCardHeights mit Delay (nach Styles, gegen Hängen)
+	setTimeout(() => {
+	    syncCardHeights();
+	    console.log('syncCardHeights nach Delay');  // DEBUG: Läuft?
+	}, 100);  // 100ms – DOM ready machen
 }
+
 
 function showRatingButtons() {
     const rateBar = $("#rateBar");  // FIX: Klein geschrieben für Konsistenz
@@ -845,7 +851,7 @@ function hideRatingButtons() {
     hideBarSmooth('ratebar');
 }
 
-// Einheitliche Styles: Mit Klasse + expliziter Overflow/Height-Fix
+// setUniformBarStyles: Buttons explizit sichtbar + Farben hardcode (falls --good fehlt)
 function setUniformBarStyles(barType) {
     let bar;
     
@@ -853,8 +859,8 @@ function setUniformBarStyles(barType) {
         bar = $('.card-controls');
         console.log('Controls-Bar Selector:', bar);
     } else if (barType === 'ratebar') {
-        bar = $('.rating-container');  // FIX: Klasse – passt zu HTML!
-        console.log('Rate-Bar Selector:', bar);  // DEBUG: Jetzt nicht null!
+        bar = $('.rating-container');  // Klasse – funktioniert!
+        console.log('Rate-Bar Selector:', bar);
     } else {
         return;
     }
@@ -874,7 +880,7 @@ function setUniformBarStyles(barType) {
     const paddingH = isMobile ? 10 : 12;
     const gap = isMobile ? '2px' : '4px';
     
-    // Bar: Flex + SICHTBARKEIT FIXEN (gegen overflow/opacity)
+    // Bar: Sichtbar + Space
     bar.style.display = 'flex';
     bar.style.flexDirection = 'row';
     bar.style.justifyContent = 'space-evenly';
@@ -884,18 +890,19 @@ function setUniformBarStyles(barType) {
     bar.style.marginBottom = '12px';
     bar.style.padding = '0';
     bar.style.gap = gap;
-    bar.style.height = barHeight + 'px';           // Explizit Höhe (gegen 0)
-    bar.style.minHeight = barHeight + 'px';        // Fallback
-    bar.style.overflow = 'visible';                // FIX: Buttons zeigen!
-    bar.style.opacity = '1';                       // Explizit sichtbar
+    bar.style.height = barHeight + 'px';
+    bar.style.minHeight = barHeight + 'px';
+    bar.style.overflow = 'visible';
+    bar.style.opacity = '1';
     bar.style.position = 'relative';
     bar.style.transition = 'all 0.25s ease';
     bar.style.boxSizing = 'border-box';
-    bar.style.flexWrap = 'nowrap';                 // Kein Wrap (wie HTML)
+    bar.style.flexWrap = 'nowrap';
+    bar.style.visibility = 'visible';  // FIX: Explizit sichtbar (gegen CSS)
     
     console.log('Bar gestylt:', barType, 'Höhe:', barHeight + 'px', 'Overflow:', bar.style.overflow);  // DEBUG
     
-    // Buttons stylen (passt zu btn-good etc.)
+    // Buttons: Explizit sichtbar + Farben (hardcode für Test)
     const buttons = bar.querySelectorAll('.btn');
     buttons.forEach(btn => {
         btn.style.flex = '1';
@@ -908,44 +915,54 @@ function setUniformBarStyles(barType) {
         btn.style.borderRadius = '8px';
         btn.style.whiteSpace = 'nowrap';
         btn.style.textAlign = 'center';
-        btn.style.overflow = 'visible';            // FIX: Text sichtbar
+        btn.style.overflow = 'visible';
         btn.style.textOverflow = 'ellipsis';
         btn.style.boxSizing = 'border-box';
         btn.style.borderWidth = '1px';
         btn.style.minWidth = '0';
         btn.style.verticalAlign = 'middle';
         btn.style.transition = 'all 0.2s ease';
-        btn.style.opacity = '1';                   // Buttons explizit sichtbar
+        btn.style.opacity = '1';                   // FIX: Buttons sichtbar
+        btn.style.visibility = 'visible';          // FIX: Explizit
+        btn.style.display = 'inline-flex';         // FIX: Zeige Buttons (gegen none)
+        btn.style.backgroundColor = 'white';       // Fallback Weiß (vor Farben)
+        btn.style.color = 'black';
+        btn.style.borderStyle = 'solid';
+        btn.style.borderColor = '#ccc';
+        console.log('Button gestylt:', btn.textContent, 'Opacity:', btn.style.opacity);  // DEBUG pro Button
     });
     
-    // Farben (übersteuert btn-good etc., aber konsistent)
-    if (barType === 'controls') {
+    // Farben: Hardcode für Rate-Bar (falls CSS-Vars fehlen)
+    if (barType === 'ratebar') {
+        const knownBtn = $('#btnRateKnown');
+        if (knownBtn) {
+            knownBtn.style.backgroundColor = '#4CAF50';  // Grün hardcode
+            knownBtn.style.borderColor = '#4CAF50';
+            knownBtn.style.color = 'white';
+            console.log('Bekannt-Button grün');
+        }
+        const unsureBtn = $('#btnRateUnsure');
+        if (unsureBtn) {
+            unsureBtn.style.backgroundColor = '#FFEB3B';  // Gelb
+            unsureBtn.style.borderColor = '#FFEB3B';
+            unsureBtn.style.color = 'black';
+            console.log('Unsicher-Button gelb');
+        }
+        const unknownBtn = $('#btnRateUnknown');
+        if (unknownBtn) {
+            unknownBtn.style.backgroundColor = '#F44336';  // Rot
+            unknownBtn.style.borderColor = '#F44336';
+            unknownBtn.style.color = 'white';
+            console.log('Unknown-Button rot');
+        }
+    } else if (barType === 'controls') {
+        // Reveal-Button (unchanged)
         const revealBtn = $('#btnReveal');
         if (revealBtn) {
             revealBtn.style.background = 'var(--accent)';
             revealBtn.style.borderColor = 'var(--accent)';
             revealBtn.style.color = 'var(--accent-text)';
             revealBtn.style.fontWeight = '700';
-        }
-    } else if (barType === 'ratebar') {
-        // Rating-Farben (passt zu Klassen btn-good/bad)
-        const knownBtn = $('#btnRateKnown');
-        if (knownBtn) {
-            knownBtn.style.background = 'var(--good)';
-            knownBtn.style.borderColor = 'var(--good)';
-            knownBtn.style.color = 'var(--accent-text)';
-        }
-        const unsureBtn = $('#btnRateUnsure');
-        if (unsureBtn) {
-            unsureBtn.style.background = 'var(--unsure)';
-            unsureBtn.style.borderColor = 'var(--unsure)';
-            unsureBtn.style.color = 'var(--accent-text)';
-        }
-        const unknownBtn = $('#btnRateUnknown');
-        if (unknownBtn) {
-            unknownBtn.style.background = 'var(--bad)';
-            unknownBtn.style.borderColor = 'var(--bad)';
-            unknownBtn.style.color = 'var(--accent-text)';
         }
     }
 }
