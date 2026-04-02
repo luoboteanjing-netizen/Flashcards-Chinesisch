@@ -54,8 +54,8 @@ const state = {
     historyPos: -1,
 
     current: null,
-	delayedSentenceTimer: null,
-	sentenceDelay: 3000,  // in Millisekunden
+    delayedSentenceTimer: null,
+    sentenceDelay: 3000,  // in Millisekunden
 
     voices: [],
     browserVoice: { zh: null, de: null },
@@ -175,7 +175,6 @@ async function loadCSV() {
 }
 
 function parseCSV(text) {
-
     state.lessons.clear();
     state.lessonOrder = [];
 
@@ -183,7 +182,6 @@ function parseCSV(text) {
     if (lines.length < 2) return;
 
     for (let i = 1; i < lines.length; i++) {
-
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
 
@@ -261,7 +259,7 @@ function populateLessonSelect() {
         sel.appendChild(opt);
 
         // Row: 5 Spalten, initial mit byLesson-Counts
-		const row = document.createElement("div");
+        const row = document.createElement("div");
         row.className = "lt-row";
         row.dataset.lesson = k;
 
@@ -275,26 +273,49 @@ function populateLessonSelect() {
 
         // ← NEU: Rechtsbündig für Zahlen + Abstände (fallback, falls CSS fehlt)
         const spans = row.querySelectorAll('span');
-        spans[0].style.setProperty('text-align', 'left', 'important');  // Lektion: Links
-        spans[0].style.setProperty('flex', '1', 'important');  // Breiter für Text
-        spans[1].style.setProperty('text-align', 'right', 'important');  // Total: Rechts
-        spans[1].style.setProperty('flex', '0.8', 'important');  // Enger
-        for (let i = 2; i < spans.length; i++) {  // ✅/❌/🤔: Rechtsbündig, gleich breit
-            spans[i].style.setProperty('text-align', 'right', 'important');
-            spans[i].style.setProperty('flex', '0.6', 'important');  // Abstände: Gleich/eng
-            spans[i].style.setProperty('padding-right', '8px', 'important');  // Padding für Lesbarkeit
-            spans[i].style.setProperty('font-family', 'monospace', 'important');  // Zahlen fixed-width
+        if (spans.length >= 5) {
+            spans[0].style.setProperty('text-align', 'left', 'important');  // Lektion: Links
+            spans[0].style.setProperty('flex', '1', 'important');  // Breiter für Text
+            spans[1].style.setProperty('text-align', 'right', 'important');  // Total: Rechts
+            spans[1].style.setProperty('flex', '0.8', 'important');  // Enger
+            for (let i = 2; i < spans.length; i++) {  // ✅/❌/🤔: Rechtsbündig, gleich breit
+                spans[i].style.setProperty('text-align', 'right', 'important');
+                spans[i].style.setProperty('flex', '0.6', 'important');  // Abstände: Gleich/eng
+                spans[i].style.setProperty('padding-right', '8px', 'important');  // Padding für Lesbarkeit
+                spans[i].style.setProperty('font-family', 'monospace', 'important');  // Zahlen fixed-width
+            }
+            row.style.setProperty('justify-content', 'space-between', 'important');  // Abstände: Even
+            row.style.setProperty('gap', '4px', 'important');  // Kleiner Gap
         }
-        row.style.setProperty('justify-content', 'space-between', 'important');  // Abstände: Even
-        row.style.setProperty('gap', '4px', 'important');  // Kleiner Gap
 
-        // Click-Handler (unverändert)
+        // Click-Handler: Vollständig (Toggle + Pool-Update, aus vorheriger Version)
         row.addEventListener("click", () => {
-            // ... (Rest wie vorher)
+            opt.selected = !opt.selected;
+            row.classList.toggle("selected", opt.selected);
+
+            // Automatisch ausgewählte Lektionen auslesen
+            const selectedLessons = [...sel.options].filter(o => o.selected).map(o => o.value);
+
+            // In Settings speichern
+            state.settings.lessons = selectedLessons;
+            saveSettings();
+
+            // Pool neu befüllen
+            gatherPoolFromSettings();
+
+            // Falls Training läuft → Pool aktualisieren
+            if (state.trainingOn) {
+                state.idx = null;
+                resetSessionStats();
+                if (state.pool.length) {
+                    setCard(state.pool[0]);
+                }
+            }
         });
 
         table.appendChild(row);
-        // Vorauswahl (unverändert)
+
+        // Vorauswahl anzeigen
         if (state.settings.lessons.includes(k)) {
             opt.selected = true;
             row.classList.add("selected");
@@ -331,11 +352,20 @@ function updateLessonStatsUI() {
         const unsureEl = row.querySelector(".lt-unsure");  // 🤔
         if (unsureEl) unsureEl.textContent = unsure;
 
+        // Rechtsbündig updaten (wie in populate)
+        const spans = row.querySelectorAll('span');
+        if (spans.length >= 5) {
+            spans[1].style.setProperty('text-align', 'right', 'important');
+            for (let i = 2; i < spans.length; i++) {
+                spans[i].style.setProperty('text-align', 'right', 'important');
+                spans[i].style.setProperty('font-family', 'monospace', 'important');
+            }
+        }
+
         // Optional: Log (entferne nach Test)
         console.log(`updateLessonStatsUI: ${lesson} – Total:${total}, ✅:${known}, ❌:${unknown}, 🤔:${unsure}`);
     });
 }
-
 
 function sortLessons() {
     const key = lessonSort.key;
@@ -384,16 +414,18 @@ function getLessonStats(lessonName) {
     const cards = state.lessons.get(lessonName) || [];
     const total = cards.length;
 
-    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0 };
+    const p = state.progress.byLesson[lessonName] || { known: 0, unknown: 0, unsure: 0 };
     const known = p.known || 0;
     const unknown = p.unknown || 0;
-    const percent = total ? Math.round((known / total) * 100) : 0;
+    const unsure = p.unsure || 0;
+    const percent = total ? Math.round(((known + unsure) / total) * 100) : 0;  // Angepasst: Known + Unsure als "bekannt"
 
     return {
         lesson: lessonName,
         total,
         known,
         unknown,
+        unsure,
         percent
     };
 }
@@ -473,22 +505,6 @@ function syncCardHeights() {
     }, 100);  // Etwas länger: Stabilisieren
 }
 
-    // Ruck-Fix: Temporär transition aus (verhindert Resize-Anim)
-    const q = document.querySelector("#promptBox");
-    const a = document.querySelector("#solBox");
-    if (!q || !a) return;
-
-    q.style.transition = 'none';  // ← FIX: Kein Anim
-    a.style.transition = 'none';
-
-    const h = Math.max(q.offsetHeight, a.offsetHeight);
-    q.style.minHeight = h + "px";
-    a.style.minHeight = h + "px";
-	 setTimeout(() => {
-        q.style.transition = 'min-height 0.3s ease';
-        a.style.transition = 'min-height 0.3s ease';
-    }, 50);
-}
 function scrollToBottom() {
     setTimeout(() => {
         window.scrollTo({
@@ -523,8 +539,6 @@ function setCard(entry, fromHistory = false) {
     if (cardTitle)  cardTitle.textContent  = `Karte (ID ${entry.id})`;
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.lesson}`;
 
-    /* -------- Fortschrittsbalken -------- */
-    
     /* -------- Fortschrittsbalken: Dreifarbig (Rot: Unknown/Box1 | Gelb: Unsure/Box2-3 | Grün: Known/Box4-5) -------- */
     const stats = document.querySelector("#lessonStats");
     if (stats) {
@@ -557,9 +571,6 @@ function setCard(entry, fromHistory = false) {
         `;
         console.log(`Balken: ${entry.lesson} – Rot:${redPct}% (Unknown), Gelb:${yellowPct}% (Unsure), Grün:${greenPct}% (Known)`);  // DEBUG
     }
-
-    // ... (Rest deines setCard-Codes unverändert: solBox masked, Wort/Satz setzen etc.)
-	
 
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
@@ -689,7 +700,6 @@ function nextCard() {
     console.log('nextCard-Ende: Neue Karte geladen!');  // DEBUG: Ende
 }
 
-
 function prevCard() {
     if (state.historyPos > 0) {
         state.historyPos--;
@@ -724,7 +734,6 @@ function showNavButtons() {
 
 /* ============================ REVEAL / RATING ============================ */
 
-// doReveal: Anti-Hängen – setTimeout für sync + Checks
 // doReveal: Anti-Hängen – setTimeout für sync + Checks
 function doReveal() {
     $("#solBox").classList.remove("masked");
@@ -761,7 +770,7 @@ function doReveal() {
     showRatingButtons();
     enableRating();
     
-  // ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
+    // ← NEU: Extra Force + Parent-Sichtbarkeit (nach Reveal)
     setTimeout(() => {
         const card = document.querySelector('#card, main');
         if (card) {
@@ -909,8 +918,6 @@ function rate(mark) {
     
     console.log('rate-Ende: Fertig!');  // DEBUG Ende
 }
-
-
 
 /* =======================================================
    JS-FIX: Einheitliche Controls- & Ratebar (Abstand 16px, Höhe 48px) – KORRIGIERT
@@ -1186,7 +1193,7 @@ function stopTraining() {
 
     disableRating();
     hideRatingButtons();
-	updateLessonStatsUI();
+    updateLessonStatsUI();
 
     $("#solBox").classList.add("masked");
 }
@@ -1700,8 +1707,6 @@ function stopAutoplayOnUserAction() {
     }
 }
 
-// Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs
-
 // Force Rating-Buttons sichtbar & farbig – ERWEITERT: Position unter #solBox + Events mit Logs (Error-frei)
 function forceRatingButtons() {
     // Buttons per ID finden (falls schon da)
@@ -1882,199 +1887,6 @@ function forceRatingButtons() {
         parent.style.setProperty('display', 'block', 'important');
         parent.style.setProperty('opacity', '1', 'important');
         parent.style.setProperty('overflow', 'visible', 'important');
-    }
-    
-    console.log('forceRatingButtons: Erfolgreich – 3 Buttons unter #solBox mit Events! Fertig.');
-}
-
-    // Buttons per ID finden (falls schon da)
-    let knownBtn = document.getElementById('btnRateKnown');
-    let unsureBtn = document.getElementById('btnRateUnsure');
-    let unknownBtn = document.getElementById('btnRateUnknown');
-    
-    let buttons = [knownBtn, unsureBtn, unknownBtn].filter(btn => btn);
-    console.log('forceRatingButtons: Gefundene Buttons vor Fix:', buttons.length);
-    
-    if (buttons.length !== 3) {
-        console.log('Warnung: Nur', buttons.length, 'Buttons gefunden – Erstelle neue');
-        // Neu erstellen, falls fehlend (z.B. HTML hat sie disabled/hidden)
-        const buttonConfigs = [
-            { id: 'btnRateKnown', text: '✅ Gewusst', class: 'good', bg: '#4CAF50', color: 'white', score: 'known' },
-            { id: 'btnRateUnsure', text: '🤔 Unsicher', class: 'unsure', bg: '#FFEB3B', color: 'black', score: 'unsure' },
-            { id: 'btnRateUnknown', text: '❌ Nicht gewusst', class: 'bad', bg: '#F44336', color: 'white', score: 'unknown' }
-        ];
-        
-        buttonConfigs.forEach(config => {
-            let btn = document.getElementById(config.id);
-            if (!btn) {
-                btn = document.createElement('button');
-                btn.id = config.id;
-                btn.className = `btn rate ${config.class}`;
-                btn.innerHTML = config.text;
-                buttons.push(btn);  // Zur Liste hinzufügen
-                console.log(`Neu erstellt: ${config.id} ("${config.text}")`);
-            }
-        });
-    }
-    
-    // Nesting fixen (falls verschachtelt)
-    buttons.forEach(btn => {
-        if (btn.parentElement && btn.parentElement.tagName === 'BUTTON') {
-            const grandparent = btn.parentElement.parentElement;
-            if (grandparent) {
-                grandparent.appendChild(btn);
-                console.log('Nesting gefixt für', btn.id);
-            }
-        }
-        // Text bereinigen (Emojis behalten)
-        btn.innerHTML = btn.innerHTML.replace(/<[^>]*>.*?<\/[^>]*>/gi, '').trim();
-        console.log('Text gefixt:', btn.textContent.trim());
-    });
-    
-    // Container finden: Zuerst .rating-container, sonst unter #solBox
-    let container = document.querySelector('.rating-container') || document.querySelector('#rateBar');
-    console.log('Container gefunden:', container ? container.id || container.className : 'null');
-    
-    // Falls kein Container: Neuen unter #solBox erstellen (korrekte Position!)
-    if (!container || container.style.display === 'none') {
-        container = document.createElement('div');
-        container.id = 'rateBar';  // Deine ID
-        container.className = 'rating-container bar rate-bar';  // Deine Klassen
-        console.log('Neuer Container erstellt: #rateBar (.rating-container)');
-        
-        // Position: Direkt unter #solBox (Solution-Box) einfügen – das ist der "Space"!
-        const solBox = document.querySelector('#solBox');
-        if (solBox && solBox.parentNode) {
-            // Einfügen nach #solBox (im Flow der Karte)
-            solBox.parentNode.insertBefore(container, solBox.nextSibling);
-            console.log('Container unter #solBox platziert – Im Space!');
-        } else {
-            // Fallback: An #card oder body (aber priorisiere #card)
-            const card = document.querySelector('#card') || document.body;
-            if (card && card !== document.body) {
-                card.appendChild(container);  // Unter Karte
-                console.log('Container an #card angehängt');
-            } else {
-                document.body.appendChild(container);  // Letzter Fallback (sollte nicht passieren)
-                console.log('Fallback: Container an body');
-            }
-        }
-    }
-    
-    // Container sichtbar machen (flex, im Space)
-    container.style.setProperty('display', 'flex', 'important');
-    container.style.setProperty('flex-direction', 'row', 'important');
-    container.style.setProperty('justify-content', 'space-around', 'important');
-    container.style.setProperty('align-items', 'center', 'important');
-    container.style.setProperty('width', '100%', 'important');
-    container.style.setProperty('height', '52px', 'important');
-    container.style.setProperty('margin', '16px 0', 'important');
-    container.style.setProperty('padding', '4px', 'important');
-    container.style.setProperty('background-color', 'transparent', 'important');
-    container.style.setProperty('border', 'none', 'important');
-    container.style.setProperty('opacity', '1', 'important');
-    container.style.setProperty('visibility', 'visible', 'important');
-    container.style.setProperty('z-index', '1000', 'important');
-    container.style.setProperty('position', 'relative', 'important');  // Im Flow halten
-    container.style.setProperty('top', '0', 'important');  // Kein Offset
-    javascript
-    container.style.setProperty('transition', 'opacity 0.2s ease', 'important');  // Smooth Show
-    container.style.setProperty('animation', 'none', 'important');  // Kein Ruck-Anim
-	console.log('Container im Space: Flex, 52px, transparent');
-    
-    // Container resetten & Buttons anhängen (nebeneinander)
-    container.innerHTML = '';  // Alte Kinder löschen
-    buttons.forEach(btn => container.appendChild(btn));
-    
-    // Buttons stylen (farbig, sichtbar)
-    const buttonConfigs = [
-        { text: '✅ Gewusst', bg: '#4CAF50', color: 'white', score: 'known' },
-        { text: '🤔 Unsicher', bg: '#FFEB3B', color: 'black', score: 'unsure' },
-        { text: '❌ Nicht gewusst', bg: '#F44336', color: 'white', score: 'unknown' }
-    ];
-    
-    buttons.forEach((btn, i) => {
-        const config = buttonConfigs[i];
-        btn.innerHTML = config.text;
-        btn.removeAttribute('style');  // Reset alte Styles
-        btn.disabled = false;
-        btn.classList.remove('disabled', 'hidden', 'invisible', 'masked');
-        btn.classList.add('btn', 'rate', i === 0 ? 'good' : i === 1 ? 'unsure' : 'bad');
-        
-        // Force-Styles (sichtbar & farbig)
-        btn.style.setProperty('display', 'flex', 'important');
-        btn.style.setProperty('align-items', 'center', 'important');
-        btn.style.setProperty('justify-content', 'center', 'important');
-        btn.style.setProperty('position', 'relative', 'important');
-        btn.style.setProperty('flex', '1', 'important');
-        btn.style.setProperty('min-width', '80px', 'important');
-        btn.style.setProperty('height', '48px', 'important');
-        btn.style.setProperty('margin', '0 4px', 'important');
-        btn.style.setProperty('padding', '8px', 'important');
-        btn.style.setProperty('border', '1px solid', 'important');
-        btn.style.setProperty('border-radius', '4px', 'important');
-        btn.style.setProperty('font-size', '14px', 'important');
-        btn.style.setProperty('font-weight', 'bold', 'important');
-        btn.style.setProperty('cursor', 'pointer', 'important');
-        btn.style.setProperty('background-color', config.bg, 'important');
-        btn.style.setProperty('color', config.color, 'important');
-        btn.style.setProperty('opacity', '1', 'important');
-        btn.style.setProperty('visibility', 'visible', 'important');
-        btn.style.setProperty('z-index', '1001', 'important');
-        btn.style.setProperty('pointer-events', 'auto', 'important');  // ← NEU: Klicks erlauben
-        btn.style.setProperty('user-select', 'none', 'important');
-        
-        // ← Event pro Button (mit Logs – direkt attachen)
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();  // Verhindert Default
-            e.stopPropagation();  // Stoppt Bubbling
-            
-            console.log(`=== KLICK DEBUG: ${config.text} geklickt! Event fired. Training on: ${state.trainingOn}, Current: ${state.current ? state.current.id : 'null'}, Pool: ${state.pool.length}`);  // DEBUG
-            
-            if (!state.current) {
-                console.error('rate blockiert: Keine aktuelle Karte!');
-                return;
-            }
-            
-            stopAutoplayOnUserAction();  // Stop Autoplay
-            
-            // Rate aufrufen
-            console.log('Klick → rate("' + config.score + '") aufrufen...');
-            rate(config.score);
-            
-            // Nach Klick: Sofort deaktivieren/hide (wie in rate())
-            disableRating();
-            hideRatingButtons();
-            showNavButtons();  // Nav zeigen (Next/Prev)
-            
-            console.log('Klick-Ende: Buttons hidden, Nav shown');
-        }, { once: false });  // Erlaube mehrmals
-        
-        // ← EXTRA: Delegation über Container (Fallback, falls Button-Event fehlschlägt)
-        container.addEventListener('click', (e) => {
-            if (e.target === btn || btn.contains(e.target)) {
-                console.log('Delegation: Klick auf ' + config.text + ' via Container');  // DEBUG Fallback
-                if (state.current) {
-                    stopAutoplayOnUserAction();
-                    console.log('Delegation → rate("' + config.score + '")');
-                    rate(config.score);
-                    disableRating();
-                    hideRatingButtons();
-                    showNavButtons();
-                }
-            }
-        }, { once: false });
-        
-        console.log(`${config.text} gestylt + Event mit Logs gesetzt: Klick-Debug aktiv!`);
-    });
-    
-    // Parent-Container sichtbar machen (z.B. #card, falls hidden)
-    const parent = container.closest('#card, .card-container, main') || document.body;
-    if (parent) {
-        parent.style.setProperty('display', 'block', 'important');
-        parent.style.setProperty('opacity', '1', 'important');
-        parent.style.setProperty('overflow', 'visible', 'important');
-        console.log('Parent-Container (#card etc.) sichtbar gemacht');
     }
     
     console.log('forceRatingButtons: Erfolgreich – 3 Buttons unter #solBox mit Events! Fertig.');
