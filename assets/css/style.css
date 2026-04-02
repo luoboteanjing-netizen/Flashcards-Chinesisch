@@ -293,8 +293,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .card-controls .btn { flex: 1 1 0; max-width:none; text-align:center; }
 .card-controls, .ratebar { justify-content:center; display:flex; }
 .card-controls .btn, .ratebar .btn { min-width:100px; }
-.ratebar { gap:12px; }
-.card-controls { gap:12px; }
+.ratebar { gap:8px; }
+.card-controls { gap:8px; }
 /* ================== JETZT AUFDECKEN in blau ================== */
 
 #btnReveal {
@@ -560,10 +560,10 @@ html:not(.light) .lt-row.selected {
     display: grid;
     grid-template-columns:
         80px   /* Lektion */
-        40px    /* Karten */
-        30px    /* ✅ */
-        30px    /* ❌ */
-        40px;   /* % */
+        35px    /* Karten */
+        35px    /* ✅ */
+        35px    /* unsure */
+        35px;   /* weak */
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
@@ -919,4 +919,30 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* Optional (falls nötig): Karte selbst oben etwas kompakter */
 .card {
     padding-top: 10px !important;    /* vorher 14px */
+}
+
+.lesson-bar-green,
+.lesson-bar-red,
+.lesson-bar-yellow,
+.lesson-bar-grey {
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+.lesson-bar-green  { background: #2ecc71; z-index: 4; }
+.lesson-bar-red    { background: #e74c3c; z-index: 3; }
+.lesson-bar-yellow { background: #ffcc33; z-index: 2; }
+.lesson-bar-grey   { background: #99999966; z-index: 1; }
+
+/* ============================================================
+   FIX: Alle Nummern in der Lektionsliste rechtsbündig ausrichten
+   ============================================================ */
+
+.lt-total,
+.lt-unknown,
+.lt-weak,
+.lt-strong {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums; /* sorgt für perfekte Spaltenausrichtung */
 }
