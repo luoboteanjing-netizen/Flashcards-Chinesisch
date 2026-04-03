@@ -980,15 +980,7 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #rateBar .btn {
     font-size: 14px;
 }
-/* ============================================================
-   Rate-Bar: minimale Gesamtbreite etwas reduzieren
-   ============================================================ */
 
-#rateBar {
-    max-width: 86%;      /* vorher effektiv 100% → jetzt etwas kompakter */
-    margin-left: auto;
-    margin-right: auto;
-}
 /* ============================================================
    Rate-Buttons: seitliches Padding um 2px reduzieren
    ============================================================ */
@@ -996,3 +988,40 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #rateBar .btn {
     padding-left: 4px;   /* vorher z. B. 12px */
     padding-right:
+	
+/* ============================================================
+   Rate-Buttons: äußere schmaler machen (min-width entfernen)
+   ============================================================ */
+
+#btnRateKnown,
+#btnRateUnknown {
+    min-width: 0 !important;
+}
+
+/* Gewusst & Nicht gewusst: schmaler */
+#btnRateKnown,
+#btnRateUnknown {
+    flex: 1 1 0 !important;
+}
+
+/* Unsicher: darf mehr Platz haben */
+#btnRateUnsure {
+    flex: 1.4 1 0 !important;
+}
+
+/* ============================================================
+   Rate-Buttons: Reihenfolge tauschen
+   Links: Nicht gewußt | Mitte: Unsicher | Rechts: Gewußt
+   ============================================================ */
+
+#btnRateUnknown {
+    order: 1;   /* links */
+}
+
+#btnRateUnsure {
+    order: 2;   /* mitte */
+}
+
+#btnRateKnown {
+    order: 3;   /* rechts */
+}
