@@ -959,8 +959,8 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 
 .card-controls .btn,
 #btnReveal {
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
 }
 /* ============================================================
    Navigationsbuttons 4px tiefer positionieren
