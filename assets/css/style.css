@@ -1029,3 +1029,19 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     width: 100%;
     text-align: center;
 }
+
+#btnRateKnown {
+    border: 4px solid lime !important;
+}
+
+#btnRateUnknown {
+    border: 4px solid red !important;
+}
+
+/* ============================================================
+   Rate-Bar: Default IMMER versteckt (JS steuert Sichtbarkeit)
+   ============================================================ */
+
+#rateBar {
+    display: none;
+}
