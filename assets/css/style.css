@@ -976,3 +976,7 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #rateBar {
     margin-top: 0px;
 }
+
+#rateBar .btn {
+    font-size: 17px;
+}
