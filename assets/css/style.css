@@ -1010,22 +1010,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 }
 
 /* ============================================================
-   Rate-Buttons: Reihenfolge tauschen
-   Links: Nicht gewußt | Mitte: Unsicher | Rechts: Gewußt
-   ============================================================ */
-
-#btnRateUnknown {
-    order: 1;   /* links */
-}
-
-#btnRateUnsure {
-    order: 2;   /* mitte */
-}
-
-#btnRateKnown {
-    order: 3;   /* rechts */
-}
-/* ============================================================
    Rate-Bar (ohne Unsicher): 2 Buttons sauber layouten
    ============================================================ */
 
@@ -1061,3 +1045,5 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     border: 3px solid var(--good) !important;
     background-clip: padding-box;
 }
+#btnRateKnown { border-color: lime !important; }
+#btnRateUnknown { border-color: red !important; }
