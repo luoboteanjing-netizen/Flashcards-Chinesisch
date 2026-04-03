@@ -1029,17 +1029,3 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     width: 100%;
     text-align: center;
 }
-
-
-/* ============================================================
-   FINAL FIX – Bewertungsbuttons mit kräftigen farbigen Rahmen
-   ============================================================ */
-
-/* Nicht gewußt – ROT */
-#btnRateKnown {
-    border: 4px solid lime !important;
-}
-/* Gewußt – GRÜN */
-#btnRateUnknown {
-    border: 4px solid red !important;
-}
