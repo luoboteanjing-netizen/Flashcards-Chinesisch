@@ -1010,5 +1010,18 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     flex: 0.8 1 0 !important;
 }
 
-#btnRateKnown { border-color: lime !important; }
-#btnRateUnknown { border-color: red !important; }
+/* ============================================================
+   FINAL FIX – Bewertungsbuttons mit kräftigen farbigen Rahmen
+   ============================================================ */
+
+/* Nicht gewußt – ROT */
+#rateBar #btnRateUnknown {
+    border: 6px solid var(--bad) !important;
+    background-clip: padding-box;
+}
+
+/* Gewußt – GRÜN */
+#rateBar #btnRateKnown {
+    border: 6px solid var(--good) !important;
+    background-clip: padding-box;
+}
