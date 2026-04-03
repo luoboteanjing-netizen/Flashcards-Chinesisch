@@ -1016,12 +1016,14 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 
 /* Nicht gewußt – ROT */
 #rateBar #btnRateUnknown {
-    border: 6px solid var(--bad) !important;
+    border: 4px solid var(--bad) !important;
+	border-radius:14px;
     background-clip: padding-box;
 }
 
 /* Gewußt – GRÜN */
 #rateBar #btnRateKnown {
-    border: 6px solid var(--good) !important;
+    border: 4px solid var(--good) !important;
+	border-radius:14px;
     background-clip: padding-box;
 }
