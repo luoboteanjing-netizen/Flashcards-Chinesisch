@@ -767,13 +767,13 @@ function hideRatingButtons() {
 
 function enableRating() {
     $("#btnRateKnown").disabled = false;
-    $("#btnRateUnsure").disabled = false;
+  
     $("#btnRateUnknown").disabled = false;
 }
 
 function disableRating() {
     $("#btnRateKnown").disabled = true;
-    $("#btnRateUnsure").disabled = true;
+ 
     $("#btnRateUnknown").disabled = true;
 }
 
@@ -1738,11 +1738,6 @@ if (overlay) {
     $("#btnRateKnown").addEventListener("click", () => {
         stopAutoplayOnUserAction();
         rate("known");
-    });
-
-    $("#btnRateUnsure").addEventListener("click", () => {
-        stopAutoplayOnUserAction();
-        rate("unsure");
     });
 
     $("#btnRateUnknown").addEventListener("click", () => {
