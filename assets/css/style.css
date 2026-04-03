@@ -1049,6 +1049,17 @@ html, body {
     padding: 0;
 }
 .app-header {
-    padding-left: 56px;
-    padding-right: 56px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.app-header {
+    outline: 1px dashed red
+}
+
+/* ============================================================
+   Header-Banner je nach Light/Dark Mode
+   ============================================================ */
+
+html.light .header-banner {
+    content: url("assets/img/header-light.png");
 }
