@@ -986,8 +986,9 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
    ============================================================ */
 
 #rateBar .btn {
-    padding-left: 4px;   /* vorher z. B. 12px */
-    padding-right:
+    padding-left: 10px;
+    padding-right: 10px;
+}
 	
 /* ============================================================
    Rate-Buttons: äußere schmaler machen (min-width entfernen)
@@ -1047,3 +1048,11 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 }
 #btnRateKnown { border-color: lime !important; }
 #btnRateUnknown { border-color: red !important; }
+
+#btnRateKnown {
+    border: 4px solid lime !important;
+}
+
+#btnRateUnknown {
+    border: 4px solid red !important;
+}
