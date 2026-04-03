@@ -1052,9 +1052,6 @@ html, body {
     padding-left: 0px;
     padding-right: 0px;
 }
-.app-header {
-    outline: 1px dashed red
-}
 
 /* ============================================================
    Header-Banner je nach Light/Dark Mode
