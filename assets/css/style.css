@@ -1025,3 +1025,22 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #btnRateKnown {
     order: 3;   /* rechts */
 }
+/* ============================================================
+   Rate-Bar (ohne Unsicher): 2 Buttons sauber layouten
+   ============================================================ */
+
+.ratebar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;   /* genau 2 Buttons */
+    gap: 12px;
+    max-width: 420px;                 /* optisch kompakt */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#btnRateKnown,
+#btnRateUnknown {
+    min-width: 0 !important;          /* alte Bremsen lösen */
+    width: 100%;
+    text-align: center;
+}
