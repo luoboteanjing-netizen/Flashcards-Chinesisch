@@ -293,8 +293,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .card-controls .btn { flex: 1 1 0; max-width:none; text-align:center; }
 .card-controls, .ratebar { justify-content:center; display:flex; }
 .card-controls .btn, .ratebar .btn { min-width:100px; }
-.ratebar { gap:12px; }
-.card-controls { gap:12px; }
+.ratebar { gap:8px; }
+.card-controls { gap:8px; }
 /* ================== JETZT AUFDECKEN in blau ================== */
 
 #btnReveal {
@@ -454,11 +454,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #lessonSelect option {
     display: grid;
     grid-template-columns:
-        160px   /* Lektionstitel */
-        60px    /* total */
-        80px    /* known */
-        100px   /* unknown */
-        60px;   /* percent */
+         80px   /* Lektion */
+         35px   /* Karten */
+         35px   /* strong (✅) */
+         35px   /* weak   (🤔) */
+         35px;  /* unknown (❌) */  
     gap: 8px;
     font-family: inherit;
     font-size: 14px;
@@ -481,27 +481,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 4px;
 }
 
-/* ===============================================
-   6-Spalten-Layout (Lektion / Total / ✅ / ⚠️ / ❌ / %)
-================================================= */
-
-.lt-row {
-    display: grid;
-    grid-template-columns:
-        80px   /* Lektion */
-        40px   /* Total */
-        30px   /* strong (✅) */
-        30px   /* weak   (⚠️) */
-        30px   /* unknown (❌) */
-        40px;  /* % */
-    gap: 8px;
-    padding: 4px 6px;
-    font-size: 14px;
-    align-items: center;
-    background: var(--card);
-    border-radius: 6px;
-    cursor: pointer;
-}
 
 .lt-head {
     background: #283344;
@@ -560,15 +539,16 @@ html:not(.light) .lt-row.selected {
     display: grid;
     grid-template-columns:
         80px   /* Lektion */
-        40px    /* Karten */
-        30px    /* ✅ */
-        30px    /* ❌ */
-        40px;   /* % */
+        35px   /* Karten */
+        35px   /* strong (✅) */
+        35px   /* weak   (🤔) */
+        35px;  /* unknown (❌) */
+
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
     align-items: center;
-    background: #1b2330;
+    background: var(--card);
     border-radius: 6px;
     cursor: pointer;
 }
@@ -919,4 +899,113 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* Optional (falls nötig): Karte selbst oben etwas kompakter */
 .card {
     padding-top: 10px !important;    /* vorher 14px */
+}
+
+.lesson-bar-green,
+.lesson-bar-red,
+.lesson-bar-yellow,
+.lesson-bar-grey {
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+.lesson-bar-green  { background: #2ecc71; z-index: 4; }
+.lesson-bar-red    { background: #e74c3c; z-index: 3; }
+.lesson-bar-yellow { background: #ffcc33; z-index: 2; }
+.lesson-bar-grey   { background: #99999966; z-index: 1; }
+
+/* ============================================================
+   FIX: Alle Nummern in der Lektionsliste rechtsbündig ausrichten
+   ============================================================ */
+
+.lt-total,
+.lt-unknown,
+.lt-weak,
+.lt-strong {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums; /* sorgt für perfekte Spaltenausrichtung */
+}
+/* ============================================================
+   Leitner ASCII Anzeige im Kartentitel
+   ============================================================ */
+
+.leitner-ascii {
+    margin-left: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--good);   /* grün */
+    white-space: nowrap;
+}
+/* Leitner-ASCII im Kartentitel größer darstellen */
+.leitner-ascii {
+    font-size: 18px;          /* vorher ca. 14px */
+    letter-spacing: 3px;      /* etwas mehr Luft zwischen Kästchen */
+    line-height: 1;           /* verhindert vertikales Verrutschen */
+}
+/* ============================================================
+   Navigations-Buttons fingerfreundlicher machen
+   ============================================================ */
+
+.card-controls .btn {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+/* ============================================================
+   Navigationsbuttons: alle gleich fingerfreundlich
+   (inkl. Aufdecken)
+============================================================ */
+
+.card-controls .btn,
+#btnReveal {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+/* ============================================================
+   Navigationsbuttons 4px tiefer positionieren
+   ============================================================ */
+   
+#lessonStats {
+    margin-bottom: 4px;
+}
+/* ============================================================
+   Rate-Buttons etwas höher positionieren
+   ============================================================ */
+
+#rateBar {
+    margin-top: 0px;
+}
+
+#rateBar .btn {
+    font-size: 14px;
+}
+
+/* ============================================================
+   Rate-Buttons: seitliches Padding um 2px reduzieren
+   ============================================================ */
+
+#rateBar .btn {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+	
+/* ============================================================
+   Rate-Buttons: äußere schmaler machen (min-width entfernen)
+   ============================================================ */
+
+#btnRateKnown,
+#btnRateUnknown {
+    min-width: 0 !important;
+}
+
+/* Gewusst & Nicht gewusst: schmaler */
+#btnRateKnown,
+#btnRateUnknown {
+    flex: 0.8 1 0 !important;
+}
+
+/* Unsicher: darf mehr Platz haben */
+#btnRateUnsure {
+    flex: 0.8 1 0 !important;
 }
