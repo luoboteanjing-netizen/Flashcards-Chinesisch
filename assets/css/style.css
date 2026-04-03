@@ -1044,3 +1044,21 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     width: 100%;
     text-align: center;
 }
+
+/* ============================================================
+   Rate-Buttons: kräftige farbige Rahmen
+   ============================================================ */
+
+/* Nicht gewußt (rot) */
+#btnRateUnknown {
+    border-width: 3px;
+    border-style: solid;
+    border-color: var(--bad) !important;
+}
+
+/* Gewußt (grün) */
+#btnRateKnown {
+    border-width: 3px;
+    border-style: solid;
+    border-color: var(--good) !important;
+}
