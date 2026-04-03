@@ -1009,3 +1009,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #btnRateUnsure {
     flex: 0.8 1 0 !important;
 }
+
+#btnRateKnown { border-color: lime !important; }
+#btnRateUnknown { border-color: red !important; }
