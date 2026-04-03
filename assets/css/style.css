@@ -965,7 +965,7 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* ============================================================
    Navigationsbuttons 4px tiefer positionieren
    ============================================================ */
-
-.card-controls {
-    margin-top: 4px;
+   
+#lessonStats {
+    margin-bottom: 4px;
 }
