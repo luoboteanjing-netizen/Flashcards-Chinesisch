@@ -1001,12 +1001,12 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 /* Gewusst & Nicht gewusst: schmaler */
 #btnRateKnown,
 #btnRateUnknown {
-    flex: 1 1 0 !important;
+    flex: 0.8 1 0 !important;
 }
 
 /* Unsicher: darf mehr Platz haben */
 #btnRateUnsure {
-    flex: 1.4 1 0 !important;
+    flex: 0.8 1 0 !important;
 }
 
 /* ============================================================
