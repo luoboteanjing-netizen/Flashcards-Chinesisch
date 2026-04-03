@@ -969,3 +969,10 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #lessonStats {
     margin-bottom: 4px;
 }
+/* ============================================================
+   Rate-Buttons etwas höher positionieren
+   ============================================================ */
+
+#rateBar {
+    margin-top: 0px;
+}
