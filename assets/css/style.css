@@ -1045,20 +1045,19 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     text-align: center;
 }
 
+
 /* ============================================================
-   Rate-Buttons: kräftige farbige Rahmen
+   FINAL FIX – Bewertungsbuttons mit kräftigen farbigen Rahmen
    ============================================================ */
 
-/* Nicht gewußt (rot) */
-#btnRateUnknown {
-    border-width: 3px;
-    border-style: solid;
-    border-color: var(--bad) !important;
+/* Nicht gewußt – ROT */
+#rateBar #btnRateUnknown {
+    border: 3px solid var(--bad) !important;
+    background-clip: padding-box;
 }
 
-/* Gewußt (grün) */
-#btnRateKnown {
-    border-width: 3px;
-    border-style: solid;
-    border-color: var(--good) !important;
+/* Gewußt – GRÜN */
+#rateBar #btnRateKnown {
+    border: 3px solid var(--good) !important;
+    background-clip: padding-box;
 }
