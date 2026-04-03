@@ -1036,23 +1036,10 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
    ============================================================ */
 
 /* Nicht gewußt – ROT */
-#rateBar #btnRateUnknown {
-    border: 3px solid var(--bad) !important;
-    background-clip: padding-box;
-}
-
-/* Gewußt – GRÜN */
-#rateBar #btnRateKnown {
-    border: 3px solid var(--good) !important;
-    background-clip: padding-box;
-}
-#btnRateKnown { border-color: lime !important; }
-#btnRateUnknown { border-color: red !important; }
-
 #btnRateKnown {
     border: 4px solid lime !important;
 }
-
+/* Gewußt – GRÜN */
 #btnRateUnknown {
     border: 4px solid red !important;
 }
