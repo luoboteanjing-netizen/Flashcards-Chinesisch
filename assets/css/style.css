@@ -1061,5 +1061,5 @@ html, body {
    ============================================================ */
 
 html.light .header-banner {
-    content: url("assets/img/header-light.png");
+    content: url("../img/header-light.png");
 }
