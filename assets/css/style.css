@@ -1,6 +1,6 @@
 /* Version 1.0.3 */
 :root{  
-	--bg: #0b0d10;
+	--bg: #15238B;
 	--card: #12161b;
 	--text: #e6edf3;
 	--muted: #8fa1b3;
@@ -13,7 +13,7 @@
 }
 
 :root.light {
-    --bg: #f5f5f5;
+    --bg: #F0BF85;
     --card: #ffffff;
     --text: #222;
     --muted: #555;
