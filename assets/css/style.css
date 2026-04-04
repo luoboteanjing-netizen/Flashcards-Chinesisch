@@ -1,6 +1,6 @@
 /* Version 1.0.3 */
 :root{  
-	--bg: #042757;
+	--bg: #01193C;
 	--card: #12161b;
 	--text: #e6edf3;
 	--muted: #8fa1b3;
@@ -1061,5 +1061,5 @@ html.light .header-banner {
     content: url("../img/header-light.png");
 }
 main.container {
-    margin-top: 2px;
+    margin-top: 0px;
 }
