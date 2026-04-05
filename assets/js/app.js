@@ -744,11 +744,22 @@ function doReveal() {
     // -----------------------------------------
     // Timer abbrechen
     // -----------------------------------------
-    if (state.delayedSentenceTimer) {
-        clearTimeout(state.delayedSentenceTimer);
-        state.delayedSentenceTimer = null;
-    }
+// -----------------------------------------
+// Verzögerten Satz ggf. sofort anzeigen
+// -----------------------------------------
+if (state.delayedSentenceTimer) {
+    clearTimeout(state.delayedSentenceTimer);
+    state.delayedSentenceTimer = null;
 
+    // ✅ Satz sofort anzeigen (je nach Modus)
+    if (state.mode === "zh2de") {
+        $("#promptSent").innerHTML =
+            `${state.current.sent.zh}<br><span class="zh-pinyin">${state.current.sent.py}</span>`;
+    } else {
+        $("#promptSent").textContent =
+            state.current.sent.de || "—";
+    }
+}
     // -----------------------------------------
     // Buttons anzeigen
     // -----------------------------------------
