@@ -887,6 +887,9 @@ function startTraining() {
 
     if (!state.trainingOn) {
 
+        // ----------------------------
+        // Training vorbereiten
+        // ----------------------------
         state.history = [];
         state.historyPos = -1;
 
@@ -909,15 +912,28 @@ function startTraining() {
             return;
         }
 
-       const lesson = state.settings.lessons[0]; // Single-Select
-const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
+        // ----------------------------
+        // ✅ Resume-Index bestimmen
+        // ----------------------------
+        const lesson = state.settings.lessons[0]; // Single-Select
+        const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
 
-if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
-    state.idx = resumeIdx;
-} else {
-    state.trainingOn = true;
+        if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
+            state.idx = resumeIdx;
+        } else {
+            state.idx = 0;
+        }
+
+        // ----------------------------
+        // ✅ Erste Karte setzen
+        // ----------------------------
+        setCard(state.pool[state.idx]);
+
+        // ----------------------------
+        // ✅ Training aktivieren
+        // ----------------------------
+        state.trainingOn = true;
         updateTrainingBtn();
-
         scrollToBottom();
 
     } else {
