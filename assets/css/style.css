@@ -1073,14 +1073,5 @@ main.container {
 
 #solWord {
     font-weight: 700;                 /* Wort fett */
-    font-size: calc(1em + 1px);       /* Wort +1px für bessere Lesbarkeit */
-}
-/* ============================================================
-   Antwortkarte: Pinyin bewusst kleiner & ruhiger darstellen
-   ============================================================ */
-
-#solWord .zh-pinyin {
-    font-size: 0.85em;    /* kleiner als Hanzi */
-    font-weight: 400;     /* nicht fett */
-    opacity: 0.9;         /* leicht zurückgenommen */
+    font-size: calc(1em + 2px);       /* Wort +1px für bessere Lesbarkeit */
 }
