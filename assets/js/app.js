@@ -541,7 +541,7 @@ if (cardTitle) {
 
     cardTitle.innerHTML = `
         <span class="card-title-left">
-            Lektion ${entry.lesson} · Karte ${idx} / ${total}
+            Karte ${idx} / ${total}
         </span>
         <span class="card-title-right leitner-ascii">
             ${ascii}
