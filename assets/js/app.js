@@ -531,9 +531,20 @@ function setCard(entry, fromHistory = false) {
 
   
 	if (cardTitle) {
-		const p = ensureCardProgress(entry);
-		const ascii = getLeitnerAscii(p.box);
-		cardTitle.innerHTML = `<span class="leitner-ascii">${ascii}</span>`;
+    const p = ensureCardProgress(entry);
+    const ascii = getLeitnerAscii(p.box);
+
+    const idx = (state.idx ?? 0) + 1;      // 1-basiert
+    const total = state.pool?.length ?? "—";
+
+    cardTitle.innerHTML = `
+        <span class="card-title-left">
+            Lektion ${entry.lesson} · Karte ${idx} von ${total}
+        </span>
+        <span class="card-title-right leitner-ascii">
+            ${ascii}
+        </span>
+    `;
 	}
 
     if (cardLesson) cardLesson.textContent = `Lektion ${entry.id}`;
@@ -898,15 +909,13 @@ function startTraining() {
             return;
         }
 
-        if (state.order === "seq") {
-            state.idx = 0;
-            setCard(state.pool[state.idx]);
-        } else {
-            const first = state.pool[Math.floor(Math.random() * state.pool.length)];
-            setCard(first);
-        }
+       const lesson = state.settings.lessons[0]; // Single-Select
+const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
 
-        state.trainingOn = true;
+if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
+    state.idx = resumeIdx;
+} else {
+    state.trainingOn = true;
         updateTrainingBtn();
 
         scrollToBottom();
@@ -918,6 +927,13 @@ function startTraining() {
 
 function stopTraining() {
     state.trainingOn = false;
+	
+	// ✅ Resume-Index der aktuellen Lektion speichern (Training + Autoplay)
+if (state.current && state.current.lesson && state.idx !== null) {
+    state.settings.resumeIndexByLesson[state.current.lesson] = state.idx;
+    saveSettings();
+}
+	
     updateTrainingBtn();
 
     $("#btnPrev").disabled = true;
@@ -1236,9 +1252,11 @@ function ensurePoolForAutoplay() {
         return false;
     }
 
-    if (state.order === "seq") {
-        state.idx = 0;
-        setCard(state.pool[state.idx]);
+   const lesson = state.settings.lessons[0];
+const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
+
+if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
+    state.idx
     } else {
         const r = state.pool[Math.floor(Math.random() * state.pool.length)];
         setCard(r);
@@ -1489,6 +1507,11 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
        ============================================================ */
     loadSettings();
     loadProgress();
+	
+	// ✅ Resume-Fortschritt pro Lektion initialisieren
+if (!state.settings.resumeIndexByLesson) {
+    state.settings.resumeIndexByLesson = {};
+}
 
     // Theme laden
     const savedTheme = localStorage.getItem("theme") || "dark";
