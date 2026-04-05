@@ -530,16 +530,18 @@ function setCard(entry, fromHistory = false) {
     const cardLesson = document.querySelector("#cardLesson");
 
   
-	if (cardTitle) {
+	
+if (cardTitle) {
     const p = ensureCardProgress(entry);
     const ascii = getLeitnerAscii(p.box);
 
-    const idx = (state.idx ?? 0) + 1;      // 1-basiert
-    const total = state.pool?.length ?? "—";
+    const idx = (state.idx ?? 0) + 1;  // 1‑basiert
+    const cardsInLesson = state.lessons.get(entry.lesson) ?? [];
+    const total = cardsInLesson.length;
 
     cardTitle.innerHTML = `
         <span class="card-title-left">
-            Lektion ${entry.lesson} · Karte ${idx} von ${total}
+            Lektion ${entry.lesson} · Karte ${idx} / ${total}
         </span>
         <span class="card-title-right leitner-ascii">
             ${ascii}
