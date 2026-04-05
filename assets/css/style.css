@@ -1063,3 +1063,24 @@ html.light .header-banner {
 main.container {
     margin-top: 0px;
 }
+/* Antwortkarte: Wort fett darstellen */
+#solWord {
+    font-weight: 700;
+}
+/* ============================================================
+   Antwortkarte: Wort (Hanzi / Übersetzung) fett & minimal größer
+   ============================================================ */
+
+#solWord {
+    font-weight: 700;                 /* Wort fett */
+    font-size: calc(1em + 1px);       /* Wort +1px für bessere Lesbarkeit */
+}
+/* ============================================================
+   Antwortkarte: Pinyin bewusst kleiner & ruhiger darstellen
+   ============================================================ */
+
+#solWord .zh-pinyin {
+    font-size: 0.85em;    /* kleiner als Hanzi */
+    font-weight: 400;     /* nicht fett */
+    opacity: 0.9;         /* leicht zurückgenommen */
+}
