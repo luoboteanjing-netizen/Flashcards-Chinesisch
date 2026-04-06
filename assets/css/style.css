@@ -1079,3 +1079,86 @@ main.container {
 #solWord .zh-pinyin {
     font-weight: 400;     /* nicht fett */
 }
+
+/* ============================================================
+   ZENTRALE TYPOGRAFIE – FRAGE & ANTWORT
+   Alle Schriftanpassungen für Karten an EINER Stelle
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   FRAGEKARTE (PROMPT)
+   ------------------------------------------------------------ */
+
+/* Hauptwort auf der Fragekarte (z.B. Deutsch oder Hanzi) */
+#promptWord {
+    font-size: 20px;          /* Grundgröße */
+    font-weight: 800;         /* fett (stärker als normal) */
+    line-height: 1.4;
+}
+
+/* Zusatz unter dem Wort (z.B. Pinyin bei ZH→DE) */
+#promptWordSub {
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* Wortart (POS) */
+#promptPOS {
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.75;
+}
+
+/* Beispielsatz auf der Fragekarte */
+#promptSent {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.55;
+    margin-top: 8px;
+}
+
+
+/* ------------------------------------------------------------
+   ANTWORTKARTE (LÖSUNG)
+   ------------------------------------------------------------ */
+
+/* Hauptwort in der Antwort (Hanzi oder Übersetzung) */
+#solWord {
+    font-size: calc(1em + 1px); /* +1px für bessere Hanzi-Lesbarkeit */
+    font-weight: 700;           /* fett */
+    line-height: 1.4;
+}
+
+/* Pinyin in der Antwort */
+#solWord .zh-pinyin {
+    font-size: 0.85em;          /* bewusst kleiner als Hanzi */
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* Beispielsatz in der Antwort */
+#solSent {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.55;
+    margin-top: 10px;
+}
+
+
+/* ------------------------------------------------------------
+   GEMEINSAM (optional feinjustierbar)
+   ------------------------------------------------------------ */
+
+/* Basis-Lesbarkeit für beide Karten */
+#promptBox,
+#solBox {
+    text-align: center;
+}
+
+/* Schriftglättung für bessere Darstellung auf allen Systemen */
+#promptBox,
+#solBox {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
