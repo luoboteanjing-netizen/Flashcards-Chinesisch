@@ -1098,21 +1098,21 @@ main.container {
 
 /* Zusatz unter dem Wort (z.B. Pinyin bei ZH→DE) */
 #promptWordSub {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 400;
     opacity: 0.9;
 }
 
 /* Wortart (POS) */
 #promptPOS {
-    font-size: 14px;
+    font-size: 20px;
     font-style: italic;
     opacity: 0.85;
 }
 
 /* Beispielsatz auf der Fragekarte */
 #promptSent {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 400;
     line-height: 1.55;
     margin-top: 8px;
@@ -1132,14 +1132,14 @@ main.container {
 
 /* Pinyin in der Antwort */
 #solWord .zh-pinyin {
-    font-size: 16px;          /* bewusst kleiner als Hanzi */
+    font-size: 20px;          /* bewusst kleiner als Hanzi */
     font-weight: 400;
     opacity: 1;
 }
 
 /* Beispielsatz in der Antwort */
 #solSent {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 400;
     line-height: 1.55;
     margin-top: 10px;
