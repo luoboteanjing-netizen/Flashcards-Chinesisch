@@ -1107,7 +1107,7 @@ main.container {
 #promptPOS {
     font-size: 14px;
     font-style: italic;
-    opacity: 0.75;
+    opacity: 0.85;
 }
 
 /* Beispielsatz auf der Fragekarte */
@@ -1125,16 +1125,16 @@ main.container {
 
 /* Hauptwort in der Antwort (Hanzi oder Übersetzung) */
 #solWord {
-    font-size: calc(1em + 1px); /* +1px für bessere Hanzi-Lesbarkeit */
+    font-size: 20px; /* +1px für bessere Hanzi-Lesbarkeit */
     font-weight: 700;           /* fett */
     line-height: 1.4;
 }
 
 /* Pinyin in der Antwort */
 #solWord .zh-pinyin {
-    font-size: 0.85em;          /* bewusst kleiner als Hanzi */
+    font-size: 16px;          /* bewusst kleiner als Hanzi */
     font-weight: 400;
-    opacity: 0.9;
+    opacity: 1;
 }
 
 /* Beispielsatz in der Antwort */
