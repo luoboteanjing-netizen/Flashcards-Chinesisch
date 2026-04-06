@@ -1092,13 +1092,13 @@ main.container {
 /* Hauptwort auf der Fragekarte (z.B. Deutsch oder Hanzi) */
 #promptWord {
     font-size: 20px;          /* Grundgröße */
-    font-weight: 800;         /* fett (stärker als normal) */
+    font-weight: 600;         /* fett (stärker als normal) */
     line-height: 1.4;
 }
 
 /* Zusatz unter dem Wort (z.B. Pinyin bei ZH→DE) */
 #promptWordSub {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 400;
     opacity: 0.9;
 }
@@ -1126,7 +1126,7 @@ main.container {
 /* Hauptwort in der Antwort (Hanzi oder Übersetzung) */
 #solWord {
     font-size: 20px; /* +1px für bessere Hanzi-Lesbarkeit */
-    font-weight: 700;           /* fett */
+    font-weight: 600;           /* fett */
     line-height: 1.4;
 }
 
