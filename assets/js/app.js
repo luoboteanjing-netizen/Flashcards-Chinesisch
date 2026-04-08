@@ -541,7 +541,7 @@ if (cardTitle) {
 
     cardTitle.innerHTML = `
         <span class="card-title-left">
-            Karte ${idx} / ${total}
+            ${idx} / ${total}
         </span>
         <span class="card-title-right leitner-ascii">
             ${ascii}
