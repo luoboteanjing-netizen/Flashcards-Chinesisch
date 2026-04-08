@@ -1091,7 +1091,7 @@ main.container {
 
 /* Hauptwort auf der Fragekarte (z.B. Deutsch oder Hanzi) */
 #promptWord {
-    font-size: 20px;          /* Grundgröße */
+    font-size: 24px;          /* Grundgröße */
     font-weight: 600;         /* fett (stärker als normal) */
     line-height: 1.4;
 }
@@ -1105,7 +1105,7 @@ main.container {
 
 /* Wortart (POS) */
 #promptPOS {
-    font-size: 20px;
+    font-size: 18px;
     font-style: italic;
     opacity: 0.85;
 }
@@ -1114,7 +1114,7 @@ main.container {
 #promptSent {
     font-size: 20px;
     font-weight: 400;
-    line-height: 1.55;
+    line-height: 1.6;
     margin-top: 8px;
 }
 
@@ -1125,7 +1125,7 @@ main.container {
 
 /* Hauptwort in der Antwort (Hanzi oder Übersetzung) */
 #solWord {
-    font-size: 20px; /* +1px für bessere Hanzi-Lesbarkeit */
+    font-size: 24px; /* +1px für bessere Hanzi-Lesbarkeit */
     font-weight: 600;           /* fett */
     line-height: 1.4;
 }
@@ -1141,7 +1141,7 @@ main.container {
 #solSent {
     font-size: 20px;
     font-weight: 400;
-    line-height: 1.55;
+    line-height: 1.6;
     margin-top: 10px;
 }
 
