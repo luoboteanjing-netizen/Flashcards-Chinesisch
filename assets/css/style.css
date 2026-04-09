@@ -23,8 +23,8 @@
     --good:   #2e8b57;
     --bad:    #cc3333;
     --unsure: #cc9900;
-	--primary-bg: var(--accent);
-    --primary-border: var(--accent);
+    /*	--primary-bg: var(--accent);*/
+    /*    --primary-border: var(--accent);*/
 }		
 
 /* Light-Warm (Abend, augenschonend) */
