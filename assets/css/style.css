@@ -26,9 +26,46 @@
 	--primary-bg: var(--accent);
     --primary-border: var(--accent);
 }		
+
+/* ============================================================
+   SEMANTISCHE FARBROLLEN (Bedeutung, nicht Darstellung)
+   UI benutzt NUR diese Variablen
+   ============================================================ */
+
+:root {
+    /* Basisflächen */
+    --color-bg:        var(--bg);
+    --color-card:      var(--card);
+    --color-border:    var(--border);
+
+    /* Text */
+    --color-text:      var(--text);
+    --color-muted:     var(--muted);
+    --color-accent-text: var(--accent-text);
+
+    /* Aktionen / Status */
+    --color-primary:   var(--accent);
+    --color-positive:  var(--good);
+    --color-negative:  var(--bad);
+    --color-warning:   var(--unsure);
+
+    /* Buttons */
+    --color-primary-bg:     var(--primary-bg);
+    --color-primary-border: var(--primary-border);
+}
+
 		
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif}
+
+html,body{
+    margin:0;
+    padding:0;
+    background: var(--color-bg);
+    color: var(--color-text);
+
+font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif
+}
+
 .container{max-width:1100px;margin:24px auto;padding:0 12px}
 header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .subtitle{margin:0 0 8px 0;color:var(--muted);font-size:14px}
@@ -38,10 +75,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  flex-shrink: 1; /* Ermöglicht Schrumpfen bei Text-Änderungen, statt Wrap */
 }
 .small-label{font-size:12px;margin-right:2px}
-.btn{
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
+.btn {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+
 	padding:8px 12px;
 	border-radius:8px;
 	cursor:pointer; 
@@ -118,11 +156,26 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  line-height: 1.2; /* Etwas mehr Zeilenhöhe für den Text */
  white-space: nowrap; /* Verhindert Umbruch des Texts */
 }
-.card{background:var(--card);border:1px solid #1e2530;border-radius:12px;padding:14px 14px 10px;margin-bottom:14px}
+
+.card{
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+	border-radius:12px;
+	padding:14px 14px 10px;
+	margin-bottom:14px
+}
+
 .lbl{display:block;margin-bottom:6px;color:var(--muted)}
 .hint{color:var(--muted);font-size:12px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pane{border:1px solid var(--border);border-radius:10px;padding:12px}
+
+.pane{
+    border:1px solid var(--color-border);
+    background: var(--color-card);
+	border-radius:10px;
+	padding:12px
+}
+
 .select, .input{width:100%;background:#0f141b;border:1px solid #293241;color:var(--text);border-radius:8px;padding:10px;min-height:42px}
 .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
 .stack{display:flex;flex-direction:column;gap:8px}
@@ -1016,14 +1069,14 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 
 /* Nicht gewußt – ROT */
 #rateBar #btnRateUnknown {
-    border: 3px solid var(--bad) !important;
+    border: 3px solid var(--color-positive) !important;
 	border-radius:12px;
     background-clip: padding-box;
 }
 
 /* Gewußt – GRÜN */
 #rateBar #btnRateKnown {
-    border: 3px solid var(--good) !important;
+    border: 3px solid var(--color-negative) !important;
 	border-radius:12px;
     background-clip: padding-box;
 }
