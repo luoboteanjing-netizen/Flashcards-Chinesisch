@@ -347,41 +347,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  .voice-config .lbl { margin-bottom:3px; }
 }
 
-.lesson-bar {
- display: inline-block;
- height: 6px;
- border-radius: 4px;
- background: #283344;
- width: 60px;
- margin-left: 8px;
- vertical-align: middle;
-}
-.lesson-bar-fill {
- height: 100%;
- border-radius: 4px;
- background: #7bd88f; /* grün */
-}
-.lesson-bar-large {
- width: 140px;
- height: 10px;
- background: #283344;
- border-radius: 5px;
- margin-top: 4px;
-}
-.lesson-bar-large-fill {
- height: 100%;
- border-radius: 5px;
- background: #7bd88f;
-}
-.lesson-bar-large {
- width: 100%;
- height: 12px;
- background: #283344;
- border-radius: 5px;
- position: relative;
- overflow: hidden;
-}
-
 .lesson-bar-red {
  height: 100%;
  background: var(--color-progress-bad);
