@@ -735,81 +735,6 @@ body.menu-open #menuToggle::before {
     color: var(--text);   /* passt sich Light/Dark Mode an */
 }
 
-:root.light #menuToggle {
-    color: #333;           /* klarer im hellen Modus */
-}
-
-/* ✅ Hintergrundfarben anpassen */
-html.light, 
-html.light body {
-    background: var(--bg);
-    color: var(--text);
-}
-
-/* ✅ Karten hell machen */
-html.light .card {
-    background: var(--card);
-    border-color: var(--border);
-}
-
-/* ✅ Pane-Hintergründe */
-html.light .pane {
-    background: var(--card);
-    border-color: var(--border);
-}
-
-/* ✅ Buttons im Light Mode */
-
-html.light .btn.primary {
-    background: var(--accent) !important;
-    border-color: var(--accent) !important;
-    color: var(--accent-text) !important;
-}
-
-/* ✅ Mode-Buttons (DE/ZH) */
-html.light .mode-item {
-    background: #f0f0f0;
-    border-color: var(--border);
-}
-
-/* ✅ Swap-Button */
-html.light .btn.swap {
-    background: #eeeeee;
-    color: #222;
-    border-color: var(--border);
-}
-
-/* ✅ Prompt Box (war vorher dunkel gestrichelt) */
-html.light #promptBox {
-    background: #fafafa;
-    border: 2px solid var(--border);
-}
-
-/* ✅ Lösungskarte */
-html.light #solBox {
-    background: #ffffff;
-    border: 2px solid var(--border);
-}
-
-/* ✅ Tabellen-Zeilen */
-html.light .lt-row {
-    background: #f3f3f3;
-}
-html.light .lt-head {
-    background: #e0e0e0;
-}
-
-/* ✅ Voice-Panel */
-html.light #voicePanel {
-    background: white;
-    border-color: var(--border);
-}
-
-/* ✅ Scrollbar Light Mode */
-html.light .lesson-table::-webkit-scrollbar-track {
-    background: #e6e6e6;
-}
-
 html.light .lesson-table::-webkit-scrollbar-thumb {
     background: #b3b3b3;
 }
@@ -832,15 +757,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     color: var(--text);
     border-radius: 6px;
     font-size: 14px;
-}
-
-/* ============================================= */
-/* ✅ Light Mode – Auswahl sichtbar machen       */
-/* ============================================= */
-
-:root.light .lt-row.selected {
-    background: #dce8ff !important;    /* helles Blau */
-    border-left: 3px solid #3366cc;     /* schöner „Markierungsstreifen“ */
 }
 
 /* ============================================= */
@@ -1084,14 +1000,14 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 
 /* Nicht gewußt – ROT */
 #rateBar #btnRateUnknown {
-    border: 3px solid var(--color-positive) !important;
+    border: 3px solid var(--color-negative) !important;
 	border-radius:12px;
     background-clip: padding-box;
 }
 
 /* Gewußt – GRÜN */
 #rateBar #btnRateKnown {
-    border: 3px solid var(--color-negative) !important;
+    border: 3px solid var(--color-positive) !important;
 	border-radius:12px;
     background-clip: padding-box;
 }
