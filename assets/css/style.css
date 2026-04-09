@@ -568,19 +568,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     font-weight: 600;
 }
 
-.lt-row.selected {
-    background: var(--color-selected-bg) !important;
-    border-left: 4px solid var(--color-selected-border) !important;
-}
 
-/* ============================================
-   Dark Mode – ausgewählte Lektion deutlicher
-============================================ */
-html:not(.light) .lt-row.selected {
-    background: #3d4f64 !important;            /* 20% heller */
-    border-left: 4px solid var(--accent) !important;
-    box-shadow: 0 0 0 1px var(--accent) inset !important;
-}
 /* ================================
    Neue Spalte: Schwach (⚠️)
 ================================ */
