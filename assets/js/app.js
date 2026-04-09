@@ -483,6 +483,24 @@ function getLeitnerAscii(box) {
 /*                Rendering · Navigation · Rating · Training                  */
 /* ========================================================================== */
 
+function setTheme(theme) {
+    const root = document.documentElement;
+
+    // Alle Theme-Klassen entfernen
+    root.classList.remove(
+        "light-orange",
+        "light-warm",
+        "light-blue"
+    );
+
+    // Dark = keine Klasse
+    if (theme !== "dark") {
+        root.classList.add(theme);
+    }
+
+    // merken
+    localStorage.setItem("theme", theme);
+}
 
 /* ============================ sync & scroll ============================ */
 
@@ -969,6 +987,7 @@ function updateTrainingBtn() {
     $("#btnStart").textContent =
         state.trainingOn ? "Training stoppen ■" : "Training starten ▶";
 }
+
 
 
 /* ========================================================================== */
@@ -1532,8 +1551,10 @@ if (!state.settings.resumeIndexByLesson) {
 }
 
     // Theme laden
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    document.documentElement.classList.toggle("light", savedTheme === "light");
+    
+	const savedTheme = localStorage.getItem("theme") || "dark";
+	setTheme(savedTheme);
+
 
     // Satz-Delay (ms)
     if (state.settings.sentenceDelay !== undefined) {
@@ -1644,16 +1665,19 @@ if (overlay) {
     });
 }
 
-    /* THEME-SWITCH */
-    document.querySelector("#btnLight")?.addEventListener("click", () => {
-        document.documentElement.classList.add("light");
-        localStorage.setItem("theme", "light");
-    });
+/* THEME-SWITCH */
+document.querySelector("#btnThemeDark")
+  ?.addEventListener("click", () => setTheme("dark"));
 
-    document.querySelector("#btnDark")?.addEventListener("click", () => {
-        document.documentElement.classList.remove("light");
-        localStorage.setItem("theme", "dark");
-    });
+document.querySelector("#btnThemeLightOrange")
+  ?.addEventListener("click", () => setTheme("light-orange"));
+
+document.querySelector("#btnThemeLightWarm")
+  ?.addEventListener("click", () => setTheme("light-warm"));
+
+document.querySelector("#btnThemeLightBlue")
+  ?.addEventListener("click", () => setTheme("light-blue"));
+  
 
     /* DELAY INPUT */
     if (delayInput) {
