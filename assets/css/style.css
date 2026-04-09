@@ -10,6 +10,8 @@
 	--good:#7bd88f; 
 	--bad:#cc3333; 
 	--unsure:#ffbd6b; 
+    --color-primary-bg: var(--primary-bg, var(--accent));
+    --color-primary-border: var(--primary-border, var(--accent));
 }
 
 :root.light-orange {
@@ -23,8 +25,7 @@
     --good:   #2e8b57;
     --bad:    #cc3333;
     --unsure: #cc9900;
-    /*	--primary-bg: var(--accent);*/
-    /*    --primary-border: var(--accent);*/
+
 }		
 
 /* Light-Warm (Abend, augenschonend) */
