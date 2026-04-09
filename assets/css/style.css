@@ -31,8 +31,8 @@
 
 /* Light-Warm (Abend, augenschonend) */
 :root.light-warm {
-    --bg: #f4efe8;
-    --card: #fbf7f2;
+    --bg: #F7D09D;
+    --card: #F2E9DE;
     --text: #3a2f25;
     --muted: #6f5c4b;
     --accent-text: #3a2f25;
@@ -47,7 +47,7 @@
 
 /* Light-Blue (modern, kühl) */
 :root.light-blue {
-    --bg: #0D4E99;
+    --bg: #01193C;
     --card: #ffffff;
     --text: #1f2a37;
     --muted: #4b5d73;
