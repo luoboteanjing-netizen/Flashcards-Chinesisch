@@ -8,7 +8,7 @@
 	--border: #283344;
 	--accent:#7aa2f7; 
 	--good:#7bd88f; 
-	--bad:#f7768e; 
+	--bad:#cc3333; 
 	--unsure:#ffbd6b; 
 }
 
@@ -52,8 +52,20 @@
     /* Buttons */
     --color-primary-bg:     var(--primary-bg);
     --color-primary-border: var(--primary-border);
+	
+	--color-progress-strong:  var(--good);
+	--color-progress-weak:    var(--unsure);
+	--color-progress-bad:     var(--bad);
+	--color-progress-neutral: var(--color-border);
+	
+	--color-table-known:   var(--color-positive);
+	--color-table-unknown: var(--color-negative);
+	--color-table-weak:    var(--color-warning);
+	
+	--color-selected-bg:    color-mix(in srgb, var(--color-primary) 15%, var(--color-card));
+	--color-selected-border: var(--color-primary);
+	--color-overlay: rgba(0,0,0,0.35);
 }
-
 		
 *{box-sizing:border-box}
 
@@ -323,21 +335,21 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 .lesson-bar-red {
  height: 100%;
- background: #e74c3c; /* rot */
+ background: var(--color-progress-bad);
  position: absolute;
  left: 0;
  top: 0;
 }
 .lesson-bar-yellow {
     height: 100%;
-    background: #ffcc33;  /* gelb (Box 1+2) */
+    background: var(--color-progress-weak);
     position: absolute;
     left: 0;
     top: 0;
 }
 .lesson-bar-green {
     height: 100%;
-    background: #2ecc71; /* grün (Box 3+4+5) */
+    background: var(--color-progress-strong);
     position: absolute;
     top: 0;
 }
@@ -555,11 +567,13 @@ html:not(.light) .lt-row.selected {
    Neue Spalte: Schwach (⚠️)
 ================================ */
 
-.lt-known   { color: var(--good); }
-.lt-unknown { color: var(--bad);  }
+.lt-known{ 
+	color: var(--color-table-known);
+	font-weight: 600;
+}
 
 .lt-weak {
-    color: #cc9900;        /* Gelb/Orange */
+    color: var(--color-table-weak);      /* Gelb/Orange */
     font-weight: 600;
 }
 
@@ -569,7 +583,7 @@ html:not(.light) .lt-row.selected {
 }
 
 .lt-unknown {
-    color: var(--bad);     /* Rot */
+    color: var(--color-table-unknown);    /* Rot */
     font-weight: 600;
 }
 
@@ -623,7 +637,8 @@ html:not(.light) .lt-row.selected {
 
 /* Auswahlzustand */
 .lt-row.selected {
-    background: #334155;
+	background: var(--color-selected-bg) !important;
+    border-left: 4px solid var(--color-selected-border) !important;
 }
 
 #menuToggle {
@@ -918,7 +933,7 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 #sideOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.35);
+    background: var(--color-overlay);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
@@ -963,10 +978,10 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     height: 100%;
 }
 
-.lesson-bar-green  { background: #2ecc71; z-index: 4; }
-.lesson-bar-red    { background: #e74c3c; z-index: 3; }
-.lesson-bar-yellow { background: #ffcc33; z-index: 2; }
-.lesson-bar-grey   { background: #99999966; z-index: 1; }
+.lesson-bar-green  { background: var(--color-progress-strong); z-index: 4; }
+.lesson-bar-red    { background: var(--color-progress-bad); z-index: 3; }
+.lesson-bar-yellow { background: var(--color-progress-weak); z-index: 2; }
+.lesson-bar-grey   { background: var(--color-progress-neutral); z-index: 1; }
 
 /* ============================================================
    FIX: Alle Nummern in der Lektionsliste rechtsbündig ausrichten
