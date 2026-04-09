@@ -1665,6 +1665,13 @@ if (overlay) {
     });
 }
 
+console.log("Theme buttons:",
+    document.querySelector("#btnThemeDark"),
+    document.querySelector("#btnThemeLightOrange"),
+    document.querySelector("#btnThemeLightWarm"),
+    document.querySelector("#btnThemeLightBlue")
+);
+
 /* THEME-SWITCH */
 document.querySelector("#btnThemeDark")
   ?.addEventListener("click", () => setTheme("dark"));
