@@ -487,7 +487,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 /* Mindesthöhe */
 #promptBox, #solBox {
- min-height: 35vh;
+ min-height: 32vh;
  display:flex;
  flex-direction:column;
  justify-content:flex-start;
@@ -1224,13 +1224,12 @@ html, body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
 /* ============================================================
-   FINAL FIX: Sprach-Umschalter immer sichtbar als Primary
+   Prompt- & Solution-Box: einheitliche Border
    ============================================================ */
 
-#btnSwapMode.btn.swap {
-    background-color: var(--color-primary-bg) !important;
-    border-color: var(--color-primary-border) !important;
-    color: var(--color-accent-text) !important;
-    opacity: 1 !important;
+#promptBox,
+#solBox {
+    border: 2px solid var(--color-border);
 }
