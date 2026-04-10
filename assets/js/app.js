@@ -888,24 +888,6 @@ function rate(mark) {
     nextCard();
 }
 
-/* ============================ SESSION STATS ============================ */
-
-function renderSessionStats() {
-    const s = state.session;
-
-    const avg = s.ttrCount
-        ? (s.ttrSum / s.ttrCount / 1000).toFixed(1)
-        : "—";
-
-    const acc = s.done
-        ? `${Math.round((s.known / s.done) * 100)}%`
-        : "—";
-
-    $("#sessionStats").textContent =
-        `Karten: ${s.done}/${s.total} · Korrekt: ${acc} · Aufdeck-Zeit: ${avg}s`;
-}
-
-
 /* ============================ TRAINING ============================ */
 
 function startTraining() {
