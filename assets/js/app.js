@@ -760,6 +760,11 @@ function showNavButtons() {
 function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
+	
+	
+	// ✅ Beim Aufdecken IMMER Chinesisch abspielen
+		playChineseOnReveal(state.current);
+
 
     // -----------------------------------------
     // LEITNER: Erste Sichtung → Box 0 → Box 1
@@ -1334,6 +1339,19 @@ function speakPair(word, sent, langKey, done) {
     speechSynthesis.speak(u1);
 }
 
+function playChineseOnReveal(entry) {
+    if (!entry) return;
+
+    speechSynthesis.cancel();
+
+    // Wort zuerst
+    ttsSpeak(entry.word.zh, "zh");
+
+    // Satz leicht verzögert danach
+    setTimeout(() => {
+        ttsSpeak(entry.sent.zh, "zh");
+    }, 600);
+}
 
 function autoplayStep() {
 
