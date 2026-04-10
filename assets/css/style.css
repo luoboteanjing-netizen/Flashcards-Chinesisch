@@ -7,7 +7,7 @@
 	--accent-text: #081018;
 	--border: #283344;
 	--accent:#7aa2f7; 
-	--good:#7bd88f; 
+	--good:#2e8b57; 
 	--bad:#cc3333; 
 	--unsure:#ffbd6b; 
 	--primary-bg: var(--accent);
@@ -210,7 +210,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 /* Dynamisch breiterer Autoplay-Button (ca. 15% breiter als Standard, aber flexibel – passt sich an Nachbarn an) */
 #btnAutoplay {
- min-width: 110px; /* Etwas schmaler (110px), damit + Training immer in einer Zeile passt (~230px Gesamt) */
+ min-width: 120px; /* Etwas schmaler (110px), damit + Training immer in einer Zeile passt (~230px Gesamt) */
  padding: 8px 16px; /* Etwas mehr horizontaler Innenabstand, aber flexibel */
  flex: 0 1 auto; /* Grow:0 (wächst nicht über Basis), Shrink:1 (schrumpft bei Engpass), Basis:auto (passt zu Inhalt) – verhindert Wrap */
  white-space: nowrap; /* Verhindert Text-Umbruch (z.B. "Autoplay ▶︎" oder "Autoplay ■ Stop") */
@@ -487,7 +487,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 /* Mindesthöhe */
 #promptBox, #solBox {
- min-height: 30vh;
+ min-height: 35vh;
  display:flex;
  flex-direction:column;
  justify-content:flex-start;
