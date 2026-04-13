@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chinesisch Flashcards – v5.5 (Browser optimiert)</title>
+    <title data-i18n="appTitle">Chinesisch Flashcards – v5.5 (Browser optimiert)</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,31 +21,42 @@
 
     <!-- ✅ Seitenmenü für Einstellungen (RICHTIG positioniert) -->
     <div id="sideMenu" class="side-menu">
-        <h3>Einstellungen</h3>
+        <h3 data-i18n="settingsTitle">Einstellungen</h3>
 
         <div class="menu-block">
-            <button id="btnMenuExport" class="btn">Fortschritt exportieren</button>
-            <button id="btnMenuImport" class="btn">Fortschritt importieren</button>
+            <div class="menu-title" data-i18n="progressTitle">Fortschritt</div>
+            <button id="btnMenuExport" class="btn" data-i18n="progressExport">Fortschritt exportieren</button>
+            <button id="btnMenuImport" class="btn" data-i18n="progressImport">Fortschritt importieren</button>
+            <button id="btnResetLessonProgress" class="btn ghost" data-i18n="progressResetLesson">Aktuelle Lektion zurücksetzen</button>
+            <button id="btnResetAllProgress" class="btn ghost" data-i18n="progressResetAll">Alle Lektionen zurücksetzen</button>
         </div>
 
-        
-	<div class="menu-block">
-		<div class="menu-title">Theme</div>
+        <div class="menu-block">
+            <div class="menu-title" data-i18n="languageTitle">Sprache</div>
+            <label class="lbl" for="uiLangSelect" data-i18n="uiLanguageLabel">UI Sprache</label>
+            <select id="uiLangSelect" class="menu-input">
+                <option value="de" data-i18n="uiLanguageSelectDe">Deutsch</option>
+                <option value="en" data-i18n="uiLanguageSelectEn">English</option>
+                <option value="zh" data-i18n="uiLanguageSelectZh">中文</option>
+            </select>
+        </div>
 
-			<button class="btn" id="btnThemeDark">Dark Mode</button>
-			<button class="btn" id="btnThemeLightOrange">Light‑Orange</button>
-			<button class="btn" id="btnThemeLightWarm">Light‑Warm</button>
-			<button class="btn" id="btnThemeLightBlue">Light‑Blue</button>
-		</div>
+        <div class="menu-block">
+            <div class="menu-title" data-i18n="themeTitle">Theme</div>
+            <button class="btn" id="btnThemeDark" data-i18n="themeDark">Dark Mode</button>
+            <button class="btn" id="btnThemeLightOrange" data-i18n="themeLightOrange">Light‑Orange</button>
+            <button class="btn" id="btnThemeLightWarm" data-i18n="themeLightWarm">Light‑Warm</button>
+            <button class="btn" id="btnThemeLightBlue" data-i18n="themeLightBlue">Light‑Blue</button>
+        </div>
 
 
         <div class="menu-block">
-            <label class="lbl">Satz‑Delay (Sekunden):</label>
+            <label class="lbl" id="gapLabel" data-i18n="delayLabel">Satz‑Delay (Sekunden):</label>
             <input id="delayInput" type="number" min="0" max="15" step="0.5" value="5" class="menu-input">
         </div>
 
         <div class="menu-version">
-            Version: <span id="appVersion"></span>
+            <span data-i18n="settingsVersion">Version:</span> <span id="appVersion"></span>
         </div>
     </div>
 
@@ -91,18 +102,18 @@
 
             <div class="mode-inline">
                 <div class="mode-item" id="modeLeft">🇩🇪 DE</div>
-                <button id="btnSwapMode" class="btn ghost swap" title="Richtung umschalten">⇄</button>
+                <button id="btnSwapMode" class="btn ghost swap" data-i18n-title="modeSwitchTitle">⇄</button>
                 <div class="mode-item" id="modeRight">🇨🇳 ZH</div>
             </div>
 
             <div class="actions-inline mt8">
-                <button id="btnOrderToggle" class="btn toggle">Zufällig</button>
+                <button id="btnOrderToggle" class="btn toggle" data-i18n="orderRandom">Zufällig</button>
                 <button id="btnToggleHanzi" class="btn ghost toggle active">汉字</button>
                 <button id="btnTogglePinyin" class="btn ghost toggle active">Pinyin</button>
             </div>
 
             <div class="mt8 gap-row">
-                <label class="lbl">
+                <label class="lbl" data-i18n="autoplayGapLabel">
                     Pause zw. Karten im Autoplay:
                     <span id="gapVal" class="hint">(0.8 s)</span>
                 </label>
@@ -111,32 +122,32 @@
 
             <!-- Stimmen -->
             <div class="two-col mt12">
-                <button id="btnVoiceDe" class="btn large fit voice-btn">DE Stimme</button>
-                <button id="btnVoiceZh" class="btn large fit voice-btn">ZH Stimme</button>
+                <button id="btnVoiceDe" class="btn large fit voice-btn" data-i18n="voiceButtonDe">DE Stimme</button>
+                <button id="btnVoiceZh" class="btn large fit voice-btn" data-i18n="voiceButtonZh">ZH Stimme</button>
             </div>
 
             <div class="two-col mt8 voice-grids">
                 <div class="voice-config">
-                    <label class="lbl">DE Tempo <span id="rateDeVal" class="hint">(0.95)</span></label>
+                    <label class="lbl" id="rateDeLabel" data-i18n="rateDeLabel">DE Tempo <span id="rateDeVal" class="hint">(0.95)</span></label>
                     <input id="rateDeRange" class="voice-range" type="range" min="0.6" max="1.6" step="0.05" value="0.95">
 
-                    <label class="lbl">DE Tonhöhe <span id="pitchDeVal" class="hint">(1.00)</span></label>
+                    <label class="lbl" id="pitchDeLabel" data-i18n="pitchDeLabel">DE Tonhöhe <span id="pitchDeVal" class="hint">(1.00)</span></label>
                     <input id="pitchDeRange" class="voice-range" type="range" min="0.7" max="1.5" step="0.05" value="1.00">
                 </div>
 
                 <div class="voice-config">
-                    <label class="lbl">ZH Tempo <span id="rateZhVal" class="hint">(0.95)</span></label>
+                    <label class="lbl" id="rateZhLabel" data-i18n="rateZhLabel">ZH Tempo <span id="rateZhVal" class="hint">(0.95)</span></label>
                     <input id="rateZhRange" class="voice-range" type="range" min="0.6" max="1.6" step="0.05" value="0.95">
 
-                    <label class="lbl">ZH Tonhöhe <span id="pitchZhVal" class="hint">(1.00)</span></label>
+                    <label class="lbl" id="pitchZhLabel" data-i18n="pitchZhLabel">ZH Tonhöhe <span id="pitchZhVal" class="hint">(1.00)</span></label>
                     <input id="pitchZhRange" class="voice-range" type="range" min="0.7" max="1.5" step="0.05" value="1.00">
                 </div>
             </div>
 
             <div class="stack mt12">
                 <div class="training-group">
-                    <button id="btnStart" class="btn primary">Training starten ▶</button>
-                    <button id="btnAutoplay" class="btn ghost">Autoplay ▶︎</button>
+                    <button id="btnStart" class="btn primary" data-i18n="trainingStart">Training starten ▶</button>
+                    <button id="btnAutoplay" class="btn ghost" data-i18n="autoPlay">Autoplay ▶︎</button>
                 </div>
             </div>
 
@@ -198,16 +209,16 @@
 
     <!-- Navigation -->
     <div class="card-controls">
-        <button id="btnPrev" class="btn">◀ Zurück</button>
-        <button id="btnReveal" class="btn ghost" disabled>Aufdecken</button>
-        <button id="btnNext" class="btn" disabled>Nächste ▶</button>
+        <button id="btnPrev" class="btn" data-i18n="prev">◀ Zurück</button>
+        <button id="btnReveal" class="btn ghost" disabled data-i18n="reveal">Aufdecken</button>
+        <button id="btnNext" class="btn" disabled data-i18n="next">Nächste ▶</button>
     </div>
 
     <!-- Rating-Bar -->
     <div class="ratebar" id="rateBar" style="display:none;">
-        <button id="btnRateUnknown" class="btn rate bad" disabled>❌ Nicht gewusst</button>
+        <button id="btnRateUnknown" class="btn rate bad" disabled data-i18n="rateUnknown">❌ Nicht gewusst</button>
 
-		<button id="btnRateKnown" class="btn rate good" disabled>✅ Gewusst</button>
+		<button id="btnRateKnown" class="btn rate good" disabled data-i18n="rateKnown">✅ Gewusst</button>
     </div>
 
  <!--   <div id="sessionStats" class="stats-bar">—</div> -->
@@ -219,18 +230,18 @@
 
 <div id="voicePanel" class="debug hidden">
     <div class="debug-head">
-        <div class="title">Stimmen</div>
-        <button id="btnCloseVoices" class="btn ghost">✕</button>
+        <div class="title" data-i18n="voicePanelTitle">Stimmen</div>
+        <button id="btnCloseVoices" class="btn ghost" data-i18n="voicePanelClose">✕</button>
     </div>
 
     <div class="debug-body">
         <div class="debug-section">
-            <div class="h">Hinweis</div>
-            <p>Wähle eine Stimme für die aktuell geöffnete Sprache.</p>
+            <div class="h" data-i18n="voicePanelHintTitle">Hinweis</div>
+            <p data-i18n="voicePanelHint">Wähle eine Stimme für die aktuell geöffnete Sprache.</p>
         </div>
 
         <div class="debug-section">
-            <div class="h">Stimmenliste</div>
+            <div class="h" data-i18n="voiceListTitle">Stimmenliste</div>
             <div id="dbgVoices"></div>
         </div>
     </div>
