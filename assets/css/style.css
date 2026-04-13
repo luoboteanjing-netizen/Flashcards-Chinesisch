@@ -191,12 +191,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     display: flex;
     gap: 8px;
     align-items: stretch;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
 }
 
 .actions-inline .btn {
-    flex: 1 1 0;
+    flex: 0 1 auto;
     min-width: 74px;
     width: auto;
     padding: 7px 10px;
@@ -422,8 +422,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  .mode-item { padding:10px 12px; min-height:28px; min-width:70px; font-size:13px; }
  .mode-inline, .actions-inline { gap:10px; }
  .actions-inline .btn {
-  flex: 0 0 100px;
-  width: 100px;
+  flex: 0 1 auto;
+  min-width: 74px;
+  width: auto;
  }
  .voice-btn, .voice-config .lbl, .gap-row .lbl { font-size:13px; }
  #rateZhVal, #pitchZhVal, #rateDeVal, #pitchDeVal, #gapVal { font-size:11px; }
