@@ -1,4 +1,4 @@
-/* Version 1.0.3 */
+/* Version 1.2 */
 :root{  
 	--bg: #01193C;
 	--card: #12161b;
@@ -181,9 +181,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     flex: 0 0 100px;
     width: 100px;
     min-width: 100px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 .btn.toggle.active {
     background: var(--primary-bg, var(--accent));
@@ -194,7 +191,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .actions-inline {
     display: flex;
     gap: 10px;
-    align-items: center;
+    align-items: stretch;
     flex-wrap: nowrap;
     justify-content: center;
 }
@@ -202,6 +199,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .actions-inline .btn {
     flex: 0 0 100px;
     width: 100px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 .training-group .btn {
  flex: 0 0 170px;
