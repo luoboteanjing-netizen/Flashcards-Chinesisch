@@ -178,14 +178,31 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 .btn.ghost{background:transparent}
 .btn.toggle {
-    min-width: 90px;
+    flex: 0 0 100px;
+    width: 100px;
+    min-width: 100px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .btn.toggle.active {
     background: var(--primary-bg, var(--accent));
     border-color: var(--primary-border, var(--accent));
     color: var(--accent-text);
 }
-/* FIX: Speziell für Training-Button + Autoplay – gleiche feste Breite für beide Buttons */
+
+.actions-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.actions-inline .btn {
+    flex: 0 0 100px;
+    width: 100px;
+}
 .training-group .btn {
  flex: 0 0 170px;
  min-width: 170px;
@@ -318,7 +335,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #dbgVoices .voice .meta{font-size:12px;color:#b6c2d0}
 #dbgVoices .voice .name{font-weight:600}
 .mode-inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap; justify-content: center;} /* Mehr Gap für Balance mit höherem Button */
-.actions-inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap; justify-content: center;} /* Gleiches für actions-inline */
 /* NEU: Gleiche Höhe wie Swap-Button für die Sprache-Items (links/rechts) – höheres Padding und min-height */
 .mode-item {
     background: var(--color-card);
@@ -402,6 +418,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  .btn.swap { padding:8px 10px; min-height:28px; font-size:16px; }
  .mode-item { padding:10px 12px; min-height:28px; min-width:70px; font-size:13px; }
  .mode-inline, .actions-inline { gap:10px; }
+ .actions-inline .btn {
+  flex: 0 0 100px;
+  width: 100px;
+ }
  .voice-btn, .voice-config .lbl, .gap-row .lbl { font-size:13px; }
  #rateZhVal, #pitchZhVal, #rateDeVal, #pitchDeVal, #gapVal { font-size:11px; }
  .voice-config { gap:6px; }
