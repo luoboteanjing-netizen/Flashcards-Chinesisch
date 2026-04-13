@@ -1,4 +1,4 @@
-/* Version 1.2 */
+/* Version 1.2.0 */
 :root{  
 	--bg: #01193C;
 	--card: #12161b;
@@ -82,7 +82,7 @@ html.light-orange .header-banner {
     content: url("../img/header-light.png");
 }
 html.light-warm .header-banner {
-    content: url("../img/header-light.png");
+    content: url("../img/header-warm.png");
 }
 
 html.light-blue .header-banner {
