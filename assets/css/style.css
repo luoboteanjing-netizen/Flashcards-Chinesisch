@@ -189,6 +189,18 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  justify-content: center;
 }
 
+#btnAutoplay {
+ background: var(--primary-bg, var(--accent)) !important;
+ border-color: var(--primary-border, var(--accent)) !important;
+ color: var(--accent-text) !important;
+}
+
+#btnAutoplay.primary {
+ background: var(--primary-bg, var(--accent)) !important;
+ border-color: var(--primary-border, var(--accent)) !important;
+ color: var(--accent-text) !important;
+}
+
 /* NEU: Gruppe für Training + Autoplay (unter Sliders) – Flex-Row für nebeneinander */
 .training-group {
  display: flex;
