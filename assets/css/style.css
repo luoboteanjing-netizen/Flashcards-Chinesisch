@@ -586,21 +586,20 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.2rem;
-    height: 2.2rem;
-    font-size: 1.6rem;
+    width: 3.3rem;
+    height: 3.3rem;
+    font-size: 2rem;
     color: var(--color-text);
     opacity: 0.95;
     cursor: pointer;
 }
 
 .card-speaker svg {
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 2.2rem;
+    height: 2.2rem;
     display: block;
 }
 
-/* Light Mode: leicht abdunkeln */
 :root.light .card-speaker {
     color: #444;
 }
