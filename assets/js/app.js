@@ -98,6 +98,9 @@ const TRANSLATIONS = {
         pitchDeLabel: "DE Tonhöhe",
         rateZhLabel: "ZH Tempo",
         pitchZhLabel: "ZH Tonhöhe",
+        pinyinButton: "Pīnyīn",
+        lessonTableLesson: "Lektion",
+        lessonTableCards: "Karten",
         voicePanelTitle: "Stimmen",
         voicePanelClose: "✕",
         voicePanelHintTitle: "Hinweis",
@@ -118,7 +121,8 @@ const TRANSLATIONS = {
         alertImportOk: "Fortschritt importiert.",
         alertImportInvalid: "Ungültiges Format.",
         alertImportError: "Fehler beim Import.",
-        csvLoadError: "Fehler beim Laden der CSV."
+        csvLoadError: "Fehler beim Laden der CSV.",
+        cardLessonTitle: "Lektion {id}"
     },
     en: {
         appTitle: "Chinese Flashcards",
@@ -158,6 +162,9 @@ const TRANSLATIONS = {
         pitchDeLabel: "DE pitch",
         rateZhLabel: "ZH rate",
         pitchZhLabel: "ZH pitch",
+        pinyinButton: "Pīnyīn",
+        lessonTableLesson: "Lesson",
+        lessonTableCards: "Cards",
         voicePanelTitle: "Voices",
         voicePanelClose: "✕",
         voicePanelHintTitle: "Hint",
@@ -178,7 +185,8 @@ const TRANSLATIONS = {
         alertImportOk: "Progress imported.",
         alertImportInvalid: "Invalid format.",
         alertImportError: "Import failed.",
-        csvLoadError: "Error loading CSV."
+        csvLoadError: "Error loading CSV.",
+        cardLessonTitle: "Lesson {id}"
     },
     zh: {
         appTitle: "中文抽认卡",
@@ -218,6 +226,9 @@ const TRANSLATIONS = {
         pitchDeLabel: "DE 音调",
         rateZhLabel: "ZH 速率",
         pitchZhLabel: "ZH 音调",
+        pinyinButton: "Pīnyīn",
+        lessonTableLesson: "课程",
+        lessonTableCards: "卡片",
         voicePanelTitle: "语音",
         voicePanelClose: "✕",
         voicePanelHintTitle: "提示",
@@ -238,7 +249,8 @@ const TRANSLATIONS = {
         alertImportOk: "进度已导入。",
         alertImportInvalid: "格式无效。",
         alertImportError: "导入失败。",
-        csvLoadError: "加载 CSV 时出错。"
+        csvLoadError: "加载 CSV 时出错。",
+        cardLessonTitle: "课程 {id}"
     }
 };
 
@@ -373,8 +385,18 @@ function translateAllUI() {
         node.title = translate(key);
     });
 
+    // Update lesson table headers
+    const lessonHeader = document.querySelector("#lessonTableHeaderLesson");
+    if (lessonHeader) lessonHeader.textContent = translate("lessonTableLesson");
+
+    const cardsHeader = document.querySelector("#lessonTableHeaderCards");
+    if (cardsHeader) cardsHeader.textContent = translate("lessonTableCards");
+
     const uiLangSelect = document.querySelector("#uiLangSelect");
     if (uiLangSelect) uiLangSelect.value = state.settings.lang || "de";
+
+    const themeSelect = document.querySelector("#themeSelect");
+    if (themeSelect) themeSelect.value = state.settings.theme || "dark";
 
     updateTrainingBtn();
     updateAutoplayBtn();
@@ -491,8 +513,8 @@ function populateLessonSelect() {
 
 const header = `
     <div class="lt-row lt-head">
-        <span class="lt-lesson" data-sort="lesson">Lektion</span>
-        <span class="lt-total" data-sort="total">Karten</span>
+        <span id="lessonTableHeaderLesson" class="lt-lesson" data-sort="lesson">${translate("lessonTableLesson")}</span>
+        <span id="lessonTableHeaderCards" class="lt-total" data-sort="total">${translate("lessonTableCards")}</span>
         <span class="lt-strong"  data-sort="strong">✅</span>    <!-- Box 4+5 -->
         <span class="lt-weak"    data-sort="weak">🤔</span>      <!-- Box 2+3 -->
 		<span class="lt-unknown" data-sort="unknown">❌</span>   <!-- Box 1 -->
@@ -726,6 +748,8 @@ function setTheme(theme) {
 
     // merken
     localStorage.setItem("theme", theme);
+    state.settings.theme = theme;
+    saveSettings();
 }
 
 /* ============================ sync & scroll ============================ */
@@ -882,7 +906,7 @@ if (cardTitle) {
     `;
 	}
 
-    if (cardLesson) cardLesson.textContent = `Lektion ${entry.id}`;
+    if (cardLesson) cardLesson.textContent = translate("cardLessonTitle", { id: entry.id });
 
 // ----------------------------------------------------------
 // Fortschrittsbalken (Leitner) – von links nach rechts:
@@ -1855,6 +1879,10 @@ if (!state.settings.resumeIndexByLesson) {
     state.settings.resumeIndexByLesson = {};
 }
 
+    // Theme laden
+    const savedTheme = state.settings.theme || localStorage.getItem("theme") || "dark";
+    setTheme(savedTheme);
+
     // UI-Sprache initialisieren
     state.settings.lang = state.settings.lang || "de";
     translateAllUI();
@@ -1969,25 +1997,13 @@ if (overlay) {
     });
 }
 
-console.log("Theme buttons:",
-    document.querySelector("#btnThemeDark"),
-    document.querySelector("#btnThemeLightOrange"),
-    document.querySelector("#btnThemeLightWarm"),
-    document.querySelector("#btnThemeLightBlue")
-);
-
 /* THEME-SWITCH */
-document.querySelector("#btnThemeDark")
-  ?.addEventListener("click", () => setTheme("dark"));
-
-document.querySelector("#btnThemeLightOrange")
-  ?.addEventListener("click", () => setTheme("light-orange"));
-
-document.querySelector("#btnThemeLightWarm")
-  ?.addEventListener("click", () => setTheme("light-warm"));
-
-document.querySelector("#btnThemeLightBlue")
-  ?.addEventListener("click", () => setTheme("light-blue"));
+const themeSelect = document.querySelector("#themeSelect");
+if (themeSelect) {
+    themeSelect.addEventListener("change", (e) => {
+        setTheme(e.target.value);
+    });
+}
 
 const uiLangSelect = document.querySelector("#uiLangSelect");
 if (uiLangSelect) {
