@@ -1570,8 +1570,7 @@ function renderModeUI() {
     }
 
     $("#btnOrderToggle").textContent =
-        "Reihenfolge: " +
-        (state.order === "seq" ? "Sequenziell" : "Zufällig");
+        state.order === "seq" ? "Sequenziell" : "Zufällig";
 
     renderDisplayToggleUI();
     updateTrainingBtn();
