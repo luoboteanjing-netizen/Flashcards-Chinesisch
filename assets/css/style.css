@@ -554,6 +554,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     font-size: 1.6rem;
     color: #222;       /* nutzt das helle Theme-Text-Weiß im Dark-Mode */
     opacity: 0.95;
+    cursor: pointer;
 }
 
 /* Light Mode: leicht abdunkeln */
