@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.1.0";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.2";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -1597,8 +1597,8 @@ function renderModeUI() {
         right.textContent = "🇩🇪 DE";
     }
 
-    $("#btnOrderToggle").textContent =
-        state.order === "seq" ? "Sequenziell" : "Zufällig";
+    $("#btnOrderToggle").textContent = "Zufällig";
+    $("#btnOrderToggle").classList.toggle("active", state.order === "random");
 
     renderDisplayToggleUI();
     updateTrainingBtn();
