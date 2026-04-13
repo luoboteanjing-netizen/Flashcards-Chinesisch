@@ -177,14 +177,22 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 	max-width: none;
 }
 .btn.ghost{background:transparent}
-/* FIX: Speziell für Training-Button – kompakte Breite (nicht 100% oder flex:1), unabhängig von Parent */
-#btnStart {
- width: auto !important; /* FIX: Nur Inhaltsbreite (Text + Padding) */
- flex: none !important; /* Kein Grow/Shrink über Inhalt */
- display: inline-block !important; /* Inline, um in Row zu passen */
- max-width: none !important; /* Entfernt Breitenbeschränkungen */
- min-width: 120px; /* Minimale Breite für "Training stoppen ■" */
+/* FIX: Speziell für Training-Button + Autoplay – feste Breite für beide Buttons */
+.training-group .btn {
+ min-width: 170px;
+ width: 170px;
+ white-space: nowrap;
+ text-align: center;
 }
+
+#btnStart,
+#btnAutoplay {
+ flex: none !important;
+ display: inline-flex !important;
+ align-items: center;
+ justify-content: center;
+}
+
 /* NEU: Gruppe für Training + Autoplay (unter Sliders) – Flex-Row für nebeneinander */
 .training-group {
  display: flex;
