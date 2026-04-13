@@ -178,9 +178,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 .btn.ghost{background:transparent}
 .btn.toggle {
-    flex: 0 0 100px;
-    width: 100px;
-    min-width: 100px;
+    min-width: 90px;
 }
 .btn.toggle.active {
     background: var(--primary-bg, var(--accent));
@@ -197,9 +195,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 .actions-inline .btn {
-    flex: 0 0 100px;
-    width: 100px;
-    padding: 8px 12px;
+    flex: 0 0 auto;
+    min-width: 90px;
+    width: auto;
+    padding: 8px 10px;
     display: flex;
     align-items: center;
     justify-content: center;
