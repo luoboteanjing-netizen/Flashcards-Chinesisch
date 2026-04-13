@@ -316,7 +316,9 @@ const state = {
         unsure: 0,
         unknown: 0,
         ttrSum: 0,
-        ttrCount: 0
+        ttrCount: 0,
+        revealedCount: 0,
+        revealedCardIds: []
     },
 
     startedAt: null,
@@ -694,7 +696,9 @@ function resetSessionStats() {
         unsure: 0,
         unknown: 0,
         ttrSum: 0,
-        ttrCount: 0
+        ttrCount: 0,
+        revealedCount: state.session.revealedCount ?? 0,
+        revealedCardIds: state.session.revealedCardIds ?? []
     };
 }
 
@@ -706,7 +710,7 @@ function gatherPool() {
     }
     state.pool = out;
     state.idx = null;
-    resetSessionStats();
+    // resetSessionStats();  // Entfernt - wird jetzt in startTraining() gemacht
 }
 
 function gatherPoolFromSettings() {
@@ -901,13 +905,13 @@ if (cardTitle) {
     const p = ensureCardProgress(entry);
     const ascii = getLeitnerAscii(p.box);
 
-    const idx = (state.idx ?? 0) + 1;  // 1‑basiert
+    const revealCount = state.session.revealedCount;  // Nur aufgedeckte Karten
     const cardsInLesson = state.lessons.get(entry.lesson) ?? [];
     const total = cardsInLesson.length;
 
     cardTitle.innerHTML = `
         <span class="card-title-left">
-            ${idx} / ${total}
+            ${revealCount} / ${total}
         </span>
         <span class="card-title-right leitner-ascii">
             ${ascii}
@@ -1103,9 +1107,30 @@ function doReveal() {
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
 	
+	// ✅ Kartenzähler hochzählen (nur beim Aufdecken von NEUEN Karten)
+	if (state.current && state.current.id && !state.session.revealedCardIds.includes(state.current.id)) {
+		state.session.revealedCardIds.push(state.current.id);
+		state.session.revealedCount++;
+		// Zähler in cardTitle aktualisieren
+		const cardTitle = document.querySelector("#cardTitle");
+		if (cardTitle) {
+			const p = ensureCardProgress(state.current);
+			const ascii = getLeitnerAscii(p.box);
+			const cardsInLesson = state.lessons.get(state.current.lesson) ?? [];
+			const total = cardsInLesson.length;
+			cardTitle.innerHTML = `
+				<span class="card-title-left">
+					${state.session.revealedCount} / ${total}
+				</span>
+				<span class="card-title-right leitner-ascii">
+					${ascii}
+				</span>
+			`;
+		}
+	}
 	
-	// ✅ Beim Aufdecken IMMER Chinesisch abspielen
-		playChineseOnReveal(state.current);
+    // ✅ Beim Aufdecken IMMER Chinesisch abspielen
+	playChineseOnReveal(state.current);
 
 
     // -----------------------------------------
@@ -1237,6 +1262,8 @@ function startTraining() {
         // ----------------------------
         state.history = [];
         state.historyPos = -1;
+        state.session.revealedCount = 0;
+        state.session.revealedCardIds = [];
 
         state.selectedLessons.clear();
         const sel = $("#lessonSelect");
@@ -1258,13 +1285,45 @@ function startTraining() {
         }
 
         // ----------------------------
+        // ✅ Lesson-Variable für beide Abschnitte
+        // ----------------------------
+        const lesson = state.settings.lessons[0];
+
+        // ----------------------------
+        // ✅ Kartenzähler initialisieren (bereits bekannte Karten)
+        // ----------------------------
+        const cardsInLesson = state.lessons.get(lesson) || [];
+        let knownCardsCount = 0;
+        const knownCardIds = [];
+
+        for (const card of cardsInLesson) {
+            const progress = state.progress.cards[card.id];
+            if (progress && progress.box >= 1 && progress.box <= 5) {
+                knownCardsCount++;
+                knownCardIds.push(card.id);
+            }
+        }
+
+        state.session.revealedCount = knownCardsCount;
+        state.session.revealedCardIds = knownCardIds;
+
+        // ----------------------------
+        // ✅ Session-Stats initialisieren (nach bekannte Karten zählen)
+        // ----------------------------
+        resetSessionStats();
+
+        // ----------------------------
         // ✅ Resume-Index bestimmen
         // ----------------------------
-        const lesson = state.settings.lessons[0]; // Single-Select
         const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
 
         if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
             state.idx = resumeIdx;
+            // ✅ History mit vorherigen Karten vorladen (1 bis resumeIdx)
+            for (let i = 0; i < resumeIdx; i++) {
+                state.history.push(state.pool[i]);
+            }
+            state.historyPos = resumeIdx - 1;
         } else {
             state.idx = 0;
         }
@@ -1885,6 +1944,7 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
        ============================================================ */
     loadSettings();
     loadProgress();
+    resetSessionStats();  // Session-Stats initialisieren
 	
 	// ✅ Resume-Fortschritt pro Lektion initialisieren
 if (!state.settings.resumeIndexByLesson) {
