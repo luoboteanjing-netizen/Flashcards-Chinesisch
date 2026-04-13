@@ -177,6 +177,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 	max-width: none;
 }
 .btn.ghost{background:transparent}
+.btn.toggle {
+    min-width: 90px;
+}
+.btn.toggle.active {
+    background: var(--primary-bg, var(--accent));
+    border-color: var(--primary-border, var(--accent));
+    color: var(--accent-text);
+}
 /* FIX: Speziell für Training-Button + Autoplay – gleiche feste Breite für beide Buttons */
 .training-group .btn {
  flex: 0 0 170px;
