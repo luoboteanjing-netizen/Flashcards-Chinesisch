@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.2";   // beim nächsten Release erhöhen
+const APP_VERSION = "1.2.0";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -305,7 +305,8 @@ const state = {
         lessons: [],
         browserVoiceZh: null,
         browserVoiceDe: null,
-        autoplayGap: 800
+        autoplayGap: 800,
+        resumeIndexByLesson: {}
     },
 
     session: {
@@ -336,27 +337,35 @@ const state = {
 function saveSettings() {
     try {
         localStorage.setItem(LS_KEYS.settings, JSON.stringify(state.settings));
-    } catch (e) {}
+    } catch (e) {
+        console.warn("[Settings Save Error]", e);
+    }
 }
 
 function loadSettings() {
     try {
         const s = JSON.parse(localStorage.getItem(LS_KEYS.settings) || "null");
         if (s) Object.assign(state.settings, s);
-    } catch (e) {}
+    } catch (e) {
+        console.warn("[Settings Load Error]", e);
+    }
 }
 
 function saveProgress() {
     try {
         localStorage.setItem(LS_KEYS.progress, JSON.stringify(state.progress));
-    } catch (e) {}
+    } catch (e) {
+        console.warn("[Progress Save Error]", e);
+    }
 }
 
 function loadProgress() {
     try {
         const p = JSON.parse(localStorage.getItem(LS_KEYS.progress) || "null");
         if (p && p.version === "v1") state.progress = p;
-    } catch (e) {}
+    } catch (e) {
+        console.warn("[Progress Load Error]", e);
+    }
 }
 
 function translate(key, vars = {}) {
@@ -1075,13 +1084,13 @@ function prevCard() {
 /* ============================ NAV SHOW/HIDE ============================ */
 
 function hideNavButtons() {
-    if (state.autoplay.on) return;   // Autoplay braucht Navigation!
     $("#btnPrev").style.display = "none";
     $("#btnReveal").style.display = "none";
     $("#btnNext").style.display = "none";
 }
 
 function showNavButtons() {
+    if (!state.trainingOn || state.autoplay.on) return;  // Nur im Training UND nicht im Autoplay zeigen!
     $("#btnPrev").style.display = "";
     $("#btnReveal").style.display = "";
     $("#btnNext").style.display = "";
@@ -1270,6 +1279,7 @@ function startTraining() {
         // ----------------------------
         state.trainingOn = true;
         updateTrainingBtn();
+        showNavButtons();  // Buttons anzeigen beim Training-Start
         scrollToBottom();
 
     } else {
@@ -1287,6 +1297,7 @@ if (state.current && state.current.lesson && state.idx !== null) {
 }
 	
     updateTrainingBtn();
+    hideNavButtons();  // Buttons verstecken beim Training-Stopp
 
     $("#btnPrev").disabled = true;
     $("#btnReveal").disabled = true;
@@ -1605,14 +1616,15 @@ function ensurePoolForAutoplay() {
         return false;
     }
 
-   const lesson = state.settings.lessons[0];
-const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
+    const lesson = state.settings.lessons[0];
+    const resumeIdx = state.settings.resumeIndexByLesson?.[lesson];
 
-if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
-    state.idx
+    if (typeof resumeIdx === "number" && resumeIdx < state.pool.length) {
+        state.idx = resumeIdx;
+        setCard(state.pool[resumeIdx]);
     } else {
-        const r = state.pool[Math.floor(Math.random() * state.pool.length)];
-        setCard(r);
+        state.idx = Math.floor(Math.random() * state.pool.length);
+        setCard(state.pool[state.idx]);
     }
 
     return true;
@@ -1910,6 +1922,7 @@ if (!state.settings.resumeIndexByLesson) {
     state.pitchZh = state.settings.pitchZh;
 
     renderModeUI();
+    hideNavButtons();  // Buttons initial unsichtbar beim App-Start
 
     /* ============================================================
        CSV LADEN
