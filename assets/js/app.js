@@ -589,6 +589,37 @@ function renderPromptSentence(entry) {
     $("#promptSent").innerHTML = parts.join(parts.length > 1 ? "<br>" : " ");
 }
 
+function renderPromptWordFull(entry) {
+    if (state.mode !== "zh2de") {
+        $("#promptWord").textContent = entry.word.de || "—";
+        $("#promptWordSub").innerHTML = "";
+        return;
+    }
+
+    $("#promptWord").innerHTML = entry.word.zh || "—";
+    $("#promptWordSub").innerHTML = entry.word.py
+        ? `<span class="pinyin-word">${entry.word.py}</span>`
+        : "";
+}
+
+function renderPromptSentenceFull(entry) {
+    if (state.mode !== "zh2de") {
+        $("#promptSent").textContent = entry.sent.de || "—";
+        return;
+    }
+
+    const parts = [];
+    if (entry.sent.zh) parts.push(entry.sent.zh);
+    if (entry.sent.py) parts.push(`<span class="zh-pinyin">${entry.sent.py}</span>`);
+
+    if (parts.length === 0) {
+        $("#promptSent").textContent = "";
+        return;
+    }
+
+    $("#promptSent").innerHTML = parts.join("<br>");
+}
+
 function setCard(entry, fromHistory = false) {
 
     /* ---- Timer für verzögerten Satz abbrechen ---- */
@@ -835,19 +866,16 @@ function doReveal() {
     // Timer abbrechen
     // -----------------------------------------
 // -----------------------------------------
-// Verzögerten Satz ggf. sofort anzeigen
+// Fragekarte VOLLSTÄNDIG anzeigen beim Aufdecken
 // -----------------------------------------
+if (state.mode === "zh2de") {
+    renderPromptWordFull(state.current);
+    renderPromptSentenceFull(state.current);
+}
+
 if (state.delayedSentenceTimer) {
     clearTimeout(state.delayedSentenceTimer);
     state.delayedSentenceTimer = null;
-
-    // ✅ Satz sofort anzeigen (je nach Modus)
-    if (state.mode === "zh2de") {
-        renderPromptSentence(state.current);
-    } else {
-        $("#promptSent").textContent =
-            state.current.sent.de || "—";
-    }
 }
     // -----------------------------------------
     // Buttons anzeigen
