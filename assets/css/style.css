@@ -177,18 +177,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 	max-width: none;
 }
 .btn.ghost{background:transparent}
-/* FIX: Speziell für Training-Button + Autoplay – feste Breite für beide Buttons */
+/* FIX: Speziell für Training-Button + Autoplay – gleiche feste Breite für beide Buttons */
 .training-group .btn {
+ flex: 0 0 170px;
  min-width: 170px;
  width: 170px;
  white-space: nowrap;
  text-align: center;
-}
-
-#btnStart,
-#btnAutoplay {
- flex: none !important;
- display: inline-flex !important;
+ display: inline-flex;
  align-items: center;
  justify-content: center;
 }
@@ -204,29 +200,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 /* NEU: Autoplay als Primary (wenn Klasse hinzugefügt): Farblich identisch zum Training-Button */
 
-#btnAutoplay.primary {
- background: var(--accent) !important;
- border-color: var(--accent) !important;
- color: var(--accent-text) !important;
- font-weight: 600;
- white-space: nowrap;
- transition: all 0.2s ease; /* Smooth bei Text-Wechsel (z.B. "Stop") */
- flex: 0 1 auto; /* Kompakt, dynamisch */
- width: auto !important; /* FIX: Gleiche kompakte Breite wie Training */
- display: inline-block !important;
- max-width: none !important;
-}
-/* Dynamisch breiterer Autoplay-Button (ca. 15% breiter als Standard, aber flexibel – passt sich an Nachbarn an) */
-#btnAutoplay {
- min-width: 120px; /* Etwas schmaler (110px), damit + Training immer in einer Zeile passt (~230px Gesamt) */
- padding: 8px 16px; /* Etwas mehr horizontaler Innenabstand, aber flexibel */
- flex: 0 1 auto; /* Grow:0 (wächst nicht über Basis), Shrink:1 (schrumpft bei Engpass), Basis:auto (passt zu Inhalt) – verhindert Wrap */
- white-space: nowrap; /* Verhindert Text-Umbruch (z.B. "Autoplay ▶︎" oder "Autoplay ■ Stop") */
- font-weight: 600; /* Leicht bolder für Prominenz (wird zu 700 bei .primary) */
- background: var(--primary-bg, var(--accent)) !important;
- border-color: var(--primary-border, var(--accent)) !important;
- color: var(--accent-text) !important;
-}
 /* Breitere und höhere Swap/Direction-Button (mit "< Richtung >" als zentriertem Text, kein Icon) */
 .btn.swap {
  background: var(--color-primary-bg);
@@ -383,11 +356,19 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Responsive: Mobile-Anpassungen */
 @media (max-width: 480px) {
  .top-actions { margin-top: 12px; gap: 6px; }
- #btnStart { min-width: 100px; }
- .training-group { gap: 8px; justify-content:center; flex-wrap:wrap; flex-direction:row; }
+ .training-group {
+  gap: 8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  flex-direction:row;
+ }
+ .training-group .btn {
+  flex: 0 0 150px;
+  width: 150px;
+  min-width: 150px;
+ }
  .btn.primary { margin-top:8px; }
  .btn.swap { padding:8px 10px; min-height:28px; font-size:16px; }
- #btnAutoplay { min-width:100px; padding:8px 14px; }
  .mode-item { padding:10px 12px; min-height:28px; min-width:70px; font-size:13px; }
  .mode-inline, .actions-inline { gap:10px; }
  .voice-btn, .voice-config .lbl, .gap-row .lbl { font-size:13px; }
