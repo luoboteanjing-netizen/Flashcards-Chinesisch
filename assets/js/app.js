@@ -104,6 +104,8 @@ const state = {
         pitchDe: 1.0,
         rateZh: 0.95,
         pitchZh: 1.0,
+        showHanzi: true,
+        showPinyin: true,
         lessons: [],
         browserVoiceZh: null,
         browserVoiceDe: null,
@@ -529,6 +531,64 @@ function scrollToBottom() {
 
 /* ============================ CARD RENDERING ============================ */
 
+function renderDisplayToggleUI() {
+    const btnHanzi = $("#btnToggleHanzi");
+    const btnPinyin = $("#btnTogglePinyin");
+    if (!btnHanzi || !btnPinyin) return;
+
+    btnHanzi.classList.toggle("active", state.showHanzi);
+    btnPinyin.classList.toggle("active", state.showPinyin);
+}
+
+function renderPromptWord(entry) {
+    if (state.mode !== "zh2de") {
+        $("#promptWord").textContent = entry.word.de || "—";
+        $("#promptWordSub").innerHTML = "";
+        return;
+    }
+
+    const showHanzi = state.showHanzi;
+    const showPinyin = state.showPinyin;
+
+    if (showHanzi && showPinyin) {
+        $("#promptWord").innerHTML = entry.word.zh || "—";
+        $("#promptWordSub").innerHTML = entry.word.py
+            ? `<span class="pinyin-word">${entry.word.py}</span>`
+            : "";
+    } else if (showHanzi) {
+        $("#promptWord").innerHTML = entry.word.zh || "—";
+        $("#promptWordSub").innerHTML = "";
+    } else if (showPinyin) {
+        $("#promptWord").innerHTML = entry.word.py
+            ? `<span class="pinyin-word">${entry.word.py}</span>`
+            : "—";
+        $("#promptWordSub").innerHTML = "";
+    } else {
+        $("#promptWord").innerHTML = entry.word.zh || "—";
+        $("#promptWordSub").innerHTML = "";
+    }
+}
+
+function renderPromptSentence(entry) {
+    const showHanzi = state.showHanzi;
+    const showPinyin = state.showPinyin;
+    const parts = [];
+
+    if (showHanzi && entry.sent.zh) {
+        parts.push(entry.sent.zh);
+    }
+    if (showPinyin && entry.sent.py) {
+        parts.push(`<span class="zh-pinyin">${entry.sent.py}</span>`);
+    }
+
+    if (parts.length === 0) {
+        $("#promptSent").textContent = "";
+        return;
+    }
+
+    $("#promptSent").innerHTML = parts.join(parts.length > 1 ? "<br>" : " ");
+}
+
 function setCard(entry, fromHistory = false) {
 
     /* ---- Timer für verzögerten Satz abbrechen ---- */
@@ -618,12 +678,7 @@ if (stats) {
     if (state.mode === "zh2de") {
         /* ---- CH → DE ---- */
 
-        $("#promptWord").innerHTML = entry.word.zh || "—";
-
-        $("#promptWordSub").innerHTML = entry.word.py
-            ? `<span class="pinyin-word">${entry.word.py}</span>`
-            : "";
-
+        renderPromptWord(entry);
         $("#promptPOS").textContent = entry.pos || "";
 
         /* ✅ Satz NICHT sofort anzeigen */
@@ -633,10 +688,9 @@ if (stats) {
         $("#solWord").textContent = entry.word.de;
         $("#solSent").textContent = entry.sent.de;
 
-        /* ✅ Verzögertes Einblenden des Satzes (CH+Pinyin) */
+        /* ✅ Verzögertes Einblenden des Satzes */
         state.delayedSentenceTimer = setTimeout(() => {
-            $("#promptSent").innerHTML =
-                `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
+            renderPromptSentence(entry);
             syncCardHeights();
         }, state.sentenceDelay);
 
@@ -789,8 +843,7 @@ if (state.delayedSentenceTimer) {
 
     // ✅ Satz sofort anzeigen (je nach Modus)
     if (state.mode === "zh2de") {
-        $("#promptSent").innerHTML =
-            `${state.current.sent.zh}<br><span class="zh-pinyin">${state.current.sent.py}</span>`;
+        renderPromptSentence(state.current);
     } else {
         $("#promptSent").textContent =
             state.current.sent.de || "—";
@@ -1520,6 +1573,7 @@ function renderModeUI() {
         "Reihenfolge: " +
         (state.order === "seq" ? "Sequenziell" : "Zufällig");
 
+    renderDisplayToggleUI();
     updateTrainingBtn();
 }
 
@@ -1564,9 +1618,11 @@ if (!state.settings.resumeIndexByLesson) {
     const delayInput = document.querySelector("#delayInput");
     if (delayInput) delayInput.value = state.sentenceDelay / 1000;
 
-    // MODE & ORDER
-    state.mode  = state.settings.mode  || "de2zh";
-    state.order = state.settings.order || "random";
+    // MODE, ORDER & DISPLAY TOGGLES
+    state.mode      = state.settings.mode  || "de2zh";
+    state.order     = state.settings.order || "random";
+    state.showHanzi = state.settings.showHanzi !== false;
+    state.showPinyin = state.settings.showPinyin !== false;
 
     // AUTOPLAY GAP
     state.autoplay.gapMs = state.settings.autoplayGap || 800;
@@ -1763,6 +1819,24 @@ document.querySelector("#btnThemeLightBlue")
         state.settings.order = state.order;
         saveSettings();
         renderModeUI();
+    });
+
+    $("#btnToggleHanzi").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.showHanzi = !state.showHanzi;
+        state.settings.showHanzi = state.showHanzi;
+        saveSettings();
+        renderDisplayToggleUI();
+        if (state.current) setCard(state.current, true);
+    });
+
+    $("#btnTogglePinyin").addEventListener("click", () => {
+        stopAutoplayOnUserAction();
+        state.showPinyin = !state.showPinyin;
+        state.settings.showPinyin = state.showPinyin;
+        saveSettings();
+        renderDisplayToggleUI();
+        if (state.current) setCard(state.current, true);
     });
 
     $("#btnAutoplay").addEventListener("click", () => {
