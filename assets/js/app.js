@@ -12,7 +12,7 @@
    =========================== */
 
 /* === Version manuell definieren === */
-const APP_VERSION = "1.2.0";   // beim nächsten Release erhöhen
+const APP_VERSION = "6.0";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
 const params = new URLSearchParams(location.search);
@@ -73,6 +73,7 @@ const TRANSLATIONS = {
         uiLanguageSelectDe: "Deutsch",
         uiLanguageSelectEn: "English",
         uiLanguageSelectZh: "中文",
+        uiLanguageSelectFr: "Français",
         themeTitle: "Theme",
         themeDark: "Dark Mode",
         themeLightOrange: "Light‑Orange",
@@ -137,6 +138,7 @@ const TRANSLATIONS = {
         uiLanguageSelectDe: "Deutsch",
         uiLanguageSelectEn: "English",
         uiLanguageSelectZh: "中文",
+        uiLanguageSelectFr: "French",
         themeTitle: "Theme",
         themeDark: "Dark mode",
         themeLightOrange: "Light Orange",
@@ -201,6 +203,7 @@ const TRANSLATIONS = {
         uiLanguageSelectDe: "Deutsch",
         uiLanguageSelectEn: "English",
         uiLanguageSelectZh: "中文",
+        uiLanguageSelectFr: "Français",
         themeTitle: "主题",
         themeDark: "深色模式",
         themeLightOrange: "浅橙",
@@ -251,6 +254,71 @@ const TRANSLATIONS = {
         alertImportError: "导入失败。",
         csvLoadError: "加载 CSV 时出错。",
         cardLessonTitle: "课程 {id}"
+    },
+    fr: {
+        appTitle: "Cartes Mémoire Chinois",
+        settingsTitle: "Paramètres",
+        progressTitle: "Progrès",
+        progressExport: "Exporter le progrès",
+        progressImport: "Importer le progrès",
+        progressResetLesson: "Réinitialiser la leçon actuelle",
+        progressResetAll: "Réinitialiser toutes les leçons",
+        languageTitle: "Langue",
+        uiLanguageLabel: "🌐 Langue de l'interface",
+        uiLanguageSelectDe: "Deutsch",
+        uiLanguageSelectEn: "English",
+        uiLanguageSelectZh: "中文",
+        uiLanguageSelectFr: "Französisch",
+        themeTitle: "Thème",
+        themeDark: "Mode sombre",
+        themeLightOrange: "Clair Orange",
+        themeLightWarm: "Clair Chaud",
+        themeLightBlue: "Clair Bleu",
+        delayLabel: "Délai de phrase (secondes) :",
+        autoplayGapLabel: "Pause entre les cartes en lecture automatique :",
+        settingsVersion: "Version :",
+        modeSwitchTitle: "Changer de direction",
+        orderRandom: "Aléatoire",
+        autoPlay: "Lecture automatique ▶︎",
+        autoPlayStop: "Lecture automatique ■ Arrêter",
+        trainingStart: "Commencer l'entraînement ▶",
+        trainingStop: "Arrêter l'entraînement ■",
+        prev: "◀ Précédent",
+        reveal: "Révéler",
+        next: "Suivant ▶",
+        rateUnknown: "❌ Ne savait pas",
+        rateKnown: "✅ Savait",
+        voiceButtonDe: "Voix DE",
+        voiceButtonZh: "Voix ZH",
+        rateDeLabel: "Vitesse DE",
+        pitchDeLabel: "Hauteur DE",
+        rateZhLabel: "Vitesse ZH",
+        pitchZhLabel: "Hauteur ZH",
+        pinyinButton: "Pīnyīn",
+        lessonTableLesson: "Leçon",
+        lessonTableCards: "Cartes",
+        voicePanelTitle: "Voix",
+        voicePanelClose: "✕",
+        voicePanelHintTitle: "Astuce",
+        voicePanelHint: "Choisissez une voix pour la langue actuellement ouverte.",
+        voiceListTitle: "Liste des voix",
+        noVoicesFound: "Aucune voix correspondante trouvée.",
+        namelessVoice: "(sans nom)",
+        pickVoice: "Choisir cette voix",
+        testVoice: "Écouter",
+        voiceActiveSuffix: "• [Actif]",
+        selectLessonAlert: "Veuillez d'abord choisir des leçons.",
+        selectLessonAlert2: "Veuillez choisir des leçons.",
+        noLessonSelected: "Aucune leçon sélectionnée.",
+        confirmResetLesson: "Réinitialiser vraiment le progrès de la leçon '{lesson}' ?",
+        resetLessonDone: "Le progrès de la leçon '{lesson}' a été réinitialisé.",
+        confirmResetAll: "Réinitialiser vraiment le progrès de toutes les leçons ?",
+        resetAllDone: "Le progrès de toutes les leçons a été réinitialisé.",
+        alertImportOk: "Progrès importé.",
+        alertImportInvalid: "Format invalide.",
+        alertImportError: "Échec de l'importation.",
+        csvLoadError: "Erreur lors du chargement du CSV.",
+        cardLessonTitle: "Leçon {id}"
     }
 };
 
@@ -388,6 +456,13 @@ function translateAllUI() {
         const key = node.dataset.i18n;
         if (!key) return;
         node.textContent = translate(key);
+    });
+
+    // Speziell für option elements in selects
+    document.querySelectorAll("option[data-i18n]").forEach((option) => {
+        const key = option.dataset.i18n;
+        if (!key) return;
+        option.textContent = translate(key);
     });
 
     document.querySelectorAll("[data-i18n-title]").forEach((node) => {
