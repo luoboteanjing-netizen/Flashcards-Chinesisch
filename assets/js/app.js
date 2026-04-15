@@ -279,10 +279,10 @@ const TRANSLATIONS = {
         settingsVersion: "Version :",
         modeSwitchTitle: "Changer de direction",
         orderRandom: "Aléatoire",
-        autoPlay: "Lecture auto ▶",
-		autoPlayStop: "Arrêter ■",
-		trainingStart: "Démarrer ▶",
-		trainingStop: "Arrêter ■",
+        autoPlay: "Lecture automatique ▶︎",
+        autoPlayStop: "Lecture automatique ■ Arrêter",
+        trainingStart: "Commencer l'entraînement ▶",
+        trainingStop: "Arrêter l'entraînement ■",
         prev: "◀ Précédent",
         reveal: "Révéler",
         next: "Suivant ▶",
@@ -1228,6 +1228,9 @@ function doReveal() {
 if (state.mode === "zh2de") {
     renderPromptWordFull(state.current);
     renderPromptSentenceFull(state.current);
+} else {
+    // ✅ DE → CH sofort alles anzeigen
+    $("#promptSent").textContent = state.current.sent.de || "—";
 }
 
 if (state.delayedSentenceTimer) {
@@ -1442,6 +1445,17 @@ if (state.current && state.current.lesson && state.idx !== null) {
 	updateLessonStatsUI();
 
     $("#solBox").classList.add("masked");
+	// -----------------------------------------
+    // Scroll nach oben (zuverlässig!)
+    // -----------------------------------------
+	window.scrollTo({
+        top: 0,
+        behavior: "smooth" // optional: "auto" wenn sofort
+    });
+
+    // Fallback für manche Browser / Layouts
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 }
 
 function updateTrainingBtn() {
