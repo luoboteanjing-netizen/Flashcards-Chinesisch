@@ -1453,9 +1453,6 @@ if (state.current && state.current.lesson && state.idx !== null) {
         behavior: "smooth" // optional: "auto" wenn sofort
     });
 
-    // Fallback für manche Browser / Layouts
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
 }
 
 function updateTrainingBtn() {
