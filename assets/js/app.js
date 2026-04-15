@@ -1448,11 +1448,13 @@ if (state.current && state.current.lesson && state.idx !== null) {
 	// -----------------------------------------
     // Scroll nach oben (zuverlässig!)
     // -----------------------------------------
-	window.scrollTo({
-        top: 0,
-        behavior: "smooth" // optional: "auto" wenn sofort
+	requestAnimationFrame(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     });
-
+	
 }
 
 function updateTrainingBtn() {
