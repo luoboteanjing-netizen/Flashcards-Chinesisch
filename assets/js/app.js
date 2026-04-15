@@ -856,12 +856,12 @@ function syncCardHeights() {
 }
 
 function scrollToBottom() {
-    setTimeout(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth"
-        });
-    }, 40);
+    requestAnimationFrame(() => {
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+    });
+});
 }
 
 
