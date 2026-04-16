@@ -7,13 +7,13 @@ const CACHE_NAME = "learning-app-v1";
 
 // 🔹 Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/app.js",
-  "/manifest.json",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 // ==========================================
