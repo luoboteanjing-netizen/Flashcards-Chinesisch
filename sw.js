@@ -7,13 +7,13 @@ const CACHE_NAME = "learning-app-v1";
 
 // 🔹 Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./app.js",
-  "./manifest.json",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "/",                // oder "index.html"
+  "index.html",
+  "assets/css/style.css",
+  "assets/js/app.js",
+  "manifest.json",
+  "icons/icon-192.png",
+  "icons/icon-512.png"
 ];
 
 // ==========================================
@@ -26,7 +26,20 @@ self.addEventListener("install", (event) => {
 
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(STATIC_ASSETS);
+      return event.waitUntil(
+  Promise.all(
+    STATIC_ASSETS.map(url =>
+      fetch(url).then(res => {
+        if (!res.ok) {
+          console.error("❌ Fehler bei:", url);
+        } else {
+          console.log("✅ OK:", url);
+        }
+        return res;
+      })
+    )
+  )
+);
     })
   );
 });
@@ -62,15 +75,27 @@ self.addEventListener("fetch", (event) => {
   // ------------------------------------------
   // 🔥 CSV IMMER FRISCH LADEN
   // ------------------------------------------
-  if (url.includes(".csv")) {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        // fallback falls offline
+ // ------------------------------------------
+// CSV: Network first, fallback to cache
+// ------------------------------------------
+if (url.includes(".csv")) {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // im Cache speichern
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, clone);
+        });
+        return response;
+      })
+      .catch(() => {
+        // offline fallback
         return caches.match(event.request);
       })
-    );
-    return;
-  }
+  );
+  return;
+}
 
   // ------------------------------------------
   // 🔹 APP-SHELL: Cache First
