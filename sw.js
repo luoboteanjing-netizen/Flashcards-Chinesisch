@@ -22,6 +22,16 @@ const STATIC_ASSETS = [
 self.addEventListener("install", (event) => {
   console.log("SW: Install");
 
+self.addEventListener("fetch", (event) => {
+    const req = event.request;
+
+    // ❗ nur GET Requests behandeln
+    if (req.method !== "GET") return;
+
+    const url = req.url;
+
+    console.log("FETCH:", url);
+
   self.skipWaiting(); // sofort aktivierbar
 
   event.waitUntil(
