@@ -92,6 +92,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+window.addEventListener("beforeinstallprompt", (e) => {
+  console.log("INSTALL EVENT READY");
+});
+
   // ------------------------------------------
   // 🔹 APP-SHELL: Cache First
   // ------------------------------------------
