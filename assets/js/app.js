@@ -2075,6 +2075,48 @@ window.addEventListener("beforeinstallprompt", (e) => {
   console.log("INSTALL EVENT READY ✅");
 });
 
+// ==========================================
+// PWA Install Button
+// ==========================================
+
+let deferredPrompt = null;
+
+const installButton = document.getElementById("btnInstall");
+
+if (installButton) {
+    // Button zunächst ausblenden
+    installButton.style.display = "none";
+
+    // Event abfangen, wenn der Browser die Installation anbietet
+    window.addEventListener("beforeinstallprompt", (e) => {
+        console.log("✅ beforeinstallprompt ausgelöst");
+        e.preventDefault();           // Verhindert den automatischen Prompt
+        deferredPrompt = e;           // Speichern für später
+        installButton.style.display = "block";   // Button anzeigen
+    });
+
+    // Button-Klick → Installation starten
+    installButton.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+
+        installButton.style.display = "none";   // Button verstecken
+
+        deferredPrompt.prompt();   // Install-Prompt anzeigen
+
+        const choiceResult = await deferredPrompt.userChoice;
+        console.log("Install choice:", choiceResult.outcome);
+
+        deferredPrompt = null;     // Zurücksetzen
+    });
+
+    // Optional: Button wieder verstecken, wenn App bereits installiert wurde
+    window.addEventListener("appinstalled", () => {
+        console.log("✅ App wurde installiert");
+        installButton.style.display = "none";
+        deferredPrompt = null;
+    });
+}
+
     // Theme laden
     const savedTheme = state.settings.theme || localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
