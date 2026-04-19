@@ -39,7 +39,7 @@ async function resolveCSV() {
 
     // 2. Fallback-Reihenfolge
     const candidates = [
-        "./data/HSK-Chinesisch_Lektionen.csv",
+    //    "./data/HSK-Chinesisch_Lektionen.csv",
         "./data/Long-Chinesisch_Lektionen.csv"
     ];
 
@@ -2070,6 +2070,10 @@ if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 if (!state.settings.resumeIndexByLesson) {
     state.settings.resumeIndexByLesson = {};
 }
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  console.log("INSTALL EVENT READY ✅");
+});
 
     // Theme laden
     const savedTheme = state.settings.theme || localStorage.getItem("theme") || "dark";
