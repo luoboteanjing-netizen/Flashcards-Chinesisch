@@ -72,6 +72,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = event.request.url;
 
+self.addEventListener("fetch", (event) => {
+    console.log("FETCH:", event.request.url);
   // ------------------------------------------
   // 🔥 CSV IMMER FRISCH LADEN
   // ------------------------------------------
