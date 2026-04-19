@@ -2055,7 +2055,7 @@ window.addEventListener("DOMContentLoaded", () => {
 const css = document.querySelector("#cssMain");
 const js  = document.querySelector("#jsMain");
 
-if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
+if (css) css.href = `assets/css/style.css${APP_VERSION}`;
 if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
     console.log("[INIT] Starte Initialisierung …");
 
