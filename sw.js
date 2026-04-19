@@ -7,7 +7,7 @@ const CACHE_NAME = "learning-app-v1";
 
 // 🔹 Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
-  "/",                // oder "index.html"
+  "index.html",                // oder "index.html"
   "index.html",
   "assets/css/style.css",
   "assets/js/app.js",
@@ -90,9 +90,13 @@ if (url.includes(".csv")) {
         return response;
       })
       .catch(() => {
-        // offline fallback
-        return caches.match(event.request);
-      })
+    return caches.match(event.request).then(res => {
+        return res || new Response("Offline", {
+            status: 503,
+            statusText: "Offline fallback"
+        });
+    });
+});
   );
   return;
 }
