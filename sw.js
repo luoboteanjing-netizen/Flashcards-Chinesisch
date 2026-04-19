@@ -89,15 +89,10 @@ if (url.includes(".csv")) {
         });
         return response;
       })
-	catch(() => {
-    return caches.match(event.request).then(res => {
-        return res || new Response("Offline", {
-            status: 503
-        });
-    });
-});
-
-)
+      .catch(() => {
+        // offline fallback
+        return caches.match(event.request);
+      })
   );
   return;
 }
