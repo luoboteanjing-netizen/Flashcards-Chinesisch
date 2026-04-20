@@ -51,11 +51,12 @@ if (window.APP_VERSION) {
 
     throw new Error("Keine CSV-Datei gefunden");
   }
-
+}
 const LS_KEYS = {
     settings: "fc_settings_v1",
     progress: "fc_progress_v1"
 };
+
 
 const TRANSLATIONS = {
     de: {
