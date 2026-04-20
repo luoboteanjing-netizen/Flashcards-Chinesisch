@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title data-i18n="appTitle">Chinesisch Flashcards – v6.0 (Browser optimiert)</title>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-	<link rel="icon" href="icons/favicon.png">
-	<link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-    <!-- Deine CSS -->
-    <link rel="stylesheet" id="cssMain" href="assets/css/style.css">
-	
-	<!-- Open Graph -->
-	<meta property="og:title" content="HSK Flashcards">
-	<meta property="og:description" content="HSK 1–4">
-	<meta property="og:image" content="https://luoboteanjing-netizen.github.io/Flashcards-Chinesisch/header-light.png">
-	<meta property="og:url" content="https://luoboteanjing-netizen.github.io/Flashcards-Chinesisch/">
-	<meta property="og:type" content="website">
-	
- <!--    <meta property="og:url" content="https://github.com/luoboteanjing-netizen/Flashcards-Chinesisch/"> -->
-    <meta property="og:type" content="website">
-	
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards Chinesisch</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Apple/iOS PWA Support (optimiert, deprecated-frei) -->
+    <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">  <!-- Icon für iOS Home-Screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">  <!-- Deprecated: Entferne diesen! -->
+    <meta name="mobile-web-app-capable" content="yes">  <!-- ← FIX: Ersetzt den alten, funktioniert für iOS + Android -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">  <!-- Statusbar-Stil (weiß/schwarz) -->
+    <meta name="apple-mobile-web-app-title" content="CiLong">  <!-- Titel für iOS-App (kurz) -->
+    
+    <!-- Favicon für Browser-Tabs (optional, falls FETCH-Log stört) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon.png">  <!-- Füge 32x32 favicon.png hinzu, falls nicht da -->
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">  <!-- Optional: Kleinere Version -->
+    
+    <!-- Theme-Color für Toolbar/Statusbar (aus deinem Manifest) -->
+    <meta name="theme-color" content="#7aa2f7">
+    <meta name="msapplication-TileColor" content="#7aa2f7">  <!-- Windows PWA -->
+    
+    <!-- Deine Styles/Scripts -->
+    <link rel="stylesheet" href="./assets/css/style.css?v=<?php echo $APP_VERSION; ?>">
+    <script src="./assets/js/app.js?v=<?php echo $APP_VERSION; ?>"></script>
 </head>
+
+
 
 <link rel="manifest" href="manifest.json">
 
