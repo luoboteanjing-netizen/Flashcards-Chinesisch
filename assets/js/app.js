@@ -11,53 +11,46 @@
    AUTOMATISCHE VERSIONIERUNG
    =========================== */
 
-/* === Version manuell definieren === */
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
+
   window.APP_VERSION = "6.1";
 
-const APP_VERSION ??= "6.1";   // beim nächsten Release erhöhen
+  // optional lokale Referenz
+  const APP_VERSION = window.APP_VERSION;
 
-// CSV-Datei dynamisch über URL-Parameter auswählen
-const params = new URLSearchParams(location.search);
-const csvParam = params.get("csv");
+  // ===========================
+  // DEIN CODE AB HIER
+  // ===========================
 
-// 🔥 CSV wird jetzt dynamisch zur Laufzeit bestimmt
-let CSV_URL = null;
+  const params = new URLSearchParams(location.search);
+  const csvParam = params.get("csv");
 
-/* ===========================
-   CSV RESOLVER (mit Fallback)
-   =========================== */
-async function resolveCSV() {
+  let CSV_URL = null;
 
-    // 1. URL-Parameter hat Priorität
+  async function resolveCSV() {
     if (csvParam) {
-        const file = `./data/${csvParam}`;
-        try {
-            const res = await fetch(file, { method: "HEAD" });
-            if (res.ok) return file;
-
-            console.warn("CSV aus URL nicht gefunden → Fallback wird verwendet");
-        } catch (e) {}
+      const file = `./data/${csvParam}`;
+      try {
+        const res = await fetch(file, { method: "HEAD" });
+        if (res.ok) return file;
+      } catch (e) {}
     }
 
-    // 2. Fallback-Reihenfolge
     const candidates = [
-    //    "./data/HSK-Chinesisch_Lektionen.csv",
-        "./data/Long-Chinesisch_Lektionen.csv"
+      "./data/Long-Chinesisch_Lektionen.csv"
     ];
 
     for (const file of candidates) {
-        try {
-            const res = await fetch(file, { method: "HEAD" });
-            if (res.ok) return file;
-        } catch (e) {}
+      try {
+        const res = await fetch(file, { method: "HEAD" });
+        if (res.ok) return file;
+      } catch (e) {}
     }
 
-    // 3. Harte Fehlerbehandlung
     throw new Error("Keine CSV-Datei gefunden");
-}
+  }
 
 const LS_KEYS = {
     settings: "fc_settings_v1",
