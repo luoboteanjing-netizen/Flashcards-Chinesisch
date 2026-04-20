@@ -12,6 +12,11 @@
    =========================== */
 
 /* === Version manuell definieren === */
+if (window.APP_VERSION) {
+  console.warn("app.js bereits geladen – Abbruch");
+} else {
+  window.APP_VERSION = "6.1";
+
 const APP_VERSION ??= "6.1";   // beim nächsten Release erhöhen
 
 // CSV-Datei dynamisch über URL-Parameter auswählen
