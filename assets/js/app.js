@@ -2055,9 +2055,10 @@ window.addEventListener("DOMContentLoaded", () => {
 const css = document.querySelector("#cssMain");
 const js  = document.querySelector("#jsMain");
 
-if (css) css.href = `assets/css/style.css`;
-if (js)  js.src  = `assets/js/app.js`;
-    console.log("[INIT] Starte Initialisierung …");
+if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
+if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
+
+console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
 
     /* ============================================================
        SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
@@ -2071,9 +2072,6 @@ if (!state.settings.resumeIndexByLesson) {
     state.settings.resumeIndexByLesson = {};
 }
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  console.log("INSTALL EVENT READY ✅");
-});
 
 // ==========================================
 // PWA Install Button
