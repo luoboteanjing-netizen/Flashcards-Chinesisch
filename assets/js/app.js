@@ -2056,7 +2056,7 @@ const css = document.querySelector("#cssMain");
 const js  = document.querySelector("#jsMain");
 
 if (css) css.href = `assets/css/style.css`;
-if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
+if (js)  js.src  = `assets/js/app.js`;
     console.log("[INIT] Starte Initialisierung …");
 
     /* ============================================================
@@ -2603,7 +2603,7 @@ if (overlay) {
 console.log("[INIT] Alles bereit ✅");
 });  // ✅ schließt NUR den DOMContentLoaded – korrekt!
 
-
+/* ==
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js")
@@ -2611,7 +2611,7 @@ if ("serviceWorker" in navigator) {
       .catch(err => console.error("SW error", err));
   });
 }
-
+==== */
 /* ========================================================================== */
 /*                                ENDE TEIL 4                                 */
 /* ========================================================================== */
