@@ -6,26 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcards Chinesisch</title>
     
-    <!-- PWA Manifest -->
+    <!-- PWA -->
     <link rel="manifest" href="./manifest.json">
-    
-    <!-- Apple/iOS PWA Support (optimiert, deprecated-frei) -->
-    <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">  <!-- Icon für iOS Home-Screen -->
-    <meta name="mobile-web-app-capable" content="yes">  <!-- ← FIX: Ersetzt den alten, funktioniert für iOS + Android -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">  <!-- Statusbar-Stil (weiß/schwarz) -->
-    <meta name="apple-mobile-web-app-title" content="CiLong">  <!-- Titel für iOS-App (kurz) -->
-    
-    <!-- Favicon für Browser-Tabs (optional, falls FETCH-Log stört) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon.png">  <!-- Füge 32x32 favicon.png hinzu, falls nicht da -->
-    <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">  <!-- Optional: Kleinere Version -->
-    
-    <!-- Theme-Color für Toolbar/Statusbar (aus deinem Manifest) -->
     <meta name="theme-color" content="#7aa2f7">
-    <meta name="msapplication-TileColor" content="#7aa2f7">  <!-- Windows PWA -->
-    
-    <!-- Deine Styles/Scripts -->
-    <link rel="stylesheet" href="./assets/css/style.css?v=<?php echo $APP_VERSION; ?>">
-    <script src="./assets/js/app.js?v=<?php echo $APP_VERSION; ?>"></script>
+    <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CiLong">
+
+    <!-- Styles & Script mit Versionierung -->
+    <link id="cssMain" rel="stylesheet" href="./assets/css/style.css">
+    <script id="jsMain" src="./assets/js/app.js"></script>
 </head>
 
 <body>
