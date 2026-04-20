@@ -11,52 +11,58 @@
    AUTOMATISCHE VERSIONIERUNG
    =========================== */
 
+/* === Version manuell definieren === */
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-
   window.APP_VERSION = "6.1";
+}
 
-  // optional lokale Referenz
-  const APP_VERSION = window.APP_VERSION;
 
-  // ===========================
-  // DEIN CODE AB HIER
-  // ===========================
+// CSV-Datei dynamisch über URL-Parameter auswählen
+const params = new URLSearchParams(location.search);
+const csvParam = params.get("csv");
 
-  const params = new URLSearchParams(location.search);
-  const csvParam = params.get("csv");
+// 🔥 CSV wird jetzt dynamisch zur Laufzeit bestimmt
+let CSV_URL = null;
 
-  let CSV_URL = null;
+/* ===========================
+   CSV RESOLVER (mit Fallback)
+   =========================== */
+async function resolveCSV() {
 
-  async function resolveCSV() {
+    // 1. URL-Parameter hat Priorität
     if (csvParam) {
-      const file = `./data/${csvParam}`;
-      try {
-        const res = await fetch(file, { method: "HEAD" });
-        if (res.ok) return file;
-      } catch (e) {}
+        const file = `./data/${csvParam}`;
+        try {
+            const res = await fetch(file, { method: "HEAD" });
+            if (res.ok) return file;
+
+            console.warn("CSV aus URL nicht gefunden → Fallback wird verwendet");
+        } catch (e) {}
     }
 
+    // 2. Fallback-Reihenfolge
     const candidates = [
-      "./data/Long-Chinesisch_Lektionen.csv"
+    //    "./data/HSK-Chinesisch_Lektionen.csv",
+        "./data/Long-Chinesisch_Lektionen.csv"
     ];
 
     for (const file of candidates) {
-      try {
-        const res = await fetch(file, { method: "HEAD" });
-        if (res.ok) return file;
-      } catch (e) {}
+        try {
+            const res = await fetch(file, { method: "HEAD" });
+            if (res.ok) return file;
+        } catch (e) {}
     }
 
+    // 3. Harte Fehlerbehandlung
     throw new Error("Keine CSV-Datei gefunden");
-  }
 }
+
 const LS_KEYS = {
     settings: "fc_settings_v1",
     progress: "fc_progress_v1"
 };
-
 
 const TRANSLATIONS = {
     de: {
