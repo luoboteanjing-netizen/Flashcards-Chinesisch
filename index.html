@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcards Chinesisch</title>
     
-    <!-- PWA Manifest -->
+    <!-- PWA Manifest (NUR HIER – einmalig!) -->
     <link rel="manifest" href="./manifest.json">
     
     <!-- Apple/iOS PWA Support (optimiert, deprecated-frei) -->
@@ -23,17 +23,12 @@
     <meta name="theme-color" content="#7aa2f7">
     <meta name="msapplication-TileColor" content="#7aa2f7">  <!-- Windows PWA -->
     
-    <!-- Deine Styles/Scripts -->
-    <link rel="stylesheet" href="./assets/css/style.css?v=<?php echo $APP_VERSION; ?>">
-    <script src="./assets/js/app.js?v=<?php echo $APP_VERSION; ?>"></script>
+    <!-- Deine Styles/Scripts (PHP zu statisch geändert – für lokal) -->
+    <link rel="stylesheet" href="./assets/css/style.css?v=1.0.3">  <!-- ← FIX: Hartcodiert, falls kein PHP-Server -->
+    <script src="./assets/js/app.js?v=1.0.3"></script>  <!-- ← FIX: Hartcodiert -->
 </head>
 
-
-
-<link rel="manifest" href="manifest.json">
-
 <body>
-
     <!-- ✅ Drei-Punkte-Menü Icon (oben rechts) -->
     <div id="menuToggle" class="menu-toggle-icon">⋮</div>
 
@@ -48,12 +43,12 @@
             <button id="btnResetLessonProgress" class="btn ghost" data-i18n="progressResetLesson">Aktuelle Lektion zurücksetzen</button>
             <button id="btnResetAllProgress" class="btn ghost" data-i18n="progressResetAll">Alle Lektionen zurücksetzen</button>
         </div>
-		<!-- Im Side Menu, z.B. nach dem Reset-Bereich -->
-		<div class="menu-block">
-			<button id="btnInstall" class="btn">
-				📲 App installieren
-			</button>
-		</div>
+        <!-- Im Side Menu, z.B. nach dem Reset-Bereich -->
+        <div class="menu-block">
+            <button id="btnInstall" class="btn">
+                📲 App installieren
+            </button>
+        </div>
         <div class="menu-block">
             <div class="menu-title" data-i18n="languageTitle">Sprache</div>
             <label class="lbl" for="uiLangSelect" data-i18n="uiLanguageLabel">UI Sprache</label>
@@ -64,6 +59,17 @@
                 <option value="fr" data-i18n="uiLanguageSelectFr">Français</option>
             </select>
         </div>
+        <!-- Dein Rest-HTML hier (z.B. Lesson-Select, Card, etc.) -->
+    </div>
+
+    <!-- Overlay für Menü-Schließen (falls nicht schon da) -->
+    <div id="sideOverlay" class="side-overlay"></div>
+
+    <!-- Dein Haupt-Content (Karten, Tabelle, etc.) -->
+    <!-- ... (Rest deiner HTML) ... -->
+</body>
+
+</html>
 
         <div class="menu-block">
             <div class="menu-title" data-i18n="themeTitle">Theme</div>
