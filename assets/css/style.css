@@ -1123,6 +1123,7 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 
 #rateBar {
     margin-top: 0px;
+	margin-bottom: 0px;
 }
 
 #rateBar .btn {
