@@ -871,15 +871,19 @@ body.menu-open #menuToggle::before {
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
 /* ============================================= */
 
+.app-header {
+    position: relative;
+}
+
 #menuToggle {
-    position: sticky;
+    position: absolute;
     top: 6px;
-	margin-left: auto;
-    font-size: 44px;      /* etwas größer für bessere Erkennung */
+    right: 16px;
+    font-size: 44px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 1000;
-    color: #A13B0F;  
+    z-index: 10;
+    color: #A13B0F;
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
