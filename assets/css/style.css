@@ -549,7 +549,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 #btnPrev, #btnNext {
  flex: 0 0 100px;
- border-radius: 10px;
+ border-radius: 14px;
  text-align:center;
 }
 
