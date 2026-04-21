@@ -549,7 +549,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 #btnPrev, #btnNext {
  flex: 0 0 100px;
- border-radius: 14px;
+ border-radius: 12px;
  text-align:center;
 }
 
@@ -590,6 +590,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     padding: 8px 20px;                     /* angenehme Breite */
     min-width: 120px;                      /* nicht zu klein */
     width: auto;                           /* bleibt kompakt */
+	border-radius: 12px;
     max-width: 200px;                      /* Überlauf in XS vermeiden */
 }
 
