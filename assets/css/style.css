@@ -812,31 +812,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-left: 4px solid var(--color-selected-border) !important;
 }
 
-/* ============================================= */
-/* ✅ Drei-Punkte-Menü im Header                 */
-/* ============================================= */
-
-.app-header {
-    position: relative;   /* Bezugspunkt */
-}
-
-#menuToggle {
-    position: absolute;   /* im Header verankert */
-    top: 6px;
-    right: 16px;
-
-    font-size: 44px;
-    font-weight: bold;
-    cursor: pointer;
-
-    z-index: 10;
-    color: #FFFFFF;
-
-    /* ✅ wichtig: Bezugspunkt für ::before */
-    position: absolute;
-    position: relative;
-}
-
 /* ============================================================
    ✅ Menübutton Animation (⋮ → ×)
    ============================================================ */
@@ -844,19 +819,64 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 body.menu-open #menuToggle {
     transform: rotate(90deg);
     transition: transform 0.25s ease, color 0.25s ease;
-    color: transparent;   /* ⋮ ausblenden */
+    color: transparent !important;
 }
 
 body.menu-open #menuToggle::before {
     content: "×";
-    font-size: 44px;
-    font-weight: bold;
-
-    color: var(--color-negative); /* eigene Farbe fürs X */
-
+    font-size: 32px;
+    color: var(--text);
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -200px;
+    width: 200px;
+    height: 100vh;
+    background: var(--card);
+    border-left: 2px solid var(--border);
+    padding: 20px;
+    transition: right 0.3s ease;
+    z-index: 999;
+}
+
+.side-menu.open {
+    right: 0;
+}
+
+.side-menu h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+/* ============================================= */
+/* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
+/* ============================================= */
+
+.app-header {
+    position: relative;
+}
+
+#menuToggle {
+    position: absolute;
+    top: 6px;
+    right: 16px;
+    font-size: 44px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    color: #FFFFFF;
+	
+    /* ✅ wichtig: Bezugspunkt für ::before */
+    position: absolute;
+    position: relative;
+}
+
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
