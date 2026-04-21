@@ -872,7 +872,7 @@ body.menu-open #menuToggle::before {
 /* ============================================= */
 
 #menuToggle {
-    position: fixed;
+    position: sticky;
     top: 6px;
     right: 16px;
     font-size: 44px;      /* etwas größer für bessere Erkennung */
