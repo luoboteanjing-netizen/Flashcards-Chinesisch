@@ -1,10 +1,11 @@
 // ==========================================
-// Service Worker – Learning App
+// Service Worker � Learning App
 // ==========================================
 
-const CACHE_NAME = "learning-app-v2";
+const APP_CACHE = "learning-app-shell-v2";
+const CSV_CACHE = "learning-app-csv-v1";
 
-// 🔹 Statische Dateien (App-Shell)
+// ?? Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
   "index.html",
   "assets/css/style.css",
@@ -17,101 +18,72 @@ const STATIC_ASSETS = [
 // ==========================================
 // INSTALL
 // ==========================================
-self.addEventListener("install", (event) => {
-  console.log("SW: Install");
-
+self.addEventListener("install", event => {
   self.skipWaiting();
-
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(STATIC_ASSETS);
-    })
+    caches.open(APP_CACHE).then(cache => cache.addAll(STATIC_ASSETS))
   );
 });
 
 // ==========================================
 // ACTIVATE
 // ==========================================
-self.addEventListener("activate", (event) => {
-  console.log("SW: Activate");
-
+self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
-          if (key !== CACHE_NAME) {
-            console.log("SW: delete old cache", key);
+          if (![APP_CACHE, CSV_CACHE].includes(key)) {
             return caches.delete(key);
           }
         })
       )
     )
   );
-
   self.clients.claim();
 });
 
 // ==========================================
 // FETCH
 // ==========================================
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", event => {
   const req = event.request;
   const url = req.url;
 
-  // ❗ nur GET Requests behandeln (fix für HEAD-Fehler)
   if (req.method !== "GET") return;
 
-  console.log("FETCH:", url);
-
-  // ------------------------------------------
-  // 🔥 CSV: Network first, fallback to cache
-  // ------------------------------------------
+  // ? CSV: Network First (Content aktualisieren)
   if (url.endsWith(".csv")) {
-    event.respondWith(
-      fetch(req)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(req, clone);
-          });
-          return response;
-        })
-        .catch(() => {
-          return caches.match(req).then(res => {
-            return res || new Response("Offline CSV not available", { status: 503 });
-          });
-        })
-    );
+    event.respondWith(networkFirstCSV(req));
     return;
   }
 
-  // ------------------------------------------
-  // 🔹 Google Fonts ignorieren (optional, stabiler offline)
-  // ------------------------------------------
-  if (url.includes("fonts.googleapis.com") || url.includes("fonts.gstatic.com")) {
-    return;
-  }
-
-  // ------------------------------------------
-  // 🔹 APP-SHELL: Cache First
-  // ------------------------------------------
+  // ? App-Shell: Cache First (stabil)
   event.respondWith(
-    caches.match(req, { ignoreSearch: true }).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(req)
-        .then((networkResponse) => {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(req, clone);
-          });
-          return networkResponse;
-        })
-        .catch(() => {
-          return caches.match("index.html");
+    caches.match(req).then(cached => {
+      if (cached) return cached;
+      return fetch(req).then(response => {
+        return caches.open(APP_CACHE).then(cache => {
+          cache.put(req, response.clone());
+          return response;
         });
+      });
     })
   );
 });
+
+// ==========================================
+// STRATEGIEN
+// ==========================================
+async function networkFirstCSV(request) {
+  const cache = await caches.open(CSV_CACHE);
+  try {
+    const response = await fetch(request);
+    cache.put(request, response.clone());
+    return response;
+  } catch {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    throw new Error("CSV offline nicht verf�gbar");
+  }
+}
