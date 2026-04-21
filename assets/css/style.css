@@ -812,6 +812,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-left: 4px solid var(--color-selected-border) !important;
 }
 
+
 /* ============================================================
    ✅ Menübutton Animation (⋮ → ×)
    ============================================================ */
@@ -854,6 +855,10 @@ body.menu-open #menuToggle::before {
     color: var(--text);
 }
 
+/* ========================================================= */
+/* ✅ Light Mode – Helle Fortschrittsbalken                  */
+/* ========================================================= */
+
 /* ============================================= */
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
 /* ============================================= */
@@ -871,12 +876,7 @@ body.menu-open #menuToggle::before {
     cursor: pointer;
     z-index: 10;
     color: #FFFFFF;
-	
-    /* ✅ wichtig: Bezugspunkt für ::before */
-    position: absolute;
-    position: relative;
-}
-
+	z-index: 1000;
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
