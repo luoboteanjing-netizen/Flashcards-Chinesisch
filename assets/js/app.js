@@ -939,7 +939,7 @@ function renderPromptSentence(entry) {
     }
 
     $("#promptSent").innerHTML = parts.join(parts.length > 1 ? "<br>" : " ");
-	scrollToBottom();
+	/* ===scrollToBottom(); === */
 }
 
 function renderPromptWordFull(entry) {
@@ -971,7 +971,7 @@ function renderPromptSentenceFull(entry) {
     }
 
     $("#promptSent").innerHTML = parts.join("<br>");
-	scrollToBottom();
+	/* ===scrollToBottom(); === */
 }
 
 function setCard(entry, fromHistory = false) {
