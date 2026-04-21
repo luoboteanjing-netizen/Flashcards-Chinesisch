@@ -743,12 +743,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 .lt-weak {
-    color: var(--color-table-weak);      /* Gelb/Orange */
+    color: var(--color-table-weak);      
     font-weight: 600;
 }
 
 .lt-strong {
-    color: var(--good);    /* Dein Grün */
+    color: var(--good);    
     font-weight: 600;
 }
 
@@ -875,11 +875,11 @@ body.menu-open #menuToggle::before {
     position: fixed;
     top: 12px;
     right: 16px;
-    font-size: 32px;      /* etwas größer für bessere Erkennung */
+    font-size: 40px;      /* etwas größer für bessere Erkennung */
     font-weight: bold;
     cursor: pointer;
     z-index: 1000;
-    color: #0D8119;  
+    color: #46FF2D;  
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
