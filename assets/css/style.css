@@ -875,11 +875,11 @@ body.menu-open #menuToggle::before {
     position: fixed;
     top: 12px;
     right: 16px;
-    font-size: 40px;      /* etwas größer für bessere Erkennung */
+    font-size: 44px;      /* etwas größer für bessere Erkennung */
     font-weight: bold;
     cursor: pointer;
     z-index: 1000;
-    color: #46FF2D;  
+    color: #ADAFAD;  
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
