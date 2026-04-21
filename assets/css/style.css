@@ -883,7 +883,7 @@ body.menu-open #menuToggle::before {
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    color: #A13B0F;
+    color: #FFFFFF;
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
