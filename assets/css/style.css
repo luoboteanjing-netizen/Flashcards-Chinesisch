@@ -840,8 +840,6 @@ body.menu-open #menuToggle::before {
     right: 0;
 }
 
-
-
 .side-menu {
     position: fixed;
     top: 0;
@@ -869,28 +867,6 @@ body.menu-open #menuToggle::before {
 /* ✅ Light Mode – Helle Fortschrittsbalken                  */
 /* ========================================================= */
 
-:root.light .lesson-bar-large {
-    background: #e0e0e0;            /* hellgrau statt dunkel */
-    border-color: #cccccc;
-}
-
-:root.light .lesson-bar-red {
-    background: #d66;               /* etwas weicheres Rot */
-}
-
-:root.light .lesson-bar-green {
-    background: #3c9f40;            /* etwas weicheres Grün */
-}
-
-/* Balken in der Lektionenliste (falls vorhanden) */
-:root.light .lt-known {
-    color: #2e8b57;                 /* dunkleres Light-Mode Grün */
-}
-
-:root.light .lt-unknown {
-    color: #cc3333;                 /* dunkles Rot */
-}
-
 /* ============================================= */
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
 /* ============================================= */
@@ -903,7 +879,7 @@ body.menu-open #menuToggle::before {
     font-weight: bold;
     cursor: pointer;
     z-index: 1000;
-    color: var(--text);   /* passt sich Light/Dark Mode an */
+    color: #A1920F;   /* passt sich Light/Dark Mode an */
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
