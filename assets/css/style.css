@@ -873,13 +873,13 @@ body.menu-open #menuToggle::before {
 
 #menuToggle {
     position: fixed;
-    top: 12px;
+    top: 6px;
     right: 16px;
     font-size: 44px;      /* etwas größer für bessere Erkennung */
     font-weight: bold;
     cursor: pointer;
     z-index: 1000;
-    color: #ADAFAD;  
+    color: var(--unsure);  
 }
 
 html.light .lesson-table::-webkit-scrollbar-thumb {
