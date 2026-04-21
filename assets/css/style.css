@@ -1122,7 +1122,7 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
    ============================================================ */
 
 #rateBar {
-    margin-top: 0px;
+    margin-top: 1px;
 	margin-bottom: 0px;
 }
 
