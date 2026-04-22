@@ -1,4 +1,4 @@
-/* Version 6.0 */
+/* Version 6.4 */
 :root{  
 	--bg: #01193C;
 	--card: #12161b;
@@ -867,7 +867,7 @@ body.menu-open #menuToggle::before {
  /*   font-weight: bold;    */
     cursor: pointer;
     z-index: 10;
-    color: #FFFFFF;
+    color: var(--text);
 	z-index: 1000;
 }
 
