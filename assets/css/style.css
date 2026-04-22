@@ -242,7 +242,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* NEU: Gruppe für Training + Autoplay (unter Sliders) – Flex-Row für nebeneinander */
 .training-group {
  display: flex;
- gap: 10px;
+ gap: 16px;
  align-items: center;
  justify-content: center; /* Zentriert die Gruppe */
  margin-top: 12px; /* Abstand zu Sliders oben */
@@ -426,7 +426,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  .btn.primary { margin-top:8px; }
  .btn.swap { padding:8px 10px; min-height:28px; font-size:16px; }
  .mode-item { padding:10px 12px; min-height:28px; min-width:84px; font-size:13px; }
- .mode-inline, .actions-inline { gap:12px; }
+ .mode-inline, .actions-inline { gap:14px; }
  .actions-inline .btn {
   flex: 0 1 auto;
   min-width: 84px;
