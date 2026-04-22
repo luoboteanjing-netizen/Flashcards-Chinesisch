@@ -868,7 +868,7 @@ body.menu-open #menuToggle::before {
     top: 6px;
     right: 16px;
     font-size: 44px;
-    font-weight: bold;
+   /* font-weight: bold;  */
     cursor: pointer;
     z-index: 10;
     color: var(--text);
@@ -1148,6 +1148,17 @@ body.menu-open #menuToggle::before {
 .app-header {
     margin-bottom: 16px;      /* Abstand zur Karte */
     text-align: center;
+	padding-left: 0px;
+    padding-right: 0px;
+}
+
+
+/* ✅ Das ist der entscheidende Wrapper */
+.app-header-inner {
+    max-width: 1100px;     /* GLEICH wie dein UI */
+    margin: 0 auto;        /* zentrieren */
+    position: relative;    /* Bezugspunkt für menuToggle */
+    padding: 0 12px;       /* mobile Seitenluft */
 }
 
 .header-banner {
@@ -1161,10 +1172,6 @@ body.menu-open #menuToggle::before {
 html, body {
     margin: 0;
     padding: 0;
-}
-.app-header {
-    padding-left: 0px;
-    padding-right: 0px;
 }
 
 
