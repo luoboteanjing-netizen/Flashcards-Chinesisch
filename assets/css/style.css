@@ -813,6 +813,27 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 
+
+/* ============================================= */
+/* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
+/* ============================================= */
+
+.app-header {
+    position: relative;
+}
+
+#menuToggle {
+    position: absolute;
+    top: 6px;
+    right: 16px;
+    font-size: 44px;
+   /* font-weight: bold;  */
+    cursor: pointer;
+    z-index: 10;
+    color: var(--text);
+	z-index: 1000;
+}
+
 /* ============================================================
    ✅ Menübutton Animation (⋮ → ×)
    ============================================================ */
@@ -855,25 +876,6 @@ body.menu-open #menuToggle::before {
     color: var(--text);
 }
 
-/* ============================================= */
-/* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
-/* ============================================= */
-
-.app-header {
-    position: relative;
-}
-
-#menuToggle {
-    position: absolute;
-    top: 6px;
-    right: 16px;
-    font-size: 44px;
-   /* font-weight: bold;  */
-    cursor: pointer;
-    z-index: 10;
-    color: var(--text);
-	z-index: 1000;
-}
 
 /* =======================
    Einstellungen Menü
@@ -894,6 +896,8 @@ body.menu-open #menuToggle::before {
     border-radius: 6px;
     font-size: 14px;
 }
+
+
 
 /* ============================================= */
 /* ✅ Lektionsliste – Zahlen rechtsbündig        */
@@ -919,6 +923,8 @@ body.menu-open #menuToggle::before {
     bottom: 8px !important;
     right: 8px !important;
 }
+
+
 
 /* ======================================== */
 /* ✅ Größeres Umschalt-Symbol (⇄)          */
@@ -1151,7 +1157,6 @@ body.menu-open #menuToggle::before {
 	padding-left: 0px;
     padding-right: 0px;
 }
-
 
 /* ✅ Das ist der entscheidende Wrapper */
 .app-header-inner {
