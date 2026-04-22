@@ -831,7 +831,7 @@ body.menu-open #menuToggle::before {
     color: var(--text);
     position: absolute;
     top: 0;
-    right: 16;
+    right:16;
 }
 
 .side-menu {
@@ -848,7 +848,7 @@ body.menu-open #menuToggle::before {
 }
 
 .side-menu.open {
-    right: 0;
+    right: 16;
 }
 
 .side-menu h3 {
@@ -1201,14 +1201,14 @@ html, body {
 #promptWordSub {
     font-size: 20px;
     font-weight: 400;
-    opacity: 0.9;
+    opacity: 1;
 }
 
 /* Wortart (POS) */
 #promptPOS {
     font-size: 18px;
     font-style: italic;
-    opacity: 0.85;
+    opacity: 1;
 }
 
 /* Beispielsatz auf der Fragekarte */
