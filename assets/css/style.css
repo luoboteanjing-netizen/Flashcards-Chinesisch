@@ -413,7 +413,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 @media (max-width: 480px) {
  .top-actions { margin-top: 12px; gap: 6px; }
  .training-group {
-  gap: 16px;
+  gap: 14px;
   justify-content:center;
   flex-wrap:wrap;
   flex-direction:row;
