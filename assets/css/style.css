@@ -47,7 +47,7 @@
 
 /* Light-Blue (modern, kühl) */
 :root.light-blue {
-    --bg: #01193C;
+    --bg: #0d559f;
     --card: #ffffff;
     --text: #1f2a37;
     --muted: #4b5d73;
@@ -86,7 +86,7 @@ html.light-warm .header-banner {
 }
 
 html.light-blue .header-banner {
-    content: url("../img/header.png");
+    content: url("../img/header-blue.png");
 }
 
 main.container {
@@ -871,7 +871,7 @@ body.menu-open #menuToggle::before {
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    color: #cc3333;
+    color: var(--text);
 	z-index: 1000;
 }
 
