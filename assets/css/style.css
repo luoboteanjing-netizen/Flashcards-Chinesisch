@@ -1188,9 +1188,9 @@ html, body {
 
 /* Wortart (POS) */
 #promptPOS {
-    font-size: 16px;
+    font-size: 17px;
     font-style: italic;
-    opacity: 0.85;
+    opacity: 0.9;
 	line-height: 1.2;
 	margin-bottom: 6px;
 }
