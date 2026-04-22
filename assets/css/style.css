@@ -829,7 +829,7 @@ body.menu-open #menuToggle::before {
     color: var(--text);
     position: absolute;
     top: 0;
-    right: 0;
+    right: 10px;
 }
 
 .side-menu {
@@ -855,10 +855,6 @@ body.menu-open #menuToggle::before {
     color: var(--text);
 }
 
-/* ========================================================= */
-/* ✅ Light Mode – Helle Fortschrittsbalken                  */
-/* ========================================================= */
-
 /* ============================================= */
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
 /* ============================================= */
@@ -875,12 +871,7 @@ body.menu-open #menuToggle::before {
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    color: #FFFFFF;
-	z-index: 1000;
-}
-
-html.light .lesson-table::-webkit-scrollbar-thumb {
-    background: #b3b3b3;
+    color: #303030;
 }
 
 /* =======================
@@ -914,8 +905,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     text-align: right;
     font-variant-numeric: tabular-nums;   /* monospaced Zahlen für perfekte Ausrichtung */
 }
-
-
 
 /* === Fix: Lautsprecher wieder unten rechts fixieren === */
 
