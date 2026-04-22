@@ -86,7 +86,7 @@ html.light-warm .header-banner {
 }
 
 html.light-blue .header-banner {
-    content: url("../img/header.png");
+    content: url("../img/header-blue.png");
 }
 
 main.container {
@@ -628,10 +628,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     display: block;
 }
 
-:root.light .card-speaker {
-    color: #444;
-}
-
 
 #btnPlayQ, #btnPlayA { display:none !important; }
 #promptBox .card-speaker { opacity:1 !important; }
@@ -855,10 +851,6 @@ body.menu-open #menuToggle::before {
     color: var(--text);
 }
 
-/* ========================================================= */
-/* ✅ Light Mode – Helle Fortschrittsbalken                  */
-/* ========================================================= */
-
 /* ============================================= */
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
 /* ============================================= */
@@ -872,15 +864,11 @@ body.menu-open #menuToggle::before {
     top: 6px;
     right: 16px;
     font-size: 44px;
-    font-weight: bold;
+ /*   font-weight: bold;    */
     cursor: pointer;
     z-index: 10;
     color: #FFFFFF;
 	z-index: 1000;
-}
-
-html.light .lesson-table::-webkit-scrollbar-thumb {
-    background: #b3b3b3;
 }
 
 /* =======================
@@ -960,10 +948,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
 
 .pinyin-word {
     color: var(--text);      /* Dark-Mode: schön hell */
-}
-
-:root.light .pinyin-word {
-    color: #444;             /* Light-Mode: besser lesbar */
 }
 
 .menu-version {
