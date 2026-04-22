@@ -1,4 +1,4 @@
-/* Version 6.1 */
+/* Version 6.0 */
 :root{  
 	--bg: #01193C;
 	--card: #12161b;
@@ -47,7 +47,7 @@
 
 /* Light-Blue (modern, kühl) */
 :root.light-blue {
-    --bg: #0d559f;
+    --bg: #01193C;
     --card: #ffffff;
     --text: #1f2a37;
     --muted: #4b5d73;
@@ -86,7 +86,7 @@ html.light-warm .header-banner {
 }
 
 html.light-blue .header-banner {
-    content: url("../img/header-blue.png");
+    content: url("../img/header.png");
 }
 
 main.container {
@@ -812,15 +812,13 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-left: 4px solid var(--color-selected-border) !important;
 }
 
-/* ============================================================
-   Zentrale UI-Hülle (Header + Content + Side-Menu)
-   ============================================================ */
-
-.app-shell {
-    max-width: 1100px;   /* exakt wie .container */
-    margin: 0 auto;
-    position: relative; /* Bezugspunkt für Side-Menu */
-	z-index: 800;
+#menuToggle {
+    position: fixed;
+    top: 12px;
+    right: 22px;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 1000;
 }
 
 /* ============================================================
@@ -838,24 +836,21 @@ body.menu-open #menuToggle::before {
     font-size: 32px;
     color: var(--text);
     position: absolute;
-    top: 8;
-    right: 10px;
+    top: 0;
+    right: 0;
 }
 
-
 .side-menu {
-    position: absolute;    /* ❗ nicht mehr fixed */
+    position: fixed;
     top: 0;
-    right: -220px;         /* Startposition außerhalb der UI */
-    width: 220px;
+    right: -200px;
+    width: 200px;
     height: 100vh;
-
     background: var(--card);
     border-left: 2px solid var(--border);
     padding: 20px;
-
     transition: right 0.3s ease;
-    z-index: 900;
+    z-index: 999;
 }
 
 .side-menu.open {
@@ -868,6 +863,32 @@ body.menu-open #menuToggle::before {
     color: var(--text);
 }
 
+/* ========================================================= */
+/* ✅ Light Mode – Helle Fortschrittsbalken                  */
+/* ========================================================= */
+
+/* ============================================= */
+/* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
+/* ============================================= */
+
+.app-header {
+    position: relative;
+}
+
+#menuToggle {
+    position: absolute;
+    top: 6px;
+    right: 16px;
+    font-size: 44px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    color: #FFFFFF;
+}
+
+html.light .lesson-table::-webkit-scrollbar-thumb {
+    background: #b3b3b3;
+}
 
 /* =======================
    Einstellungen Menü
@@ -889,28 +910,6 @@ body.menu-open #menuToggle::before {
     font-size: 14px;
 }
 
-
-
-/* ============================================= */
-/* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
-/* ============================================= */
-
-.app-header {
-    position: relative;
-}
-
-#menuToggle {
-    position: absolute;
-    top: 6px;
-    right: 26px;
-    font-size: 44px;
-   /* font-weight: bold;  */
-    cursor: pointer;
-    color: var(--text);
-	z-index: 1000;
-}
-
-
 /* ============================================= */
 /* ✅ Lektionsliste – Zahlen rechtsbündig        */
 /* ============================================= */
@@ -922,6 +921,8 @@ body.menu-open #menuToggle::before {
     text-align: right;
     font-variant-numeric: tabular-nums;   /* monospaced Zahlen für perfekte Ausrichtung */
 }
+
+
 
 /* === Fix: Lautsprecher wieder unten rechts fixieren === */
 
@@ -935,8 +936,6 @@ body.menu-open #menuToggle::before {
     bottom: 8px !important;
     right: 8px !important;
 }
-
-
 
 /* ======================================== */
 /* ✅ Größeres Umschalt-Symbol (⇄)          */
@@ -1164,18 +1163,8 @@ body.menu-open #menuToggle::before {
    ============================================================ */
 
 .app-header {
-    margin-bottom: 6px;      /* Abstand zur Karte */
+    margin-bottom: 16px;      /* Abstand zur Karte */
     text-align: center;
-	padding-left: 0px;
-    padding-right: 0px;
-}
-
-/* ✅ Das ist der entscheidende Wrapper */
-.app-header-inner {
-    max-width: 1100px;     /* GLEICH wie dein UI */
-    margin: 0 auto;        /* zentrieren */
-    position: relative;    /* Bezugspunkt für menuToggle */
-    padding: 0 12px;       /* mobile Seitenluft */
 }
 
 .header-banner {
@@ -1185,11 +1174,14 @@ body.menu-open #menuToggle::before {
     display: block;
     margin: 0 auto;
 }
-
 /* Entfernt den Standardabstand ganz oben */
 html, body {
     margin: 0;
     padding: 0;
+}
+.app-header {
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 
