@@ -1280,3 +1280,75 @@ html, body {
 #solBox {
     border: 2px solid var(--color-border);
 }
+
+
+
+/* Deine bestehenden Styles (z.B. .container, Buttons, etc.) ... */
+
+/* NEU: Basis-Styles für Menü-Toggle & Slide-Menü (Mobile-fokussiert) */
+/* ← Diese erweitern, was du schon hast – passe an, falls nötig */
+.menu-toggle-icon {
+    position: fixed;
+    top: 20px;
+    right: 12px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    /* Füge hier deine bestehenden Toggle-Styles hinzu (z.B. display, width) */
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -300px;  /* Versteckt rechts */
+    width: 300px;
+    height: 100vh;
+    background: white;  /* Oder var(--bg-color) für Theme */
+    transition: right 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    /* Füge hier deine bestehenden Menü-Styles hinzu (z.B. .side-menu.open) */
+}
+
+/* NEU: Container als relative Parent (für Desktop) */
+.container {
+    position: relative;  /* ← Das ist neu – füge zu deiner bestehenden .container hinzu */
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 12px;
+    /* Deine alten .container-Styles bleiben (z.B. background, etc.) */
+}
+
+/* NEU: DESKTOP-FIX mit Media Query (überschreibt nur auf großen Screens) */
+@media (min-width: 769px) {
+    .menu-toggle-icon {
+        position: absolute;  /* Bindet ans UI (Container) */
+        right: 12px;
+        top: 20px;
+        /* Deine anderen Toggle-Styles bleiben */
+    }
+    
+    .side-menu {
+        position: absolute;
+        right: -300px;
+        top: 0;
+        height: 100%;  /* Passt an Container-Höhe */
+        /* Deine Menü-Styles (z.B. open { right: 0; }) bleiben */
+    }
+}
+
+/* Optional: Für extra große Screens (füge bei Bedarf hinzu) */
+@media (min-width: 1200px) {
+    .menu-toggle-icon {
+        right: calc(50% - 550px + 12px);  /* Dynamisch am UI-Rand */
+    }
+    
+    .side-menu {
+        right: calc(50% - 550px - 300px);
+    }
+}
