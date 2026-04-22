@@ -21,24 +21,10 @@
 
 <body>
 
-<!-- ✅ Overlay MUSS außerhalb des Menüs und Containers stehen -->
-<div id="sideOverlay"></div>
-
-<!-- ✅ Header OHNE .container → kein Top-Abstand -->
-<header class="app-header">
-  <img
-    src="assets/img/header.png"
-    alt="App Banner"
-    class="header-banner"
-  />
-</header>
-
-<!-- ✅ Ab hier beginnt der normale Seiteninhalt -->
-<main class="container">
-    <!-- ✅ Drei-Punkte-Menü Icon (oben rechts) – JETZT IM CONTAINER (für Desktop-Fix) -->
+    <!-- ✅ Drei-Punkte-Menü Icon (oben rechts) -->
     <div id="menuToggle" class="menu-toggle-icon">⋮</div>
 
-    <!-- ✅ Seitenmenü für Einstellungen (RICHTIG positioniert) – JETZT IM CONTAINER (für Desktop-Fix) -->
+    <!-- ✅ Seitenmenü für Einstellungen (RICHTIG positioniert) -->
     <div id="sideMenu" class="side-menu">
         <h3 data-i18n="settingsTitle">Einstellungen</h3>
 
@@ -49,12 +35,12 @@
             <button id="btnResetLessonProgress" class="btn ghost" data-i18n="progressResetLesson">Aktuelle Lektion zurücksetzen</button>
             <button id="btnResetAllProgress" class="btn ghost" data-i18n="progressResetAll">Alle Lektionen zurücksetzen</button>
         </div>
-        <!-- Im Side Menu, z.B. nach dem Reset-Bereich -->
-        <div class="menu-block">
-            <button id="btnInstall" class="btn">
-                📲 App installieren
-            </button>
-        </div>
+		<!-- Im Side Menu, z.B. nach dem Reset-Bereich -->
+		<div class="menu-block">
+			<button id="btnInstall" class="btn">
+				📲 App installieren
+			</button>
+		</div>
         <div class="menu-block">
             <div class="menu-title" data-i18n="languageTitle">Sprache</div>
             <label class="lbl" for="uiLangSelect" data-i18n="uiLanguageLabel">UI Sprache</label>
@@ -76,6 +62,7 @@
             </select>
         </div>
 
+
         <div class="menu-block">
             <label class="lbl" id="gapLabel" data-i18n="delayLabel">Satz‑Delay (Sekunden):</label>
             <input id="delayInput" type="number" min="0" max="15" step="0.5" value="5" class="menu-input">
@@ -85,6 +72,23 @@
             <span data-i18n="settingsVersion">Version:</span> <span id="appVersion"></span>
         </div>
     </div>
+
+<!-- ✅ Overlay MUSS außerhalb des Menüs und Containers stehen -->
+<div id="sideOverlay"></div>
+
+<!-- ✅ Header OHNE .container → kein Top-Abstand -->
+<header class="app-header">
+  <img
+    src="assets/img/header.png"
+    alt="App Banner"
+    class="header-banner"
+  />
+</header>
+
+<!-- ✅ Ab hier beginnt der normale Seiteninhalt -->
+<main class="container">
+
+
 
 <!-- ====================================================================== -->
 <!-- KONFIG-BLOCK -->
