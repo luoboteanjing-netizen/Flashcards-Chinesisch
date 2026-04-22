@@ -871,7 +871,7 @@ body.menu-open #menuToggle::before {
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    color: #454545;
+    color: #696969;
 	z-index: 1000;
 }
 
