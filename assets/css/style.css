@@ -855,7 +855,7 @@ body.menu-open #menuToggle::before {
     padding: 20px;
 
     transition: right 0.3s ease;
-    z-index: 50;
+    z-index: 900;
 }
 
 .side-menu.open {
@@ -902,13 +902,13 @@ body.menu-open #menuToggle::before {
 #menuToggle {
     position: absolute;
     top: 6px;
-    right: 22px;
+    right: 26px;
     font-size: 44px;
    /* font-weight: bold;  */
     cursor: pointer;
     z-index: 10;
     color: var(--text);
-	z-index: 60;
+	z-index: 1000;
 }
 
 
@@ -1006,7 +1006,7 @@ body.menu-open #menuToggle::before {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
-    z-index: 40; /* unter dem Menü selbst (999) */
+    z-index: 800; /* unter dem Menü selbst (999) */
 }
 
 .side-menu.open + #sideOverlay {
