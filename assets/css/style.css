@@ -634,10 +634,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     display: block;
 }
 
-:root.light .card-speaker {
-    color: #444;
-}
-
 
 #btnPlayQ, #btnPlayA { display:none !important; }
 #promptBox .card-speaker { opacity:1 !important; }
@@ -955,10 +951,6 @@ body.menu-open #menuToggle::before {
 
 .pinyin-word {
     color: var(--text);      /* Dark-Mode: schön hell */
-}
-
-:root.light .pinyin-word {
-    color: #444;             /* Light-Mode: besser lesbar */
 }
 
 .menu-version {
