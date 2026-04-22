@@ -812,6 +812,15 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-left: 4px solid var(--color-selected-border) !important;
 }
 
+/* ============================================================
+   Zentrale UI-Hülle (Header + Content + Side-Menu)
+   ============================================================ */
+
+.app-shell {
+    max-width: 1100px;   /* exakt wie .container */
+    margin: 0 auto;
+    position: relative; /* Bezugspunkt für Side-Menu */
+}
 
 /* ============================================================
    ✅ Menübutton Animation (⋮ → ×)
@@ -832,17 +841,20 @@ body.menu-open #menuToggle::before {
     right: 10px;
 }
 
+
 .side-menu {
-    position: fixed;
+    position: absolute;    /* ❗ nicht mehr fixed */
     top: 0;
-    right: -200px;
-    width: 200px;
+    right: -220px;         /* Startposition außerhalb der UI */
+    width: 220px;
     height: 100vh;
+
     background: var(--card);
     border-left: 2px solid var(--border);
     padding: 20px;
+
     transition: right 0.3s ease;
-    z-index: 999;
+    z-index: 50;
 }
 
 .side-menu.open {
