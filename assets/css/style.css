@@ -21,7 +21,7 @@
     --muted: #555;
 	--accent-text: #222;    /* dunkles Textgrau für bessere Lesbarkeit */
     --border: #bbbbbb;
-	--accent: #ffbb55;    /* z.B. warmes Orange statt blau */
+	--accent: #ffbb55;      /* z.B. warmes Orange statt blau */
     --good:   #2e8b57;
     --bad:    #cc3333;
     --unsure: #cc9900;
@@ -74,25 +74,25 @@
     margin: 0 auto;
 }
    
-   /* ============================================================
+/* ============================================================
    Header-Banner je nach Light/Dark Mode
    ============================================================ */
    
 html.light-orange .header-banner {
     content: url("../img/header-light.png");
 }
+
 html.light-warm .header-banner {
     content: url("../img/header-warm.png");
 }
 
 html.light-blue .header-banner {
-    content: url("../img/header.png");
+    content: url("../img/header-blue.png");
 }
 
 main.container {
     margin-top: 0px;
 }
-
 
 /* ============================================================
    SEMANTISCHE FARBROLLEN (Bedeutung, nicht Darstellung)
@@ -863,10 +863,6 @@ body.menu-open #menuToggle::before {
     color: var(--text);
 }
 
-/* ========================================================= */
-/* ✅ Light Mode – Helle Fortschrittsbalken                  */
-/* ========================================================= */
-
 /* ============================================= */
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
 /* ============================================= */
@@ -883,11 +879,7 @@ body.menu-open #menuToggle::before {
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    color: #FFFFFF;
-}
-
-html.light .lesson-table::-webkit-scrollbar-thumb {
-    background: #b3b3b3;
+    color: var(--text);
 }
 
 /* =======================
@@ -921,8 +913,6 @@ html.light .lesson-table::-webkit-scrollbar-thumb {
     text-align: right;
     font-variant-numeric: tabular-nums;   /* monospaced Zahlen für perfekte Ausrichtung */
 }
-
-
 
 /* === Fix: Lautsprecher wieder unten rechts fixieren === */
 
