@@ -47,7 +47,7 @@
 
 /* Light-Blue (modern, kühl) */
 :root.light-blue {
-    --bg: #01193C;
+    --bg: #0d559f;
     --card: #ffffff;
     --text: #1f2a37;
     --muted: #4b5d73;
@@ -60,7 +60,6 @@
 	--primary-bg: var(--accent);
     --primary-border: var(--accent);
 }
-
 
 /* ============================================================
    Header-Banner – Default (Dark Mode)
