@@ -146,7 +146,7 @@ font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial
 }
 
 .container{max-width:1100px;
-	margin-top: 16px;     /* Oben: Weniger Abstand (z.B. zu Header) */
+	margin-top: 24px;     /* Oben: Weniger Abstand (z.B. zu Header) */
     margin-bottom: 24px;  /* Unten: Mehr Abstand (z.B. zu Footer oder Scroll-Ende) */
     margin-left: auto;    /* Links: Zentriert */
     margin-right: auto;   /* Rechts: Zentriert */
@@ -835,7 +835,7 @@ body.menu-open #menuToggle::before {
     color: var(--text);
     position: absolute;
     top: 0;
-    right: 12;
+    right: 16;
 }
 
 .side-menu {
