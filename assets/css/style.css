@@ -1,4 +1,4 @@
-/* Version 6.2 */
+/* Version 6.0 */
 :root{  
 	--bg: #01193C;
 	--card: #12161b;
@@ -21,7 +21,7 @@
     --muted: #555;
 	--accent-text: #222;    /* dunkles Textgrau für bessere Lesbarkeit */
     --border: #bbbbbb;
-	--accent: #ffbb55;      /* z.B. warmes Orange statt blau */
+	--accent: #ffbb55;    /* z.B. warmes Orange statt blau */
     --good:   #2e8b57;
     --bad:    #cc3333;
     --unsure: #cc9900;
@@ -47,7 +47,7 @@
 
 /* Light-Blue (modern, kühl) */
 :root.light-blue {
-    --bg: #0d559f;
+    --bg: #01193C;
     --card: #ffffff;
     --text: #1f2a37;
     --muted: #4b5d73;
@@ -74,25 +74,25 @@
     margin: 0 auto;
 }
    
-/* ============================================================
+   /* ============================================================
    Header-Banner je nach Light/Dark Mode
    ============================================================ */
    
 html.light-orange .header-banner {
     content: url("../img/header-light.png");
 }
-
 html.light-warm .header-banner {
     content: url("../img/header-warm.png");
 }
 
 html.light-blue .header-banner {
-    content: url("../img/header-blue.png");
+    content: url("../img/header.png");
 }
 
 main.container {
     margin-top: 0px;
 }
+
 
 /* ============================================================
    SEMANTISCHE FARBROLLEN (Bedeutung, nicht Darstellung)
@@ -145,13 +145,7 @@ html,body{
 font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif
 }
 
-.container{max-width:1100px;
-	margin-top: 24px;     /* Oben: Weniger Abstand (z.B. zu Header) */
-    margin-bottom: 24px;  /* Unten: Mehr Abstand (z.B. zu Footer oder Scroll-Ende) */
-    margin-left: auto;    /* Links: Zentriert */
-    margin-right: auto;   /* Rechts: Zentriert */
-	padding:0 12px}
-	
+.container{max-width:1100px;margin:24px auto;padding:0 12px}
 header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .subtitle{margin:0 0 8px 0;color:var(--muted);font-size:14px}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px; margin-top:16px;} /* Etwas mehr Gap (10px) für bessere Gruppierung (Training + Autoplay) */
@@ -634,6 +628,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     display: block;
 }
 
+:root.light .card-speaker {
+    color: #444;
+}
+
 
 #btnPlayQ, #btnPlayA { display:none !important; }
 #promptBox .card-speaker { opacity:1 !important; }
@@ -831,7 +829,7 @@ body.menu-open #menuToggle::before {
     color: var(--text);
     position: absolute;
     top: 0;
-    right:16;
+    right: 0;
 }
 
 .side-menu {
@@ -848,7 +846,7 @@ body.menu-open #menuToggle::before {
 }
 
 .side-menu.open {
-    right: 16;
+    right: 0;
 }
 
 .side-menu h3 {
@@ -856,6 +854,10 @@ body.menu-open #menuToggle::before {
     margin-bottom: 12px;
     color: var(--text);
 }
+
+/* ========================================================= */
+/* ✅ Light Mode – Helle Fortschrittsbalken                  */
+/* ========================================================= */
 
 /* ============================================= */
 /* ✅ Drei-Punkte-Menü Styling (statt Hamburger) */
@@ -869,11 +871,16 @@ body.menu-open #menuToggle::before {
     position: absolute;
     top: 6px;
     right: 16px;
-    font-size: 40px;
- /*   font-weight: bold;   */
+    font-size: 44px;
+    font-weight: bold;
     cursor: pointer;
-    z-index: 1000;
-    color: var(--text);
+    z-index: 10;
+    color: #FFFFFF;
+	z-index: 1000;
+}
+
+html.light .lesson-table::-webkit-scrollbar-thumb {
+    background: #b3b3b3;
 }
 
 /* =======================
@@ -907,6 +914,8 @@ body.menu-open #menuToggle::before {
     text-align: right;
     font-variant-numeric: tabular-nums;   /* monospaced Zahlen für perfekte Ausrichtung */
 }
+
+
 
 /* === Fix: Lautsprecher wieder unten rechts fixieren === */
 
@@ -951,6 +960,10 @@ body.menu-open #menuToggle::before {
 
 .pinyin-word {
     color: var(--text);      /* Dark-Mode: schön hell */
+}
+
+:root.light .pinyin-word {
+    color: #444;             /* Light-Mode: besser lesbar */
 }
 
 .menu-version {
@@ -1201,14 +1214,14 @@ html, body {
 #promptWordSub {
     font-size: 20px;
     font-weight: 400;
-    opacity: 1;
+    opacity: 0.9;
 }
 
 /* Wortart (POS) */
 #promptPOS {
     font-size: 18px;
     font-style: italic;
-    opacity: 1;
+    opacity: 0.85;
 }
 
 /* Beispielsatz auf der Fragekarte */
@@ -1272,5 +1285,3 @@ html, body {
 #solBox {
     border: 2px solid var(--color-border);
 }
-
-
