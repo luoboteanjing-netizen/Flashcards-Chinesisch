@@ -10,8 +10,7 @@
 	--good:#2e8b57; 
 	--bad:#cc3333; 
 	--unsure:#ffbd6b; 
-	--primary-bg: var(--accent);
-    --primary-border: var(--accent);
+
 }
 
 :root.light-orange {
@@ -25,8 +24,7 @@
     --good:   #2e8b57;
     --bad:    #cc3333;
     --unsure: #cc9900;
-    --primary-bg: var(--accent);
-    --primary-border: var(--accent);
+
 }		
 
 /* Light-Warm (Abend, augenschonend) */
@@ -41,8 +39,7 @@
     --good:   #5a8f6a;
     --bad:    #b05a5a;
     --unsure: #b79a55;
-	--primary-bg: var(--accent);
-	--primary-border: var(--accent);
+
 }
 
 /* Light-Blue (modern, kühl) */
@@ -57,8 +54,7 @@
     --good:   #2e8b57;
     --bad:    #c24141;
     --unsure: #d1a22f;
-	--primary-bg: var(--accent);
-    --primary-border: var(--accent);
+
 }
 
 /* ============================================================
