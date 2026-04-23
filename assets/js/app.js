@@ -847,6 +847,17 @@ function setTheme(theme) {
     saveSettings();
 }
 
+/* ============================ Farbe Taskleiste ändern ============================== */
+
+
+function setTaskbarColor(color) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute("content", color);
+  }
+}
+
+
 function applyTheme(theme) {
   document.documentElement.className = theme;
 
@@ -869,16 +880,6 @@ function applyTheme(theme) {
 
     default:
       setTaskbarColor("#000000");
-  }
-}
-
-/* ============================ Farbe Taskleiste ändern ================================= */
-
-
-function setTaskbarColor(color) {
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) {
-    meta.setAttribute("content", color);
   }
 }
 
