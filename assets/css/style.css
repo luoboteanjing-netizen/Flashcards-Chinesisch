@@ -830,7 +830,7 @@ body.menu-open #menuToggle::before {
     font-size: 32px;
     color: var(--text);
     position: absolute;
-    top: 0;
+    top:6;
 	right: 24px;
 }
 
