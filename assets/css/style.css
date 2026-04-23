@@ -10,7 +10,7 @@
 	--good:#2e8b57; 
 	--bad:#cc3333; 
 	--unsure:#ffbd6b; 
-	--primary-bg: #000000;
+    --primary-bg: var(--accent);
     --primary-border: var(--accent);
 }
 
@@ -25,7 +25,7 @@
     --good:   #2e8b57;
     --bad:    #cc3333;
     --unsure: #cc9900;
-    --primary-bg: #F7D09D;
+    --primary-bg: var(--accent);
     --primary-border: var(--accent);
 }		
 
@@ -41,8 +41,8 @@
     --good:   #5a8f6a;
     --bad:    #b05a5a;
     --unsure: #b79a55;
-	--primary-bg: #F7D09D;
-	--primary-border: var(--accent);
+    --primary-bg: var(--accent);
+    --primary-border: var(--accent);
 }
 
 /* Light-Blue (modern, kühl) */
@@ -57,7 +57,7 @@
     --good:   #2e8b57;
     --bad:    #c24141;
     --unsure: #d1a22f;
-	--primary-bg: #0d559f;
+    --primary-bg: var(--accent);
     --primary-border: var(--accent);
 }
 
