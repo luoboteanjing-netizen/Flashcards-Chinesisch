@@ -1,0 +1,38 @@
+{
+  "name": "Flashcards Chinesisch",
+  "short_name": "CiLong",
+  "description": "Chinesisch Flashcards mit Leitner-System und TTS",
+  "start_url": "./index.html",
+  "scope": "/Flashcards-Chinesisch/",
+  "id": "/Flashcards-Chinesisch/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#01193C",
+  "theme_color": "#7aa2f7",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
