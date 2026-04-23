@@ -847,7 +847,7 @@ function setTheme(theme) {
     saveSettings();
 }
 
-/* ============================ Farbe Taskleiste ändern ============================== */
+/* ============================ Farbe Taskleiste ändern =====
 
 
 function setTaskbarColor(color) {
@@ -882,7 +882,7 @@ function applyTheme(theme) {
       setTaskbarColor("#000000");
   }
 }
-
+========================= */
 
 /* ============================ sync & scroll ============================ */
 
