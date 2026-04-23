@@ -500,6 +500,8 @@ function setUILanguage(lang) {
     translateAllUI();
 }
 
+
+
 /* ============================ CSV PARSING ================================= */
 
 function parseCSVLine(line) {
@@ -844,6 +846,42 @@ function setTheme(theme) {
     state.settings.theme = theme;
     saveSettings();
 }
+
+function applyTheme(theme) {
+  document.documentElement.className = theme;
+
+  switch (theme) {
+    case "dark":
+      setTaskbarColor("#000000");
+      break;
+
+    case "light-orange":
+      setTaskbarColor("#ffbb55");
+      break;
+
+    case "light-warm":
+      setTaskbarColor("#c97c5d");
+      break;
+
+    case "light-blue":
+      setTaskbarColor("#3b82f6");
+      break;
+
+    default:
+      setTaskbarColor("#000000");
+  }
+}
+
+/* ============================ Farbe Taskleiste ändern ================================= */
+
+
+function setTaskbarColor(color) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute("content", color);
+  }
+}
+
 
 /* ============================ sync & scroll ============================ */
 
