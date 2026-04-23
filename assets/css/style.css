@@ -1,4 +1,4 @@
-/* Version 6.5 */
+/* Version 6.4 */
 :root{  
 	--bg: #01193C;
 	--card: #12161b;
@@ -10,8 +10,8 @@
 	--good:#2e8b57; 
 	--bad:#cc3333; 
 	--unsure:#ffbd6b; 
-    --primary-bg: #000000;
-    --primary-border: #000000;
+    --primary-bg: var(--accent);
+    --primary-border: var(--accent);
 }
 
 :root.light-orange {
@@ -116,8 +116,8 @@ main.container {
     --color-warning:   var(--unsure);
 
     /* Buttons */
-    --color-primary-bg:     var(--accent);
-    --color-primary-border: var(--accent);
+    --color-primary-bg:     var(--primary-bg);
+    --color-primary-border: var(--primary-border);
 	
 	--color-progress-strong:  var(--good);
 	--color-progress-weak:    var(--unsure);
