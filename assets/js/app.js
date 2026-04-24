@@ -845,10 +845,8 @@ function setTheme(theme) {
     localStorage.setItem("theme", theme);
     state.settings.theme = theme;
     saveSettings();
+	applyTheme(theme);
 }
-
-/* ============================ Farbe Taskleiste ändern =====
-
 
 function setTaskbarColor(color) {
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -859,8 +857,7 @@ function setTaskbarColor(color) {
 
 
 function applyTheme(theme) {
-  document.documentElement.className = theme;
-
+ 
   switch (theme) {
     case "dark":
       setTaskbarColor("#000000");
@@ -882,7 +879,7 @@ function applyTheme(theme) {
       setTaskbarColor("#000000");
   }
 }
-========================= */
+
 
 /* ============================ sync & scroll ============================ */
 
@@ -2108,6 +2105,7 @@ console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
        SETTINGS + PROGRESS LADEN + THEME & DELAY INITIALISIEREN
        ============================================================ */
     loadSettings();
+	applyTheme(state.settings.theme);
     loadProgress();
     resetSessionStats();  // Session-Stats initialisieren
 	
@@ -2115,7 +2113,6 @@ console.log(`[INIT] Starte Initialisierung … (v${APP_VERSION})`);
 if (!state.settings.resumeIndexByLesson) {
     state.settings.resumeIndexByLesson = {};
 }
-
 
 // ==========================================
 // PWA Install Button
