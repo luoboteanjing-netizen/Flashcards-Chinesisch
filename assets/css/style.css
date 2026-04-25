@@ -15,11 +15,11 @@
 }
 
 :root.light-orange {
-    --bg: #F7D09D;
+    --bg: #ffbb55;
     --card: #ffffff;
     --text: #222;
     --muted: #555;
-	--accent-text: #222;    /* dunkles Textgrau für bessere Lesbarkeit */
+	--accent-text: #222;   /* dunkles Textgrau für bessere Lesbarkeit */
     --border: #bbbbbb;
 	--accent: #ffbb55;    /* z.B. warmes Orange statt blau */
     --good:   #2e8b57;
@@ -31,7 +31,7 @@
 
 /* Light-Warm (Abend, augenschonend) */
 :root.light-warm {
-    --bg: #F7D09D;
+    --bg: #c97c5d;
     --card: #F2E9DE;
     --text: #3a2f25;
     --muted: #6f5c4b;
@@ -47,7 +47,7 @@
 
 /* Light-Blue (modern, kühl) */
 :root.light-blue {
-    --bg: #0d559f;
+    --bg: #3b82f6;
     --card: #ffffff;
     --text: #1f2a37;
     --muted: #4b5d73;
