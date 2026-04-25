@@ -407,6 +407,9 @@ const state = {
     trainingOn: false
 };
 
+	state.reinsertQueue = [];
+	state.cardCounter = 0;
+
 /* ============================ SETTINGS / PROGRESS ========================= */
 
 function saveSettings() {
@@ -1197,7 +1200,7 @@ function updateNavButtons() {
 }
 
 function nextCard() {
-
+	state.cardCounter++;
     if (!state.pool.length) return;
 
     if (state.historyPos < state.history.length - 1) {
@@ -1206,7 +1209,16 @@ function nextCard() {
         syncCardHeights();
         return;
     }
+	// 🔥 NEU: Prüfen ob eine Karte wieder erscheinen soll
+	const dueIndex = state.reinsertQueue.findIndex(item => item.due <= state.cardCounter);
 
+	if (dueIndex !== -1) {
+		const item = state.reinsertQueue.splice(dueIndex, 1)[0];
+		setCard(item.card);
+		syncCardHeights();
+		return;
+	}
+	
     let next;
 
     if (state.order === "seq") {
@@ -1359,13 +1371,19 @@ function rate(mark) {
 
         p.timesCorrect++;
     }
-    else if (mark === "unsure") {
-        // unsicher → 2 oder 3
-        if (p.box < 2)      p.box = 2;   // 1 → 2
-        else if (p.box === 2) p.box = 3; // 2 → 3
+    else if (mark === "unknown") {
+    // falsch → zurück zu 1
+    p.box = 1;
+    p.timesWrong++;
 
-        p.timesWrong++;
-    }
+    // 🔥 NEU: Karte verzögert wieder einplanen
+    const delay = Math.floor(Math.random() * 8) + 3; // 3–10 Karten
+
+    state.reinsertQueue.push({
+        card: state.current,
+        due: state.cardCounter + delay
+    });
+}
     else if (mark === "unknown") {
         // falsch → zurück zu 1
         p.box = 1;
