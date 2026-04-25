@@ -1377,7 +1377,7 @@ function rate(mark) {
     p.timesWrong++;
 
     // 🔥 NEU: Karte verzögert wieder einplanen
-    const delay = Math.floor(Math.random() * 8) + 3; // 3–10 Karten
+    const delay = Math.floor(Math.random() * 6) + 3; // 3–8 Karten
 
     state.reinsertQueue.push({
         card: state.current,
