@@ -823,6 +823,15 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     z-index: 1000;
 }
 
+#menuToggle::before {
+    content: "×";
+    font-size: 32px;
+    color: var(--text);
+    position: absolute;
+    top: 0;
+	right: 30;
+}
+
 /* ============================================================
    ✅ Menübutton Animation (⋮ → ×)
    ============================================================ */
