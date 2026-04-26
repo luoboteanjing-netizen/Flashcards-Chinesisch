@@ -814,24 +814,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     border-left: 4px solid var(--color-selected-border) !important;
 }
 
-#menuToggle {
-    position: fixed;
-    top: 16px;
-    right: 30px;
-    font-size: 28px;
-    cursor: pointer;
-    z-index: 1000;
-}
-
-#menuToggle::before {
-    content: "×";
-    font-size: 32px;
-    color: var(--text);
-    position: absolute;
-    top: 0;
-	right: 30;
-}
-
 /* ============================================================
    ✅ Menübutton Animation (⋮ → ×)
    ============================================================ */
