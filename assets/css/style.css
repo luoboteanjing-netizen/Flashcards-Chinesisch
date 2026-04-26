@@ -830,7 +830,7 @@ body.menu-open #menuToggle::before {
     color: var(--text);
     position: absolute;
     top: 0;
-	right: 0;
+	right: 30px;
 }
 
 .side-menu {
