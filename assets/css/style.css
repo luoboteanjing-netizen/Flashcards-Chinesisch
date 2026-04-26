@@ -816,8 +816,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 #menuToggle {
     position: fixed;
-    top: 12px;
-    right: 22px;
+    top: 16px;
+    right: 30px;
     font-size: 28px;
     cursor: pointer;
     z-index: 1000;
