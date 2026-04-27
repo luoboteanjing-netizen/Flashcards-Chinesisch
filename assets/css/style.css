@@ -192,7 +192,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     flex-wrap: nowrap;
     justify-content: center;      /* zentriert die ganze Gruppe */
     width: 100%;    /* volle Breite des Containers nutzen */
-    padding: 0 8px;	
+    padding: 0 4px;	
     margin-bottom: 12px;
 }
 
@@ -206,7 +206,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     text-align: center;
     white-space: nowrap;
     border-radius: 8px;
-    min-height: 32px;             /* einheitliche Höhe mit den anderen Buttons */
+    min-height: 28px;             /* einheitliche Höhe mit den anderen Buttons */
 }
 
 .training-group .btn {
