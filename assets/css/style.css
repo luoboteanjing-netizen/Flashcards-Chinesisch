@@ -188,23 +188,26 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 .actions-inline {
     display: flex;
-    gap: 8px;
-    align-items: stretch;
+    gap: 8px;                    /* etwas mehr Gap für bessere Optik */
     flex-wrap: nowrap;
-    justify-content: center;
+    justify-content: center;      /* zentriert die ganze Gruppe */
+    width: 100%;                  /* volle Breite des Containers nutzen */
+    margin-bottom: 12px;
 }
 
+/* Alle Buttons in dieser Reihe gleichmäßig wachsen */
 .actions-inline .btn {
-    flex: 0 1 auto;
-    min-width: 104px;
-    width: auto;
-    padding: 7px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    flex: 1 1 0;                  /* wichtig: gleichmäßig wachsen + schrumpfen */
+    min-width: 0;                 /* erlaubt Schrumpfen unter Inhaltsbreite */
+    padding: 12px 8px;            /* etwas mehr vertikales Padding für bessere Höhe */
+    font-weight: 600;
     font-size: 14px;
+    text-align: center;
     white-space: nowrap;
+    border-radius: 8px;
+    min-height: 48px;             /* einheitliche Höhe mit den anderen Buttons */
 }
+
 .training-group .btn {
  flex: 0 0 170px;
  min-width: 170px;
