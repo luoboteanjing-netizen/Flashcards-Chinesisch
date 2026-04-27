@@ -177,7 +177,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 .btn.ghost{background:transparent}
 .btn.toggle {
-    min-width: 104px;
+    min-width: 84px;
     padding: 7px 10px;
 }
 .btn.toggle.active {
@@ -188,7 +188,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 .actions-inline {
     display: flex;
-    gap: 8px;                    /* etwas mehr Gap für bessere Optik */
+    gap: 14px;                    /* etwas mehr Gap für bessere Optik */
     flex-wrap: nowrap;
     justify-content: center;      /* zentriert die ganze Gruppe */
     width: 100%;                  /* volle Breite des Containers nutzen */
@@ -495,7 +495,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
  .mode-inline, .actions-inline { gap:14px; }
  .actions-inline .btn {
   flex: 0 1 auto;
-  min-width: 104px;
+  min-width: 84px;
   width: auto;
  }
  .voice-btn, .voice-config .lbl, .gap-row .lbl { font-size:13px; }
