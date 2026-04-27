@@ -44,24 +44,24 @@ Sie, Ihnen;nín;Pronomen;Nín guì xìng?;Wie ist Ihr Nachname?;您;您贵姓？
 ich, mich, mir, (mein);wǒ;Pronomen;Wǒ shì xuéshēng.;Ich bin Student.;我;我是学生。;L01-1-14;L01
 Johann;Yuēhàn;Name;Yuēhàn shì měiguórén.;Johann ist Amerikaner.;约翰;约翰是美国人。;L01-1-15;L01
 Auf Wiedersehen!;zàijiàn;Phrase;Zàijiàn!;Auf Wiedersehen!;再见;再见！;L01-1-16;L01
-* Lektion 1 Dialoge;*Lektion 1 Dialoge;* Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;LD01-1-00;L01-Dialog
-;;;Nǐ hǎo!;Guten Tag!;你好！;你好！;LD01-1-01;L01-Dialog
-;;;Nǐ hǎo!;Guten Tag!;你好！;你好！;LD01-1-02;L01-Dialog
-;;;Nǐ hǎo ma?;Wie geht es Ihnen?;你好吗？;你好吗？;LD01-1-03;L01-Dialog
-;;;Wǒ hěn hǎo, nǐ ne?;Mir geht es gut, und Ihnen?;我很好，你呢？;我很好，你呢？;LD01-1-04;L01-Dialog
-;;;Mǎmǎ-hūhū;Es geht so.;马马虎虎;马马虎虎;LD01-1-05;L01-Dialog
-;;;Zàijiàn.;Auf Wiedersehen.;再见。;再见。;LD01-1-06;L01-Dialog
-;;;Zàijiàn.;Auf Wiedersehen.;再见。;再见。;LD01-1-07;L01-Dialog
-;;;Nǐ hǎo ma?;Wie geht es Ihnen?;你好吗？;你好吗？;LD01-1-08;L01-Dialog
-;;;Mǎmǎ-hūhū;Es geht so.;马马虎虎;马马虎虎;LD01-1-09;L01-Dialog
-;;;Wǒ hěn hǎo.;Mir geht es gut.;我很好。;我很好。;LD01-1-10;L01-Dialog
-;;;Wǒ hěn è.;Ich habe Hunger.;我很饿。;我很饿。;LD01-1-11;L01-Dialog
-;;;Wǒ hěn kě.;Ich bin durstig.;我很渴。;我很渴。;LD01-1-12;L01-Dialog
-;;;Wǒ bù kě.;Ich bin nicht durstig.;我不渴。;我不渴。;LD01-1-13;L01-Dialog
-;;;Nǐ kě ma?;Bist du durstig?;你渴吗？;你渴吗？;LD01-1-14;L01-Dialog
-;;;Wǒ hěn mǎng.;Ich bin beschäftigt.;我很忙。;我很忙。;LD01-1-15;L01-Dialog
-;;;Wǒ bù mǎng.;Ich bin nicht beschäftigt.;我不忙。;我不忙。;LD01-1-16;L01-Dialog
-;;;Nǐ mǎng ma?;Bist du beschäftigt?;你忙吗？;你忙吗？;LD01-1-17;L01-Dialog
+* Lektion 1 Dialoge;*Lektion 1 Dialoge;* Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;LD01-1-00;L01-Dialog 1
+;;;Nǐ hǎo!;Guten Tag!;;你好！;LD01-1-01;L01-Dialog 1
+;;;Nǐ hǎo!;Guten Tag!;;你好！;LD01-1-02;L01-Dialog 1
+;;;Nǐ hǎo ma?;Wie geht es Ihnen?;;你好吗？;LD01-1-03;L01-Dialog 1
+;;;Wǒ hěn hǎo, nǐ ne?;Mir geht es gut, und Ihnen?;;我很好，你呢？;LD01-1-04;L01-Dialog 1
+;;;Mǎmǎ-hūhū;Es geht so.;;马马虎虎;LD01-1-05;L01-Dialog 1
+;;;Zàijiàn.;Auf Wiedersehen.;;再见。;LD01-1-06;L01-Dialog 1
+;;;Zàijiàn.;Auf Wiedersehen.;;再见。;LD01-1-07;L01-Dialog 1
+;;;Nǐ hǎo ma?;Wie geht es Ihnen?;;你好吗？;LD01-1-08;L01-Dialog 1
+;;;Mǎmǎ-hūhū;Es geht so.;;马马虎虎;LD01-1-09;L01-Dialog 1
+;;;Wǒ hěn hǎo.;Mir geht es gut.;;我很好。;LD01-1-10;L01-Dialog 1
+;;;Wǒ hěn è.;Ich habe Hunger.;;我很饿。;LD01-1-11;L01-Dialog 1
+;;;Wǒ hěn kě.;Ich bin durstig.;;我很渴。;LD01-1-12;L01-Dialog 1
+;;;Wǒ bù kě.;Ich bin nicht durstig.;;我不渴。;LD01-1-13;L01-Dialog 1
+;;;Nǐ kě ma?;Bist du durstig?;;你渴吗？;LD01-1-14;L01-Dialog 1
+;;;Wǒ hěn mǎng.;Ich bin beschäftigt.;;我很忙。;LD01-1-15;L01-Dialog 1
+;;;Wǒ bù mǎng.;Ich bin nicht beschäftigt.;;我不忙。;LD01-1-16;L01-Dialog 1
+;;;Nǐ mǎng ma?;Bist du beschäftigt?;;你忙吗？;LD01-1-17;L01-Dialog 1
 * Lektion 2;*Lektion 2;* Lektion 2;*Lektion 2;*Lektion 2;*Lektion 2;*Lektion 2;L02-1-00;L02
 er, sie, es;tā;Pronomen;Tā shì wǒ de péngyou.;Er ist mein Freund.;他;他是我的朋友。;L02-1-01;L02
 heißen, rufen, nennen;jiào;Verb;Wǒ jiào Lǐ Míng.;Mein Name ist Ming Li.;叫;我叫李明。;L02-1-02;L02
@@ -92,31 +92,31 @@ Name;míngzì;Subst.;Nǐ de míngzì shì shénme?;Wie ist dein Name?;名字;你
 sie, er, es;tā;Pronomen;Tā shì wǒ de péngyou.;Sie ist meine Freundin.;她;她是我的朋友。;L02-2-12;L02
 Wang Gang;Wánggāng;Name;Wǒmen de mìshū jiào Wánggāng.;Unser Sekretär heißt Wang Gang.;王刚;我们的秘书叫王刚。;L02-2-13;L02
 wir;wǒmen;Pronomen;Wǒmen shì péngyou.;Wir sind Freunde.;我们;我们是朋友。;L02-2-14;L02
-* Lektion 2 Dialoge;*Lektion 2 Dialoge;* Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;LD02-1-00;LD02
-Entschuldigung, wie ist Ihr Name?;Qǐng wèn, nín jiào shénme míngzì?;;Qǐng wèn, nín jiào shénme míngzì?;Entschuldigung, wie ist Ihr Name?;请问，您叫什么名字？;请问，您叫什么名字？;LD02-1-14;LD02
-Mein Familienname ist Li. Ich heiße Li Li.;Wǒ xìng Lǐ, jiào Lǐ Lì.;;Wǒ xìng Lǐ, jiào Lǐ Lì.;Mein Familienname ist Li. Ich heiße Li Li.;我姓李，叫李丽。;我姓李，叫李丽。;LD02-2-14;LD02
-Wie ist Ihr werter Name?;Nín guì xìng?;;Nín guì xìng?;Wie ist Ihr werter Name?;您贵姓？;您贵姓？;LD02-1-03;LD02
-Mein Familienname ist Müller, ich heiße Johann Müller.;Wǒ xìng Mǐlē, jiào Yuēhàn Mǐlē;;Wǒ xìng Mǐlē, jiào Yuēhàn Mǐlē;Mein Familienname ist Müller, ich heiße Johann Müller.;我姓米勒，叫约翰米勒。;我姓米勒，叫约翰米勒。;LD02-1-04;LD02
-Entschuldigung, sind Sie Lehrer?;Duìbuqǐ, nǐ shì lǎoshī ma?;;Duìbuqǐ, nǐ shì lǎoshī ma?;Entschuldigung, sind Sie Lehrer?;对不起，你是老师吗？;对不起，你是老师吗？;LD02-1-05;LD02
-Nein, ich bin kein Lehrer, ich bin Ingenieur, sie ist Lehrerin.;Bù, wǒ bù shì lǎoshī, wǒ shì gōngchéngshī, tā shì lǎoshī.;;Bù, wǒ bù shì lǎoshī, wǒ shì gōngchéngshī, tā shì lǎoshī.;Nein, ich bin kein Lehrer, ich bin Ingenieur, sie ist Lehrerin.;不，我不是老师，我是工程师，她是老师。;不，我不是老师，我是工程师，她是老师。;LD02-1-06;LD02
-Ja, ich bin Lehrerin, und ihr?;Shì de, wǒ shì lǎoshī, nǐ ne?;;Shì de, wǒ shì lǎoshī, nǐ ne?;Ja, ich bin Lehrerin, und ihr?;是的，我是老师，你呢？;是的，我是老师，你呢？;LD02-1-07;LD02
-Ich bin Sekretärin.;Wǒ shì mìshū.;;Wǒ shì mìshū.;Ich bin Sekretärin.;我是秘书。;我是秘书。;LD02-1-08;LD02
-Ich bin Student.;Wǒ shì xuéshēng.;;Wǒ shì xuéshēng.;Ich bin Student.;我是学生。;我是学生。;LD02-1-09;LD02
-Johann! Lass mich ihn vorstellen. Er ist mein Freund.;Yuēhàn! Wǒ jièshào yīxià, tā shì wǒ de péngyǒu.;;Yuēhàn! Wǒ jièshào yīxià, tā shì wǒ de péngyǒu.;Johann! Lass mich ihn vorstellen. Er ist mein Freund.;约翰！我介绍一下，他是我的朋友。;约翰！我介绍一下，他是我的朋友。;LD02-1-10;LD02
-Wang Gāng, sie ist meine Lehrerin.;Wáng Gāng, tā shì wǒ de lǎoshī.;;Wáng Gāng, tā shì wǒ de lǎoshī.;Wang Gāng, sie ist meine Lehrerin.;王刚，她是我的老师。;王刚，她是我的老师。;LD02-1-11;LD02
-Hallo zusammen, ich heiße Johann Müller.;Nǐmen hǎo, wǒ jiào Yuēhàn Mǐlē.;;Nǐmen hǎo, wǒ jiào Yuēhàn Mǐlē.;Hallo zusammen, ich heiße Johann Müller.;你们好，我叫约翰米勒。;你们好，我叫约翰米勒。;LD02-1-12;LD02
-Mein Familienname ist Dèng, ich heiße Dèng xiǎomíng.;Wǒ xìng Dèng, jiào Dèng xiǎomíng;;Wǒ xìng Dèng, jiào Dèng xiǎomíng;Mein Familienname ist Dèng, ich heiße Dèng xiǎomíng.;我姓邓，叫邓小明。;我姓邓，叫邓小明。;LD02-1-13;LD02
-Ich freue mich, Sie kennenzulernen.;Rènshi nǐmen, wǒ hěn gāoxìng;;Rènshi nǐmen, wǒ hěn gāoxìng;Ich freue mich, Sie kennenzulernen.;认识你们，我很高兴。;认识你们，我很高兴。;LD02-1-14;LD02
-Wir freuen uns auch, Sie kennenzulernen.;Wǒmen yě hěn gāoxìng rènshi nǐ.;;Wǒmen yě hěn gāoxìng rènshi nǐ.;Wir freuen uns auch, Sie kennenzulernen.;我们也很高兴认识你。;我们也很高兴认识你。;LD02-1-15;LD02
-Herr Müller, hier ist meine Visitenkarte.;Mǐlē xiānsheng, zhè shì wǒ de míngpiàn.;;Mǐlē xiānsheng, zhè shì wǒ de míngpiàn.;Herr Müller, hier ist meine Visitenkarte.;米勒先生，这是我的名片。;米勒先生，这是我的名片。;LD02-1-16;LD02
-Vielen Dank! Lehrerin Deng, das ist meine Visitenkarte.;Xièxiè! Dèng lǎoshī, zhè shì wǒ de míngpiàn.;;Xièxiè! Dèng lǎoshī, zhè shì wǒ de míngpiàn.;Vielen Dank! Lehrerin Deng, das ist meine Visitenkarte.;谢谢！邓老师，这是我的名片。;谢谢！邓老师，这是我的名片。;LD02-1-17;LD02
-Mein Familienname ist Wang, mein Name ist Wang Gang.;Wǒ xìng Wáng, wǒ jiào Wáng Gāng.;;Wǒ xìng Wáng, wǒ jiào Wáng Gāng.;Mein Familienname ist Wang, mein Name ist Wang Gang.;我姓王，我叫王刚。;我姓王，我叫王刚。;LD02-1-18;LD02
-Ich bin Schüler/-in oder Student/-in.;Wǒ shì xuéshēng.;;Wǒ shì xuéshēng.;Ich bin Schüler/-in oder Student/-in.;我是学生。;我是学生。;LD02-1-19;LD02
-Er ist nicht Lehrer.;Tā bù shì lǎoshī.;;Tā bù shì lǎoshī.;Er ist nicht Lehrer.;他不是老师。;他不是老师。;LD02-1-20;LD02
-Das ist mein/-e Freund/-in.;Zhè shì wǒ de nǚ péngyǒu.;;Zhè shì wǒ de nǚ péngyǒu.;Das ist mein/-e Freund/-in.;这是我的女朋友。;这是我的女朋友。;LD02-1-21;LD02
-Dich kennen zu lernen, freut mich sehr.;Wèile rènshi nǐ, wǒ hěn gāoxìng;;Wèile rènshi nǐ, wǒ hěn gāoxìng;Dich kennen zu lernen, freut mich sehr.;为了认识你，我很高兴。;为了认识你，我很高兴。;LD02-1-22;LD02
-Danke!;Xièxiè!;;Xièxiè!;Danke!;谢谢！;谢谢！;LD02-1-23;LD02
-Danke!;Xièxiè!;;Xièxiè!;Danke!;谢谢！;谢谢！;LD02-1-24;LD02
+* Lektion 2 Dialoge;*Lektion 2 Dialoge;* Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;LD02-1-00;L02 - Dialog 1
+;;;Qǐng wèn, nín jiào shénme míngzì?;Entschuldigung, wie ist Ihr Name?;;请问，您叫什么名字？;LD02-1-14;L02 - Dialog 1
+;;;Wǒ xìng Lǐ, jiào Lǐ Lì.;Mein Familienname ist Li. Ich heiße Li Li.;;我姓李，叫李丽。;LD02-1-14;L02 - Dialog 1
+;;;Nín guì xìng?;Wie ist Ihr werter Name?;;您贵姓？;LD02-1-03;L02 - Dialog 1
+;;;Wǒ xìng Mǐlē, jiào Yuēhàn Mǐlē;Mein Familienname ist Müller, ich heiße Johann Müller.;;我姓米勒，叫约翰米勒。;LD02-1-04;L02 - Dialog 1
+;;;Duìbuqǐ, nǐ shì lǎoshī ma?;Entschuldigung, sind Sie Lehrer?;;对不起，你是老师吗？;LD02-1-05;L02 - Dialog 1
+;;;Bù, wǒ bù shì lǎoshī, wǒ shì gōngchéngshī, tā shì lǎoshī.;Nein, ich bin kein Lehrer, ich bin Ingenieur, sie ist Lehrerin.;;不，我不是老师，我是工程师，她是老师。;LD02-1-06;L02 - Dialog 1
+;;;Shì de, wǒ shì lǎoshī, nǐ ne?;Ja, ich bin Lehrerin, und ihr?;;是的，我是老师，你呢？;LD02-1-07;L02 - Dialog 1
+;;;Wǒ shì mìshū.;Ich bin Sekretärin.;;我是秘书。;LD02-1-08;L02 - Dialog 1
+;;;Wǒ shì xuéshēng.;Ich bin Student.;;我是学生。;LD02-1-09;L02 - Dialog 1
+;;;Yuēhàn! Wǒ jièshào yīxià, tā shì wǒ de péngyǒu.;Johann! Lass mich ihn vorstellen. Er ist mein Freund.;;约翰！我介绍一下，他是我的朋友。;LD02-1-10;L02 - Dialog 1
+;;;Wáng Gāng, tā shì wǒ de lǎoshī.;Wang Gāng, sie ist meine Lehrerin.;;王刚，她是我的老师。;LD02-1-11;L02 - Dialog 1
+;;;Nǐmen hǎo, wǒ jiào Yuēhàn Mǐlē.;Hallo zusammen, ich heiße Johann Müller.;;你们好，我叫约翰米勒。;LD02-1-12;L02 - Dialog 1
+;;;Wǒ xìng Dèng, jiào Dèng xiǎomíng;Mein Familienname ist Dèng, ich heiße Dèng xiǎomíng.;;我姓邓，叫邓小明。;LD02-1-13;L02 - Dialog 1
+;;;Rènshi nǐmen, wǒ hěn gāoxìng;Ich freue mich, Sie kennenzulernen.;;认识你们，我很高兴。;LD02-1-14;L02 - Dialog 1
+;;;Wǒmen yě hěn gāoxìng rènshi nǐ.;Wir freuen uns auch, Sie kennenzulernen.;;我们也很高兴认识你。;LD02-1-15;L02 - Dialog 1
+;;;Mǐlē xiānsheng, zhè shì wǒ de míngpiàn.;Herr Müller, hier ist meine Visitenkarte.;;米勒先生，这是我的名片。;LD02-1-16;L02 - Dialog 1
+;;;Xièxiè! Dèng lǎoshī, zhè shì wǒ de míngpiàn.;Vielen Dank! Lehrerin Deng, das ist meine Visitenkarte.;;谢谢！邓老师，这是我的名片。;LD02-1-17;L02 - Dialog 1
+;;;Wǒ xìng Wáng, wǒ jiào Wáng Gāng.;Mein Familienname ist Wang, mein Name ist Wang Gang.;;我姓王，我叫王刚。;LD02-1-18;L02 - Dialog 1
+;;;Wǒ shì xuéshēng.;Ich bin Schüler/-in oder Student/-in.;;我是学生。;LD02-1-19;L02 - Dialog 1
+;;;Tā bù shì lǎoshī.;Er ist nicht Lehrer.;;他不是老师。;LD02-1-20;L02 - Dialog 1
+;;;Zhè shì wǒ de nǚ péngyǒu.;Das ist mein/-e Freund/-in.;;这是我的女朋友。;LD02-1-21;L02 - Dialog 1
+;;;Wèile rènshi nǐ, wǒ hěn gāoxìng;Dich kennen zu lernen, freut mich sehr.;;为了认识你，我很高兴。;LD02-1-22;L02 - Dialog 1
+;;;Xièxiè!;Danke!;;谢谢！;LD02-1-23;L02 - Dialog 1
+;;;Xièxiè!;Danke!;;谢谢！;LD02-1-24;L02 - Dialog 1
 * Lektion 3;*Lektion 3;* Lektion 3;*Lektion 3;*Lektion 3;*Lektion 3;*Lektion 3;L03-1-00;L03
 Österreich;Àodìlì;Subst.;Wǒ xiǎng qù Àodìlì.;Ich möchte nach Österreich gehen.;奥地利;我想去奥地利。;L03-1-01;L03
 Peking;Běijīng;Subst.;Wǒ zài Běijīng dāng lǎoshī.;Ich arbeite als Lehrer in Peking.;北京;我在北京当老师。;L03-1-02;L03
@@ -160,39 +160,39 @@ England;Yīngguó;Subst.;Tā zhù zài Yīngguó.;Sie lebt in England.;英国;�
 "sich befinden; in, bei, an, auf";zài;Präposition;Wǒ zài xuéxiào.;Ich bin in der Schule.;在;我在学校。;L03-1-40;L03
 hier;zhèr;Adverb;Zhèr hěn piàoliang.;Hier ist es sehr schön.;这儿;这儿很漂亮。;L03-1-41;L03
 China;Zhōngguó;Subst.;Wǒ zài Zhōngguó.;Ich bin in China.;中国;我在中国。;L03-1-42;L03
-* Lektion 3 Dialoge;*Lektion 3 Dialoge;* Lektion 3 Dialoge;*Lektion 3 Dialoge;*Lektion 3 Dialoge;*Lektion 3 Dialoge;*Lektion 3 Dialoge;LD03-1-00;LD03
-Deutschland befindet sich dort.;Déguó zài nàr.;;Déguó zài nàr.;Deutschland befindet sich dort.;德国在那儿。;德国在那儿。;LD03-1-01;LD03
-China befindet sich hier.;Zhōngguó zài zhèr.;;Zhōngguó zài zhèr.;China befindet sich hier.;中国在这儿。;中国在这儿。;LD03-1-02;LD03
-Wo befinden sich die USA und Japan?;Měiguó hé Rìběn zài nǎr?;;Měiguó hé Rìběn zài nǎr?;Wo befinden sich die USA und Japan?;美国和日本在哪儿？;美国和日本在哪儿？;LD03-1-03;LD03
-Das hier sind England und Frankreich.;Zhè shì Yīngguó hé Fǎguó.;;Zhè shì Yīngguó hé Fǎguó.;Das hier sind England und Frankreich.;这是英国和法国。;这是英国和法国。;LD03-1-04;LD03
-Das da sind Österreich und die Schweiz.;Nà shì Àodìlì hé Ruìshì.;;Nà shì Àodìlì hé Ruìshì.;Das da sind Österreich und die Schweiz.;那是奥地利和瑞士。;那是奥地利和瑞士。;LD03-1-05;LD03
-Wer ist das?;Nà shì shéi?;;Nà shì shéi?;Wer ist das?;那是谁？;那是谁？;LD03-1-06;LD03
-Das ist mein Mitschüler.;Nà shì wǒ de tóngxué.;;Nà shì wǒ de tóngxué.;Das ist mein Mitschüler.;那是我的同学。;那是我的同学。;LD03-1-07;LD03
-Aus welchem Land kommt er?;Tā shì nǎ guó rén?;;Tā shì nǎ guó rén?;Aus welchem Land kommt er?;他是哪国人？;他是哪国人？;LD03-1-08;LD03
-Er ist Deutscher.;Tā shì Déguórén.;;Tā shì Déguórén.;Er ist Deutscher.;他是德国人。;他是德国人。;LD03-1-09;LD03
-Kann er Chinesisch sprechen?;Tā huì shuō Hànyǔ ma?;;Tā huì shuō Hànyǔ ma?;Kann er Chinesisch sprechen?;他会说汉语吗？;他会说汉语吗？;LD03-1-10;LD03
-Nein. Er kann nicht Chinesisch sprechen, er kann ein bisschen Japanisch sprechen.;Bù, tā bù huì shuō Hànyǔ, tā huì shuō yīdiǎnr Rìyǔ.;;Bù, tā bù huì shuō Hànyǔ, tā huì shuō yīdiǎnr Rìyǔ.;Nein. Er kann nicht Chinesisch sprechen, er kann ein bisschen Japanisch sprechen.;不，他不会说汉语，他会说一点儿日语。;不，他不会说汉语，他会说一点儿日语。;LD03-1-11;LD03
-Entschuldigung, woher kommst du?;Qǐng wèn, nǐ cóng nǎr lái?;;Qǐng wèn, nǐ cóng nǎr lái?;Entschuldigung, woher kommst du?;请问，你从哪儿来？;请问，你从哪儿来？;LD03-1-12;LD03
-Ich komme aus London, England.;Wǒ cóng Yīngguó Lúndūn lái.;;Wǒ cóng Yīngguó Lúndūn lái.;Ich komme aus London, England.;我从英国伦敦来。;我从英国伦敦来。;LD03-1-13;LD03
-Dein Chinesisch ist sehr gut.;Nǐ de Hànyǔ hěn hǎo.;;Nǐ de Hànyǔ hěn hǎo.;Dein Chinesisch ist sehr gut.;你的汉语很好。;你的汉语很好。;LD03-1-14;LD03
-Nicht der Rede wert, ich lerne an der Universität Peking Chinesisch.;Nǎlǐ, nǎlǐ, wǒ zài Běijīng Dàxué xué Hànyǔ.;;Nǎlǐ, nǎlǐ, wǒ zài Běijīng Dàxué xué Hànyǔ.;Nicht der Rede wert, ich lerne an der Universität Peking Chinesisch.;哪里，哪里，我在北京大学学汉语。;哪里，哪里，我在北京大学学汉语。;LD03-1-15;LD03
-Und du? Wo kommst du her?;Nǐ ne? Nǐ cóng nǎr lái?;;Nǐ ne? Nǐ cóng nǎr lái?;Und du? Wo kommst du her?;你呢？你从哪儿来？;你呢？你从哪儿来？;LD03-1-16;LD03
-Ich komme aus Berlin, Deutschland.;Wǒ cóng Déguó Bólín lái.;;Wǒ cóng Déguó Bólín lái.;Ich komme aus Berlin, Deutschland.;我从德国柏林来。;我从德国柏林来。;LD03-1-17;LD03
-Ich arbeite bei der Firma VW in Shanghai, China.;Wǒ zài Zhōngguó Shànghǎi Dàzhòng gōngsī gōngzuò.;;Wǒ zài Zhōngguó Shànghǎi Dàzhòng gōngsī gōngzuò.;Ich arbeite bei der Firma VW in Shanghai, China.;我在中国上海大众公司工作。;我在中国上海大众公司工作。;LD03-1-18;LD03
-Das ist mein Freund.;Zhè shì wǒ de péngyou.;;Zhè shì wǒ de péngyou.;Das ist mein Freund.;这是我的朋友。;这是我的朋友。;LD03-1-19;LD03
-Wer ist das?;Zhè shì shéi?;;Zhè shì shéi?;Wer ist das?;这是谁？;这是谁？;LD03-1-20;LD03
-Woher kommt sie?;Tā cóng nǎlǐ lái?;;Tā cóng nǎlǐ lái?;Woher kommt sie?;她从哪里来？;她从哪里来？;LD03-1-21;LD03
-Sie kommt aus Deutschland.;Tā cóng Déguó lái.;;Tā cóng Déguó lái.;Sie kommt aus Deutschland.;她从德国来。;她从德国来。;LD03-1-22;LD03
-Ich bin Chinese.;Wǒ shì Zhōngguórén.;;Wǒ shì Zhōngguórén.;Ich bin Chinese.;我是中国人。;我是中国人。;LD03-1-23;LD03
-Welche Staatsangehörigkeit hast du?;Nǐ shì shénme guójiā de rén?;;Nǐ shì shénme guójiā de rén?;Welche Staatsangehörigkeit hast du?;你是什么国家的人？;你是什么国家的人？;LD03-1-24;LD03
-Wo ist Lehrer Deng?;Dèng lǎoshī zài nǎlǐ?;;Dèng lǎoshī zài nǎlǐ?;Wo ist Lehrer Deng?;邓老师在哪里？;邓老师在哪里？;LD03-1-25;LD03
-Lehrer Deng befindet sich an der Uni.;Dèng lǎoshī zài dàxué.;;Dèng lǎoshī zài dàxué.;Lehrer Deng befindet sich an der Uni.;邓老师在大学。;邓老师在大学。;LD03-1-26;LD03
-Wo ist China?;Zhōngguó zài nǎr?;;Zhōngguó zài nǎr?;Wo ist China?;中国在哪儿？;中国在哪儿？;LD03-1-27;LD03
-Peking liegt in China.;Běijīng zài Zhōngguó.;;Běijīng zài Zhōngguó.;Peking liegt in China.;北京在中国。;北京在中国。;LD03-1-28;LD03
-Ich kann Englisch sprechen.;Wǒ huì shuō Yīngyǔ.;;Wǒ huì shuō Yīngyǔ.;Ich kann Englisch sprechen.;我会说英语。;我会说英语。;LD03-1-29;LD03
-Kommst du aus Peking?;Nǐ cóng Běijīng lái ma?;;Nǐ cóng Běijīng lái ma?;Kommst du aus Peking?;你从北京来吗？;你从北京来吗？;LD03-1-30;LD03
-Ich lerne Chinesisch.;Wǒ xuéxí Hànyǔ.;;Wǒ xuéxí Hànyǔ.;Ich lerne Chinesisch.;我学习汉语。;我学习汉语。;LD03-1-31;LD03
-Sie arbeitet bei der Firma VW.;Tā zài Dàzhòng gōngzuò.;;Tā zài Dàzhòng gōngzuò.;Sie arbeitet bei der Firma VW.;她在大众工作。;她在大众工作。;LD03-1-32;LD03
+* Lektion 3 Dialoge;*Lektion 3 Dialoge;* Lektion 3 Dialoge;*Lektion 3 Dialoge;*Lektion 3 Dialoge;*Lektion 3 Dialoge;*Lektion 3 Dialoge;LD03-1-00;L03 - Dialog 1
+;;;Déguó zài nàr.;Deutschland befindet sich dort.;;德国在那儿。;LD03-1-01;L03 - Dialog 1
+;;;Zhōngguó zài zhèr.;China befindet sich hier.;;中国在这儿。;LD03-1-02;L03 - Dialog 1
+;;;Měiguó hé Rìběn zài nǎr?;Wo befinden sich die USA und Japan?;;美国和日本在哪儿？;LD03-1-03;L03 - Dialog 1
+;;;Zhè shì Yīngguó hé Fǎguó.;Das hier sind England und Frankreich.;;这是英国和法国。;LD03-1-04;L03 - Dialog 1
+;;;Nà shì Àodìlì hé Ruìshì.;Das da sind Österreich und die Schweiz.;;那是奥地利和瑞士。;LD03-1-05;L03 - Dialog 1
+;;;Nà shì shéi?;Wer ist das?;;那是谁？;LD03-1-06;L03 - Dialog 1
+;;;Nà shì wǒ de tóngxué.;Das ist mein Mitschüler.;;那是我的同学。;LD03-1-07;L03 - Dialog 1
+;;;Tā shì nǎ guó rén?;Aus welchem Land kommt er?;;他是哪国人？;LD03-1-08;L03 - Dialog 1
+;;;Tā shì Déguórén.;Er ist Deutscher.;;他是德国人。;LD03-1-09;L03 - Dialog 1
+;;;Tā huì shuō Hànyǔ ma?;Kann er Chinesisch sprechen?;;他会说汉语吗？;LD03-1-10;L03 - Dialog 1
+;;;Bù, tā bù huì shuō Hànyǔ, tā huì shuō yīdiǎnr Rìyǔ.;Nein. Er kann nicht Chinesisch sprechen, er kann ein bisschen Japanisch sprechen.;;不，他不会说汉语，他会说一点儿日语。;LD03-1-11;L03 - Dialog 1
+;;;Qǐng wèn, nǐ cóng nǎr lái?;Entschuldigung, woher kommst du?;;请问，你从哪儿来？;LD03-1-12;L03 - Dialog 1
+;;;Wǒ cóng Yīngguó Lúndūn lái.;Ich komme aus London, England.;;我从英国伦敦来。;LD03-1-13;L03 - Dialog 1
+;;;Nǐ de Hànyǔ hěn hǎo.;Dein Chinesisch ist sehr gut.;;你的汉语很好。;LD03-1-14;L03 - Dialog 1
+;;;Nǎlǐ, nǎlǐ, wǒ zài Běijīng Dàxué xué Hànyǔ.;Nicht der Rede wert, ich lerne an der Universität Peking Chinesisch.;;哪里，哪里，我在北京大学学汉语。;LD03-1-15;L03 - Dialog 1
+;;;Nǐ ne? Nǐ cóng nǎr lái?;Und du? Wo kommst du her?;;你呢？你从哪儿来？;LD03-1-16;L03 - Dialog 1
+;;;Wǒ cóng Déguó Bólín lái.;Ich komme aus Berlin, Deutschland.;;我从德国柏林来。;LD03-1-17;L03 - Dialog 1
+;;;Wǒ zài Zhōngguó Shànghǎi Dàzhòng gōngsī gōngzuò.;Ich arbeite bei der Firma VW in Shanghai, China.;;我在中国上海大众公司工作。;LD03-1-18;L03 - Dialog 1
+;;;Zhè shì wǒ de péngyou.;Das ist mein Freund.;;这是我的朋友。;LD03-1-19;L03 - Dialog 1
+;;;Zhè shì shéi?;Wer ist das?;;这是谁？;LD03-1-20;L03 - Dialog 1
+;;;Tā cóng nǎlǐ lái?;Woher kommt sie?;;她从哪里来？;LD03-1-21;L03 - Dialog 1
+;;;Tā cóng Déguó lái.;Sie kommt aus Deutschland.;;她从德国来。;LD03-1-22;L03 - Dialog 1
+;;;Wǒ shì Zhōngguórén.;Ich bin Chinese.;;我是中国人。;LD03-1-23;L03 - Dialog 1
+;;;Nǐ shì shénme guójiā de rén?;Welche Staatsangehörigkeit hast du?;;你是什么国家的人？;LD03-1-24;L03 - Dialog 1
+;;;Dèng lǎoshī zài nǎlǐ?;Wo ist Lehrer Deng?;;邓老师在哪里？;LD03-1-25;L03 - Dialog 1
+;;;Dèng lǎoshī zài dàxué.;Lehrer Deng befindet sich an der Uni.;;邓老师在大学。;LD03-1-26;L03 - Dialog 1
+;;;Zhōngguó zài nǎr?;Wo ist China?;;中国在哪儿？;LD03-1-27;L03 - Dialog 1
+;;;Běijīng zài Zhōngguó.;Peking liegt in China.;;北京在中国。;LD03-1-28;L03 - Dialog 1
+;;;Wǒ huì shuō Yīngyǔ.;Ich kann Englisch sprechen.;;我会说英语。;LD03-1-29;L03 - Dialog 1
+;;;Nǐ cóng Běijīng lái ma?;Kommst du aus Peking?;;你从北京来吗？;LD03-1-30;L03 - Dialog 1
+;;;Wǒ xuéxí Hànyǔ.;Ich lerne Chinesisch.;;我学习汉语。;LD03-1-31;L03 - Dialog 1
+;;;Tā zài Dàzhòng gōngzuò.;Sie arbeitet bei der Firma VW.;;她在大众工作。;LD03-1-32;L03 - Dialog 1
 * Lektion 4;*Lektion 4;* Lektion 4;*Lektion 4;*Lektion 4;*Lektion 4;*Lektion 4;L04-1-00;L04
 Partikel für Vorschlag, Zustimmung;ba;Modalpartikel;Wǒmen zǒu ba.;Lass uns gehen.;吧;我们走吧。;L04-1-01;L04
 acht;bā;Zahlwort;Míngtiān wǒ bā diǎn yǒu yuē.;Morgen habe ich um acht Uhr eine Verabredung.;八;明天我八点有约。;L04-1-02;L04
@@ -281,30 +281,30 @@ Mittag;zhōngwǔ;Subst.;Zhōngwǔ wǒmen chī zhōngcān.;Mittags essen wir Mitt
 ;;;Dàn míngtiān wǎn wǒ méiyǒu kòng, zǎoshang wǒ yǒu kòng.;Aber morgen Abend habe ich keine Zeit, am Vormittag habe ich Zeit.;但明天晚我没有空，早上我有空。;但明天晚我没有空，早上我有空。;LD04-2-12;L04 - Dialog 2
 ;;;Méi guānxì, wǒmen hòulái zài shuō.;Das macht nichts, wir sprechen später darüber.;没关系，我们后来再说。;没关系，我们后来再说。;LD04-2-13;L04 - Dialog 2
 * Lektion 4 Dialoge;*Lektion 4 Dialoge;* Lektion 4 Dialoge;*Lektion 4 Dialoge;*Lektion 4 Dialoge;*Lektion 4 Dialoge;*Lektion 4 Dialoge;LD04-3-01;L04 - Dialog  3
-Lìlì;;;Nǐ hǎo, Yuēhàn! Nǐ hǎo, Wánggāng! Wǒmen jīntiān liànxí Hànyǔ kèwén ba?;Hallo John! Hallo Wang Gang! Wollen wir heute den Chinesisch‑Text üben?;你好，约翰！你好，王刚！我们今天练习汉语课文吧？;你好，约翰！你好，王刚！我们今天练习汉语课文吧？;LD04-3-02;L04 - Dialog  3
-Yuēhàn;;;Hǎo de, Lìlì. Wǒ shì Yuēhàn, láizì Yīngguó Lúndūn. Nǐmen ne?;Gern. Ich heiße John und komme aus London in England. Und ihr?;好的，莉莉。我是约翰，来自英国伦敦。你们呢？;好的，莉莉。我是约翰，来自英国伦敦。你们呢？;LD04-3-03;L04 - Dialog  3
-Wánggāng;;;Wǒ jiào Wánggāng, shì lǎoshī, zài Běijīng gōngzuò. Hěn gāoxìng rènshi nǐmen.;Ich heiße Wang Gang, bin Lehrer und arbeite in Peking. Freut mich, euch kennenzulernen.;我叫王刚，是老师，在北京工作。很高兴认识你们。;我叫王刚，是老师，在北京工作。很高兴认识你们。;LD04-3-04;L04 - Dialog  3
-Lìlì;;;Qǐng dǎkāi shū, niàn dì sì kè de shēngcí. Yuēhàn, nǐ dǒng ma?;Bitte öffne das Buch und lies die Vokabeln von Lektion 4. Verstehst du das, John?;请打开书，念第四课的生词。约翰，你懂吗？;请打开书，念第四课的生词。约翰，你懂吗？;LD04-3-05;L04 - Dialog  3
-Yuēhàn;;;Bù tài dǒng. Mànmàn niàn yí biàn, hǎo ma?;Ich verstehe es nicht ganz. Kannst du es langsam einmal lesen?;不太懂。慢慢念一遍，好吗？;不太懂。慢慢念一遍，好吗？;LD04-3-06;L04 - Dialog  3
-Wánggāng;;;Duì, nǐ shuō de duì. Xiān niàn pīnyīn, ránhòu shuō yìsi.;Richtig, du hast recht. Erst Pinyin lesen, dann die Bedeutung sagen.;对，你说得对。先念拼音，然后说意思。;对，你说得对。先念拼音，然后说意思。;LD04-3-07;L04 - Dialog  3
-Lìlì;;;Wǒmen xiànzài xué yǔfǎ.;Wir lernen jetzt Grammatik.;我们现在学语法。;我们现在学语法。;LD04-3-08;L04 - Dialog  3
-Yuēhàn;;;Duì, hěn hǎo! Dànshì wǒ bù dǒng “diànyǐng” shì shénme yìsi.;Ja, sehr gut! Aber ich verstehe nicht, was „diànyǐng“ bedeutet.;对，很好！但是我不懂“电影”是什么意思。;对，很好！但是我不懂“电影”是什么意思。;LD04-3-09;L04 - Dialog  3
-Wánggāng;;;“Diànyǐng” jiùshì movie. Xiànzài qǐng nǐ yòng “qù kāfēiguǎn” xiě yí gè jùzi.;„Diànyǐng“ bedeutet Film. Bitte bilde jetzt einen Satz mit „ins Café gehen“.;“电影”就是 movie。现在请你用“去咖啡馆”写一个句子。;“电影”就是 movie。现在请你用“去咖啡馆”写一个句子。;LD04-3-10;L04 - Dialog  3
-Lìlì;;;Wǒ xiě: “Wǒmen yìqǐ qù kāfēiguǎn chīfàn.” Yuēhàn, nǐ yǒu wèntí ma?;Ich schreibe: „Wir gehen zusammen ins Café essen.“ John, hast du Fragen?;我写：“我们一起去咖啡馆吃饭。”约翰，你有问题吗？;我写：“我们一起去咖啡馆吃饭。”约翰，你有问题吗？;LD04-3-11;L04 - Dialog  3
-Yuēhàn;;;Méiyǒu wèntí. Xiànzài shíjiān shì shàngwǔ shí diǎn, wǒmen kěyǐ tán yuēhuì.;Keine Fragen. Es ist jetzt zehn Uhr vormittags, wir können über ein Treffen sprechen.;没有问题。现在时间是上午十点，我们可以谈约会。;没有问题。现在时间是上午十点，我们可以谈约会。;LD04-3-12;L04 - Dialog  3
-Wánggāng;;;Hǎo, chúnyì! Wǒmen xīngqīsān wǎnshàng qù kàn diànyǐng, hǎo ma?;Gut, aufgepasst! Gehen wir am Mittwochabend ins Kino?;好，注意！我们星期三晚上去看电影，好吗？;好，注意！我们星期三晚上去看电影，好吗？;LD04-3-13;L04 - Dialog  3
-Lìlì;;;Bù hǎo, wǒ xīngqīsān hěn máng. Xīngqīliù xiàwǔ sān diǎn zěnmeyàng?;Nicht gut, ich bin am Mittwoch sehr beschäftigt. Wie wäre Samstag um drei Uhr nachmittags?;不好，我星期三很忙。星期六下午三点怎么样？;不好，我星期三很忙。星期六下午三点怎么样？;LD04-3-14;L04 - Dialog  3
-Yuēhàn;;;Duìbuqǐ, xīngqīliù wǒ yào qù Shànghǎi. Míngtiān xīngqī’èr zhōngwǔ shí’èr diǎn ne?;Tut mir leid, am Samstag fahre ich nach Shanghai. Wie wäre morgen, Dienstag um 12 Uhr?;对不起，星期六我要去上海。明天星期二中午十二点呢？;对不起，星期六我要去上海。明天星期二中午十二点呢？;LD04-3-15;L04 - Dialog  3
-Wánggāng;;;Bù duì, míngtiān shì xīngqīyī. Wǒmen xīngqīwǔ wǎnshàng bā diǎn qù kāfēiguǎn ba.;Nicht richtig, morgen ist Montag. Gehen wir am Freitag um 20 Uhr ins Café.;不对，明天是星期一。我们星期五晚上八点去咖啡馆吧。;不对，明天是星期一。我们星期五晚上八点去咖啡馆吧。;LD04-3-16;L04 - Dialog  3
-Lìlì;;;Hǎo, wǒ zhīdào zhèr yǒu yí jiā hěn piàoliang de kāfēiguǎn. Jǐ diǎn kāishǐ?;Gut, ich kenne hier ein sehr schönes Café. Um wie viel Uhr beginnen wir?;好，我知道这儿有一家很漂亮的咖啡馆。几点开始？;好，我知道这儿有一家很漂亮的咖啡馆。几点开始？;LD04-3-17;L04 - Dialog  3
-Yuēhàn;;;Bā diǎn bàn. Dànshì bié zhāojí, wǒmen kěyǐ děng nǐ.;Halb neun. Aber keine Eile, wir können auf dich warten.;八点半。但是别着急，我们可以等你。;八点半。但是别着急，我们可以等你。;LD04-3-18;L04 - Dialog  3
-Wánggāng;;;Háiyǒu shéi yào qù? Wǒ de péngyou Dèng Xiǎomíng yě xiǎng lái.;Wer kommt noch mit? Mein Freund Deng Xiaoming möchte auch kommen.;还有谁要去？我的朋友邓小明也想来。;还有谁要去？我的朋友邓小明也想来。;LD04-3-19;L04 - Dialog  3
-Lìlì;;;Wǒ huì qù, hé Yuēhàn yìqǐ. Tā shì Měiguórén ma?;Ich komme mit John. Ist er Amerikaner?;我会去，和约翰一起。他是美国人吗？;我会去，和约翰一起。他是美国人吗？;LD04-3-20;L04 - Dialog  3
-Yuēhàn;;;Bù, tā shì Zhōngguórén, zài Dàzhòng Gōngsī gōngzuò.;Nein, er ist Chinese und arbeitet bei der Firma Volkswagen.;不，他是中国人，在大众公司工作。;不，他是中国人，在大众公司工作。;LD04-3-21;L04 - Dialog  3
-Wánggāng;;;Hǎo, hěn hǎo. Xiànzài wǒmen liànxí wán le. Zàijiàn!;Gut, sehr gut. Für heute sind wir fertig. Auf Wiedersehen!;好，很好。现在我们练习完了。再见！;好，很好。现在我们练习完了。再见！;LD04-3-22;L04 - Dialog  3
-Lìlì;;;Xièxie, lǎoshī. Míngtiān jiàn, bié wàng le yuēhuì!;Danke, Lehrer. Bis morgen, vergiss das Treffen nicht!;谢谢，老师。明天见，别忘了约会！;谢谢，老师。明天见，别忘了约会！;LD04-3-23;L04 - Dialog  3
-Yuēhàn;;;Bù kèqi. Wǒ hěn lèi, dàn hěn gāoxìng. Zàijiàn!;Gern geschehen. Ich bin müde, aber sehr zufrieden. Tschüss!;不客气。我很累，但很高兴。再见！;不客气。我很累，但很高兴。再见！;LD04-3-24;L04 - Dialog  3
-Wánggāng;;;Méiguānxi, qù xiūxi yíxià ba. Zàijiàn, péngyoumen!;Kein Problem, ruht euch etwas aus. Auf Wiedersehen, Freunde!;没关系，去休息一下吧。再见，朋友们！;没关系，去休息一下吧。再见，朋友们！;LD04-3-25;L04 - Dialog  3
+Lìlì;;;Nǐ hǎo, Yuēhàn! Nǐ hǎo, Wánggāng! Wǒmen jīntiān liànxí Hànyǔ kèwén ba?;Hallo John! Hallo Wang Gang! Wollen wir heute den Chinesisch‑Text üben?;莉莉;你好，约翰！你好，王刚！我们今天练习汉语课文吧？;LD04-3-02;L04 - Dialog  3
+Yuēhàn;;;Hǎo de, Lìlì. Wǒ shì Yuēhàn, láizì Yīngguó Lúndūn. Nǐmen ne?;Gern. Ich heiße John und komme aus London in England. Und ihr?;约翰;好的，莉莉。我是约翰，来自英国伦敦。你们呢？;LD04-3-03;L04 - Dialog  3
+Wánggāng;;;Wǒ jiào Wánggāng, shì lǎoshī, zài Běijīng gōngzuò. Hěn gāoxìng rènshi nǐmen.;Ich heiße Wang Gang, bin Lehrer und arbeite in Peking. Freut mich, euch kennenzulernen.;王刚;我叫王刚，是老师，在北京工作。很高兴认识你们。;LD04-3-04;L04 - Dialog  3
+Lìlì;;;Qǐng dǎkāi shū, niàn dì sì kè de shēngcí. Yuēhàn, nǐ dǒng ma?;Bitte öffne das Buch und lies die Vokabeln von Lektion 4. Verstehst du das, John?;莉莉;请打开书，念第四课的生词。约翰，你懂吗？;LD04-3-05;L04 - Dialog  3
+Yuēhàn;;;Bù tài dǒng. Mànmàn niàn yí biàn, hǎo ma?;Ich verstehe es nicht ganz. Kannst du es langsam einmal lesen?;约翰;不太懂。慢慢念一遍，好吗？;LD04-3-06;L04 - Dialog  3
+Wánggāng;;;Duì, nǐ shuō de duì. Xiān niàn pīnyīn, ránhòu shuō yìsi.;Richtig, du hast recht. Erst Pinyin lesen, dann die Bedeutung sagen.;王刚;对，你说得对。先念拼音，然后说意思。;LD04-3-07;L04 - Dialog  3
+Lìlì;;;Wǒmen xiànzài xué yǔfǎ.;Wir lernen jetzt Grammatik.;莉莉;我们现在学语法。;LD04-3-08;L04 - Dialog  3
+Yuēhàn;;;Duì, hěn hǎo! Dànshì wǒ bù dǒng “diànyǐng” shì shénme yìsi.;Ja, sehr gut! Aber ich verstehe nicht, was „diànyǐng“ bedeutet.;约翰;对，很好！但是我不懂“电影”是什么意思。;LD04-3-09;L04 - Dialog  3
+Wánggāng;;;“Diànyǐng” jiùshì movie. Xiànzài qǐng nǐ yòng “qù kāfēiguǎn” xiě yí gè jùzi.;„Diànyǐng“ bedeutet Film. Bitte bilde jetzt einen Satz mit „ins Café gehen“.;王刚;“电影”就是 movie。现在请你用“去咖啡馆”写一个句子。;LD04-3-10;L04 - Dialog  3
+Lìlì;;;Wǒ xiě: “Wǒmen yìqǐ qù kāfēiguǎn chīfàn.” Yuēhàn, nǐ yǒu wèntí ma?;Ich schreibe: „Wir gehen zusammen ins Café essen.“ John, hast du Fragen?;莉莉;我写：“我们一起去咖啡馆吃饭。”约翰，你有问题吗？;LD04-3-11;L04 - Dialog  3
+Yuēhàn;;;Méiyǒu wèntí. Xiànzài shíjiān shì shàngwǔ shí diǎn, wǒmen kěyǐ tán yuēhuì.;Keine Fragen. Es ist jetzt zehn Uhr vormittags, wir können über ein Treffen sprechen.;约翰;没有问题。现在时间是上午十点，我们可以谈约会。;LD04-3-12;L04 - Dialog  3
+Wánggāng;;;Hǎo, chúnyì! Wǒmen xīngqīsān wǎnshàng qù kàn diànyǐng, hǎo ma?;Gut, aufgepasst! Gehen wir am Mittwochabend ins Kino?;王刚;好，注意！我们星期三晚上去看电影，好吗？;LD04-3-13;L04 - Dialog  3
+Lìlì;;;Bù hǎo, wǒ xīngqīsān hěn máng. Xīngqīliù xiàwǔ sān diǎn zěnmeyàng?;Nicht gut, ich bin am Mittwoch sehr beschäftigt. Wie wäre Samstag um drei Uhr nachmittags?;莉莉;不好，我星期三很忙。星期六下午三点怎么样？;LD04-3-14;L04 - Dialog  3
+Yuēhàn;;;Duìbuqǐ, xīngqīliù wǒ yào qù Shànghǎi. Míngtiān xīngqī’èr zhōngwǔ shí’èr diǎn ne?;Tut mir leid, am Samstag fahre ich nach Shanghai. Wie wäre morgen, Dienstag um 12 Uhr?;约翰;对不起，星期六我要去上海。明天星期二中午十二点呢？;LD04-3-15;L04 - Dialog  3
+Wánggāng;;;Bù duì, míngtiān shì xīngqīyī. Wǒmen xīngqīwǔ wǎnshàng bā diǎn qù kāfēiguǎn ba.;Nicht richtig, morgen ist Montag. Gehen wir am Freitag um 20 Uhr ins Café.;王刚;不对，明天是星期一。我们星期五晚上八点去咖啡馆吧。;LD04-3-16;L04 - Dialog  3
+Lìlì;;;Hǎo, wǒ zhīdào zhèr yǒu yí jiā hěn piàoliang de kāfēiguǎn. Jǐ diǎn kāishǐ?;Gut, ich kenne hier ein sehr schönes Café. Um wie viel Uhr beginnen wir?;莉莉;好，我知道这儿有一家很漂亮的咖啡馆。几点开始？;LD04-3-17;L04 - Dialog  3
+Yuēhàn;;;Bā diǎn bàn. Dànshì bié zhāojí, wǒmen kěyǐ děng nǐ.;Halb neun. Aber keine Eile, wir können auf dich warten.;约翰;八点半。但是别着急，我们可以等你。;LD04-3-18;L04 - Dialog  3
+Wánggāng;;;Háiyǒu shéi yào qù? Wǒ de péngyou Dèng Xiǎomíng yě xiǎng lái.;Wer kommt noch mit? Mein Freund Deng Xiaoming möchte auch kommen.;王刚;还有谁要去？我的朋友邓小明也想来。;LD04-3-19;L04 - Dialog  3
+Lìlì;;;Wǒ huì qù, hé Yuēhàn yìqǐ. Tā shì Měiguórén ma?;Ich komme mit John. Ist er Amerikaner?;莉莉;我会去，和约翰一起。他是美国人吗？;LD04-3-20;L04 - Dialog  3
+Yuēhàn;;;Bù, tā shì Zhōngguórén, zài Dàzhòng Gōngsī gōngzuò.;Nein, er ist Chinese und arbeitet bei der Firma Volkswagen.;约翰;不，他是中国人，在大众公司工作。;LD04-3-21;L04 - Dialog  3
+Wánggāng;;;Hǎo, hěn hǎo. Xiànzài wǒmen liànxí wán le. Zàijiàn!;Gut, sehr gut. Für heute sind wir fertig. Auf Wiedersehen!;王刚;好，很好。现在我们练习完了。再见！;LD04-3-22;L04 - Dialog  3
+Lìlì;;;Xièxie, lǎoshī. Míngtiān jiàn, bié wàng le yuēhuì!;Danke, Lehrer. Bis morgen, vergiss das Treffen nicht!;莉莉;谢谢，老师。明天见，别忘了约会！;LD04-3-23;L04 - Dialog  3
+Yuēhàn;;;Bù kèqi. Wǒ hěn lèi, dàn hěn gāoxìng. Zàijiàn!;Gern geschehen. Ich bin müde, aber sehr zufrieden. Tschüss!;约翰;不客气。我很累，但很高兴。再见！;LD04-3-24;L04 - Dialog  3
+Wánggāng;;;Méiguānxi, qù xiūxi yíxià ba. Zàijiàn, péngyoumen!;Kein Problem, ruht euch etwas aus. Auf Wiedersehen, Freunde!;王刚;没关系，去休息一下吧。再见，朋友们！;LD04-3-25;L04 - Dialog  3
 * Lektion 5;*Lektion 5;* Lektion 5;*Lektion 5;*Lektion 5;*Lektion 5;*Lektion 5;L05-1-00;L05
 hundert;bǎi;Zahlwort;Zhè běn shū yào yī bǎi yuán.;Dieses Buch kostet hundert Yuan.;百;这本书要一百元。;L05-1-01;L05
 Formular;biǎogé;Subst.;Qǐng tiánxie biǎogé.;Bitte füllen Sie das Formular aus.;表格;请填写表格。;L05-1-02;L05
@@ -348,31 +348,31 @@ ZEW für Geld (= 10 jiǎo);yuán;Subst.;Zhè běn shū yào wǔshí yuán.;Diese
 ZEW für Geld (= 10 jiǎo);kuài;Subst.;Zhè běn shū yào èrshí kuài qián.;Dieses Buch kostet 20 Yuan.;块;这本书要二十块钱。;L05-1-40;L05
 so, so sehr;zhème;Adverb;Tā zhème gāoxìng.;Sie ist so glücklich.;这么;她这么高兴。;L05-1-41;L05
 wohnen;zhù;Verb;Wǒ zhù zài yīhào lóu.;Ich wohne im ersten Stock.;住;我住在一楼。;L05-1-42;L05
-Geldautomat;zìdòng qǔkuǎnjī;Subst.;Zìdòng qǔkuǎnjī zài lóu xià.;Der Geldautomat ist unten im Gebäude.;自动取款机;自动取款机在楼下。;L05-1-43;LD05
-* Lektion 5 Dialoge;*Lektion 5 Dialoge;* Lektion 5 Dialoge;*Lektion 5 Dialoge;*Lektion 5 Dialoge;*Lektion 5 Dialoge;*Lektion 5 Dialoge;LD05-1-00;LD05
-Entschuldigung, gibt es hier ein freies Zimmer?;Duìbuqǐ, zhèlǐ yǒu kòng fángjiān ma?;;Duìbuqǐ, zhèlǐ yǒu kòng fángjiān ma?;Entschuldigung, gibt es hier ein freies Zimmer?;对不起，这里有空房间吗？;对不起，这里有空房间吗？;LD05-1-01;LD05
-Ja, wollen Sie ein Einzelzimmer oder ein Doppelzimmer?;Shì, nín yào yīgè dān rén fáng háishì yīgè shuāngrén fáng?;;Shì, nín yào yīgè dān rén fáng háishì yīgè shuāngrén fáng?;Ja, wollen Sie ein Einzelzimmer oder ein Doppelzimmer?;是，您要一个单人房还是一个双人房？;是，您要一个单人房还是一个双人房？;LD05-1-02;LD05
-Ich möchte ein Doppelzimmer.;Wǒ xiǎng yào yīgè shuāngrén fáng.;;Wǒ xiǎng yào yīgè shuāngrén fáng.;Ich möchte ein Doppelzimmer.;我想要一个双人房。;我想要一个双人房。;LD05-1-03;LD05
-Wie viele Tage wollen Sie bleiben?;Nín xiǎng zhù jǐ tiān?;;Nín xiǎng zhù jǐ tiān?;Wie viele Tage wollen Sie bleiben?;您想住几天？;您想住几天？;LD05-1-04;LD05
-Ich will zwei Tage bleiben, was kostet ein Tag?;Wǒ xiǎng zhù liǎng tiān, yī tiān duōshǎo qián?;;Wǒ xiǎng zhù liǎng tiān, yī tiān duōshǎo qián?;Ich will zwei Tage bleiben, was kostet ein Tag?;我想住两天，一天多少钱？;我想住两天，一天多少钱？;LD05-1-05;LD05
-Eine Nacht kostet 340 Yuan.;Yī wǎn shí sānbǎi sìshí yuán.;;Yī wǎn shí sānbǎi sìshí yuán.;Eine Nacht kostet 340 Yuan.;一晚是三百四十元。;一晚是三百四十元。;LD05-1-06;LD05
-So teuer, geht es ein bisschen günstiger?;Zhème guì, kěyǐ piányi yīdiǎn ma?;;Zhème guì, kěyǐ piányi yīdiǎn ma?;So teuer, geht es ein bisschen günstiger?;这么贵，可以便宜一点吗？;这么贵，可以便宜一点吗？;LD05-1-07;LD05
-Es geht für 290 Yuan pro Tag, aber Sie müssen mindestens drei Tage bleiben.;Yī tiān èr bǎi jiǔ shí yuán kěyǐ, dànshì nín bìxū zhù sān tiān.;;Yī tiān èr bǎi jiǔ shí yuán kěyǐ, dànshì nín bìxū zhù sān tiān.;Es geht für 290 Yuan pro Tag, aber Sie müssen mindestens drei Tage bleiben.;一天二百九十元可以，但是您必须住三天。;一天二百九十元可以，但是您必须住三天。;LD05-1-08;LD05
-In Ordnung, ich bleibe drei Tage, ein Tag kostet 290 Yuan.;Hǎo de, wǒ zhù sān tiān, yī tiān èr bǎi jiǔ shí yuán.;;Hǎo de, wǒ zhù sān tiān, yī tiān èr bǎi jiǔ shí yuán.;In Ordnung, ich bleibe drei Tage, ein Tag kostet 290 Yuan.;好的，我住三天，一天二百九十元。;好的，我住三天，一天二百九十元。;LD05-1-09;LD05
-Bitte füllen Sie kurz das Formular aus.;Qǐng tián yīxià biǎogé.;;Qǐng tián yīxià biǎogé.;Bitte füllen Sie kurz das Formular aus.;请填一下表格。;请填一下表格。;LD05-1-10;LD05
-Gut.;Hǎo.;;Hǎo.;Gut.;好。;好。;LD05-1-11;LD05
-Das ist die Zimmerkarte von Zimmer 603, das Zimmer befindet sich im 5. Stock.;Zhè shì 603 fángjiān de fángjiān kǎ, fángjiān zài dì wǔ céng.;;Zhè shì 603 fángjiān de fángjiān kǎ, fángjiān zài dì wǔ céng.;Das ist die Zimmerkarte von Zimmer 603, das Zimmer befindet sich im 5. Stock.;这是603房间的房间卡，房间在第五层。;这是603房间的房间卡，房间在第五层。;LD05-1-12;LD05
-Guten Tag! Ich möchte bezahlen, Zimmer 603.;Nǐ hǎo! Wǒ xiǎng zhīfù, 603 fángjiān.;;Nǐ hǎo! Wǒ xiǎng zhīfù, 603 fángjiān.;Guten Tag! Ich möchte bezahlen, Zimmer 603.;你好！我想支付，603房间。;你好！我想支付，603房间。;LD05-2-01;LD05
-Sie haben vier Tage (hier) gewohnt, insgesamt 1160 Yuan.;Nín zhù le sì tiān, zǒnggòng yīqiān yībǎi liùshí yuán.;;Nín zhù le sì tiān, zǒnggòng yīqiān yībǎi liùshí yuán.;Sie haben vier Tage (hier) gewohnt, insgesamt 1160 Yuan.;您住了四天，总共一千一百六十元。;您住了四天，总共一千一百六十元。;LD05-2-02;LD05
-Kann ich mit Euro bezahlen?;Wǒ kěyǐ yòng ōuyuán zhīfù ma?;;Wǒ kěyǐ yòng ōuyuán zhīfù ma?;Kann ich mit Euro bezahlen?;我可以用欧元支付吗？;我可以用欧元支付吗？;LD05-2-03;LD05
-Entschuldigung, hier kann man nicht mit Euro bezahlen.;Duìbuqǐ, zhèlǐ bù néng yòng ōuyuán zhīfù.;;Duìbuqǐ, zhèlǐ bù néng yòng ōuyuán zhīfù.;Entschuldigung, hier kann man nicht mit Euro bezahlen.;对不起，这里不能用欧元支付。;对不起，这里不能用欧元支付。;LD05-2-04;LD05
-Sie können mit Karte bezahlen.;Nín kěyǐ yòng kǎ zhīfù.;;Nín kěyǐ yòng kǎ zhīfù.;Sie können mit Karte bezahlen.;您可以用卡支付。;您可以用卡支付。;LD05-2-05;LD05
-Gut. Das ist meine Karte. Entschuldigung, wo kann man Geld wechseln?;Hǎo. Zhè shì wǒ de kǎ. Duìbuqǐ, nǎlǐ kěyǐ huàn qián?;;Hǎo. Zhè shì wǒ de kǎ. Duìbuqǐ, nǎlǐ kěyǐ huàn qián?;Gut. Das ist meine Karte. Entschuldigung, wo kann man Geld wechseln?;好。这是我的卡。对不起，哪里可以换钱？;好。这是我的卡。对不起，哪里可以换钱？;LD05-2-06;LD05
-Gibt es in der Nähe eine Bank?;Fùjìn yǒu yínháng ma?;;Fùjìn yǒu yínháng ma?;Gibt es in der Nähe eine Bank?;附近有银行吗？;附近有银行吗？;LD05-2-07;LD05
-Schauen Sie, gegenüber gibt es einen Geldautomaten, dort können Sie Geld holen.;Kàn, duìmiàn yǒu yí gè zìdòng qǔkuǎnjī, nàlǐ kěyǐ qǔ qián.;;Kàn, duìmiàn yǒu yí gè zìdòng qǔkuǎnjī, nàlǐ kěyǐ qǔ qián.;Schauen Sie, gegenüber gibt es einen Geldautomaten, dort können Sie Geld holen.;看，对面有一个自动取款机，那里可以取钱。;看，对面有一个自动取款机，那里可以取钱。;LD05-2-08;LD05
-Wie hoch ist der Wechselkurs von Euro zu Renminbi heute?;Jīntiān Ōuyuán dào rénmínbì de huìlǜ shì duōshǎo?;;Jīntiān Ōuyuán dào rénmínbì de huìlǜ shì duōshǎo?;Wie hoch ist der Wechselkurs von Euro zu Renminbi heute?;今天欧元到人民币的汇率是多少？;今天欧元到人民币的汇率是多少？;LD05-2-09;LD05
-Heute ist der Kurs eins zu acht.;Jīntiān de huìlǜ shì yī dào bā.;;Jīntiān de huìlǜ shì yī dào bā.;Heute ist der Kurs eins zu acht.;今天的汇率是一到八。;今天的汇率是一到八。;LD05-2-10;LD05
-Vielen Dank.;Fēicháng gǎnxiè.;;Fēicháng gǎnxiè.;Vielen Dank.;非常感谢。;非常感谢。;LD05-2-11;LD05
+Geldautomat;zìdòng qǔkuǎnjī;Subst.;Zìdòng qǔkuǎnjī zài lóu xià.;Der Geldautomat ist unten im Gebäude.;自动取款机;自动取款机在楼下。;L05-1-43;L05
+* Lektion 5 Dialoge;*Lektion 5 Dialoge;* Lektion 5 Dialoge;*Lektion 5 Dialoge;*Lektion 5 Dialoge;*Lektion 5 Dialoge;*Lektion 5 Dialoge;LD05-1-00;L05-Dialog 1
+;;;Duìbuqǐ, zhèlǐ yǒu kòng fángjiān ma?;Entschuldigung, gibt es hier ein freies Zimmer?;对不起，这里有空房间吗？;对不起，这里有空房间吗？;LD05-1-01;L05-Dialog 1
+;;;Shì, nín yào yīgè dān rén fáng háishì yīgè shuāngrén fáng?;Ja, wollen Sie ein Einzelzimmer oder ein Doppelzimmer?;是，您要一个单人房还是一个双人房？;是，您要一个单人房还是一个双人房？;LD05-1-02;L05-Dialog 1
+;;;Wǒ xiǎng yào yīgè shuāngrén fáng.;Ich möchte ein Doppelzimmer.;我想要一个双人房。;我想要一个双人房。;LD05-1-03;L05-Dialog 1
+;;;Nín xiǎng zhù jǐ tiān?;Wie viele Tage wollen Sie bleiben?;您想住几天？;您想住几天？;LD05-1-04;L05-Dialog 1
+;;;Wǒ xiǎng zhù liǎng tiān, yī tiān duōshǎo qián?;Ich will zwei Tage bleiben, was kostet ein Tag?;我想住两天，一天多少钱？;我想住两天，一天多少钱？;LD05-1-05;L05-Dialog 1
+;;;Yī wǎn shí sānbǎi sìshí yuán.;Eine Nacht kostet 340 Yuan.;一晚是三百四十元。;一晚是三百四十元。;LD05-1-06;L05-Dialog 1
+;;;Zhème guì, kěyǐ piányi yīdiǎn ma?;So teuer, geht es ein bisschen günstiger?;这么贵，可以便宜一点吗？;这么贵，可以便宜一点吗？;LD05-1-07;L05-Dialog 1
+;;;Yī tiān èr bǎi jiǔ shí yuán kěyǐ, dànshì nín bìxū zhù sān tiān.;Es geht für 290 Yuan pro Tag, aber Sie müssen mindestens drei Tage bleiben.;一天二百九十元可以，但是您必须住三天。;一天二百九十元可以，但是您必须住三天。;LD05-1-08;L05-Dialog 1
+;;;Hǎo de, wǒ zhù sān tiān, yī tiān èr bǎi jiǔ shí yuán.;In Ordnung, ich bleibe drei Tage, ein Tag kostet 290 Yuan.;好的，我住三天，一天二百九十元。;好的，我住三天，一天二百九十元。;LD05-1-09;L05-Dialog 1
+;;;Qǐng tián yīxià biǎogé.;Bitte füllen Sie kurz das Formular aus.;请填一下表格。;请填一下表格。;LD05-1-10;L05-Dialog 1
+;;;Hǎo.;Gut.;好。;好。;LD05-1-11;L05-Dialog 1
+;;;Zhè shì 603 fángjiān de fángjiān kǎ, fángjiān zài dì wǔ céng.;Das ist die Zimmerkarte von Zimmer 603, das Zimmer befindet sich im 5. Stock.;这是603房间的房间卡，房间在第五层。;这是603房间的房间卡，房间在第五层。;LD05-1-12;L05-Dialog 1
+;;;Nǐ hǎo! Wǒ xiǎng zhīfù, 603 fángjiān.;Guten Tag! Ich möchte bezahlen, Zimmer 603.;你好！我想支付，603房间。;你好！我想支付，603房间。;LD05-2-01;L05-Dialog 2
+;;;Nín zhù le sì tiān, zǒnggòng yīqiān yībǎi liùshí yuán.;Sie haben vier Tage (hier) gewohnt, insgesamt 1160 Yuan.;您住了四天，总共一千一百六十元。;您住了四天，总共一千一百六十元。;LD05-2-02;L05-Dialog 2
+;;;Wǒ kěyǐ yòng ōuyuán zhīfù ma?;Kann ich mit Euro bezahlen?;我可以用欧元支付吗？;我可以用欧元支付吗？;LD05-2-03;L05-Dialog 2
+;;;Duìbuqǐ, zhèlǐ bù néng yòng ōuyuán zhīfù.;Entschuldigung, hier kann man nicht mit Euro bezahlen.;对不起，这里不能用欧元支付。;对不起，这里不能用欧元支付。;LD05-2-04;L05-Dialog 2
+;;;Nín kěyǐ yòng kǎ zhīfù.;Sie können mit Karte bezahlen.;您可以用卡支付。;您可以用卡支付。;LD05-2-05;L05-Dialog 2
+;;;Hǎo. Zhè shì wǒ de kǎ. Duìbuqǐ, nǎlǐ kěyǐ huàn qián?;Gut. Das ist meine Karte. Entschuldigung, wo kann man Geld wechseln?;好。这是我的卡。对不起，哪里可以换钱？;好。这是我的卡。对不起，哪里可以换钱？;LD05-2-06;L05-Dialog 2
+;;;Fùjìn yǒu yínháng ma?;Gibt es in der Nähe eine Bank?;附近有银行吗？;附近有银行吗？;LD05-2-07;L05-Dialog 2
+;;;Kàn, duìmiàn yǒu yí gè zìdòng qǔkuǎnjī, nàlǐ kěyǐ qǔ qián.;Schauen Sie, gegenüber gibt es einen Geldautomaten, dort können Sie Geld holen.;看，对面有一个自动取款机，那里可以取钱。;看，对面有一个自动取款机，那里可以取钱。;LD05-2-08;L05-Dialog 2
+;;;Jīntiān Ōuyuán dào rénmínbì de huìlǜ shì duōshǎo?;Wie hoch ist der Wechselkurs von Euro zu Renminbi heute?;今天欧元到人民币的汇率是多少？;今天欧元到人民币的汇率是多少？;LD05-2-09;L05-Dialog 2
+;;;Jīntiān de huìlǜ shì yī dào bā.;Heute ist der Kurs eins zu acht.;今天的汇率是一到八。;今天的汇率是一到八。;LD05-2-10;L05-Dialog 2
+;;;Fēicháng gǎnxiè.;Vielen Dank.;非常感谢。;非常感谢。;LD05-2-11;L05-Dialog 2
 * Lektion 6;*Lektion 6;* Lektion 6;*Lektion 6;*Lektion 6;*Lektion 6;*Lektion 6;L06-1-00;L06
 Getränk;yǐnliào;Nomen;Nǐ xǐhuān hē shénme yǐnliào?;Was für ein Getränk magst du?;饮料;你喜欢喝什么饮料？;L06-1-01;L06
 Apfelsaft;píngguǒzhī;Nomen;Wǒ xiǎng yào yī bēi píngguǒ zhī.;Ich möchte ein Glas Apfelsaft.;苹果汁;我想要一杯苹果汁。;L06-1-02;L06
@@ -560,18 +560,18 @@ U-Bahn;dìtiě;Nomen;;;地铁;;L08-1-40;L08
 vorne;qián/qiánmiàn;Nomen;;;前/前面;;L08-1-41;L08
 Westen;xī;Nomen;;;西;;L08-1-42;L08
 Der Bund (in Shanghai);Wàitān;Eigenname;;;外滩;;L08-1-43;L08
-* Lektion 8 Dialoge;*Lektion 8 Dialoge;* Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;L08-D-00;L08
-Ich möchte in die Bar gehen.;Wǒ xiǎng qù jiǔbā.;;Wǒ xiǎng qù jiǔbā.;Ich möchte in die Bar gehen.;我想去酒吧。;;L08-D-01;L08
-Die Bar ist nicht weit von hier. Wie kommst du dorthin?;Jiǔbā lí zhèr bù yuǎn, nǐ zěnme qù?;;Jiǔbā lí zhèr bù yuǎn, nǐ zěnme qù?;Die Bar ist nicht weit von hier. Wie kommst du dorthin?;酒吧离这儿不远，你怎么去？;;L08-D-02;L08
-Ich möchte mit dem Auto oder dem Fahrrad hinfahren.;Wǒ xiǎng kāichē huòzhě qí zìxíngchē qù.;;Wǒ xiǎng kāichē huòzhě qí zìxíngchē qù.;Ich möchte mit dem Auto oder dem Fahrrad hinfahren.;我想开车或者骑自行车去。;;L08-D-03;L08
-Ich nehme die U-Bahn oder den Bus.;Chéng dìtiě huòzhě zuò gōnggòng qìchē qù.;;Chéng dìtiě huòzhě zuò gōnggòng qìchē qù.;Ich nehme die U-Bahn oder den Bus.;乘地铁或者坐公共汽车去。;;L08-D-04;L08
-Ich fahre nicht gern mit dem Bus.;Wǒ bù xǐhuan zuò gōngchē.;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern mit dem Bus.;我不喜欢坐公车。;;L08-D-05;L08
-In den Bussen sind die meisten Leute müde oder schlafen.;Chē lǐ de rén dàduō lè huòzhě shuìjiào.;;Chē lǐ de rén dàduō lè huòzhě shuìjiào.;In den Bussen sind die meisten Leute müde oder schlafen.;车里的人大多累或者睡觉。;;L08-D-06;L08
-Dann geh doch zu Fuß hin und nimm ein Taxi zurück. Wie wäre das?;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin und nimm ein Taxi zurück. Wie wäre das?;那么，你走路去，打的回家，怎么样？;;L08-D-07;L08
-Du kannst mit dem Bus hinfahren.;Nǐ kěyǐ zuò gōngchē qù.;;Nǐ kěyǐ zuò gōngchē qù.;Du kannst mit dem Bus hinfahren.;你可以坐公车去。;;L08-D-08;L08
-Ich fahre nicht gern Bus.;Wǒ bù xǐhuan zuò gōngchē.;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern Bus.;我不喜欢坐公车。;;L08-D-09;L08
-Im Bus gibt es zu viele Menschen.;Gōngchē lǐ rén tài duō le.;;Gōngchē lǐ rén tài duō le.;Im Bus gibt es zu viele Menschen.;公车里人太多了。;;L08-D-10;L08
-Dann geh doch zu Fuß hin, und fahr mit dem Taxi nach Hause, was meinst du?;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin, und fahr mit dem Taxi nach Hause, was meinst du?;那么，你走路去，打的回家，怎么样？;;L08-D-11;L08
+* Lektion 8 Dialoge;*Lektion 8 Dialoge;* Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;L08-D-00;L08 - Dialog 1
+;;;Wǒ xiǎng qù jiǔbā.;Ich möchte in die Bar gehen.;;我想去酒吧。;L08-D-01;L08 - Dialog 1
+;;;Jiǔbā lí zhèr bù yuǎn, nǐ zěnme qù?;Die Bar ist nicht weit von hier. Wie kommst du dorthin?;;酒吧离这儿不远，你怎么去？;L08-D-02;L08 - Dialog 1
+;;;Wǒ xiǎng kāichē huòzhě qí zìxíngchē qù.;Ich möchte mit dem Auto oder dem Fahrrad hinfahren.;;我想开车或者骑自行车去。;L08-D-03;L08 - Dialog 1
+;;;Chéng dìtiě huòzhě zuò gōnggòng qìchē qù.;Ich nehme die U-Bahn oder den Bus.;;乘地铁或者坐公共汽车去。;L08-D-04;L08 - Dialog 1
+;;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern mit dem Bus.;;我不喜欢坐公车。;L08-D-05;L08 - Dialog 1
+;;;Chē lǐ de rén dàduō lè huòzhě shuìjiào.;In den Bussen sind die meisten Leute müde oder schlafen.;;车里的人大多累或者睡觉。;L08-D-06;L08 - Dialog 1
+;;;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin und nimm ein Taxi zurück. Wie wäre das?;;那么，你走路去，打的回家，怎么样？;L08-D-07;L08 - Dialog 1
+;;;Nǐ kěyǐ zuò gōngchē qù.;Du kannst mit dem Bus hinfahren.;;你可以坐公车去。;L08-D-08;L08 - Dialog 1
+;;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern Bus.;;我不喜欢坐公车。;L08-D-09;L08 - Dialog 1
+;;;Gōngchē lǐ rén tài duō le.;Im Bus gibt es zu viele Menschen.;;公车里人太多了。;L08-D-10;L08 - Dialog 1
+;;;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin, und fahr mit dem Taxi nach Hause, was meinst du?;;那么，你走路去，打的回家，怎么样？;L08-D-11;L08 - Dialog 1
 * Lektion 9;*Lektion 9;* Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;*Lektion 9;L09-1-00;L09
 tragen (Kleidung);chuān;Verb;;;穿;;L09-1-01;L09
 gerade (Partikel);zhe;Partikel;;;着;;L09-1-02;L09
