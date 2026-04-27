@@ -191,7 +191,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 14px;                    /* etwas mehr Gap für bessere Optik */
     flex-wrap: nowrap;
     justify-content: center;      /* zentriert die ganze Gruppe */
-    width: 100%;                  /* volle Breite des Containers nutzen */
+    width: 100%;    /* volle Breite des Containers nutzen */
+    padding: 0 8px;	
     margin-bottom: 12px;
 }
 
