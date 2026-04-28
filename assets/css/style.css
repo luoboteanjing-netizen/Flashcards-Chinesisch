@@ -759,15 +759,15 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 4px;     /* Emoji + Zahl etwas trennen */
     font-variant-numeric: tabular-nums;  /* ✅ Zahlen monospaced → perfekt ausgerichtet */
 }
-/* ===============================
-   5 Spalten Layout für Lektionen
-   =============================== */
+/* ==============================================
+   Überschrift für 5 Spalten Layout für Lektionen
+   ============================================== */
 
 #lessonSelect option {
     display: grid;
     grid-template-columns:
         100px   /* Lektion */
-         20px   /* Karten */
+         25px   /* Karten */
          30px   /* strong (✅) */
          30px   /* weak   (🤔) */
          30px;  /* unknown (❌) */  
