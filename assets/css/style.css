@@ -760,7 +760,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     font-variant-numeric: tabular-nums;  /* ✅ Zahlen monospaced → perfekt ausgerichtet */
 }
 /* ===============================
-   5‑Spalten‑Layout für Lektionen
+   5 Spalten Layout für Lektionen
    =============================== */
 
 #lessonSelect option {
@@ -768,7 +768,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     grid-template-columns:
         100px   /* Lektion */
          35px   /* Karten */
-         35px   /* strong (✅) */
+         30px   /* strong (✅) */
          30px   /* weak   (🤔) */
          30px;  /* unknown (❌) */  
     gap: 8px;
@@ -846,7 +846,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     grid-template-columns:
        100px   /* Lektion */
         35px   /* Karten */
-        35px   /* strong (✅) */
+        30px   /* strong (✅) */
         30px   /* weak   (🤔) */
         30px;  /* unknown (❌) */
 
