@@ -2317,23 +2317,34 @@ if (uiLangSelect) {
    ============================================================ */
 
 function bindSlider(rangeEl, valueId, onChange) {
-    if (!rangeEl) return;
+    if (!rangeEl) {
+        console.warn(`bindSlider: range element not found for ${valueId}`);
+        return;
+    }
 
-    const update = () => {
-        const valEl = document.getElementById(valueId);
+    const valEl = document.getElementById(valueId);
+    if (!valEl) {
+        console.warn(`bindSlider: value element #${valueId} not found`);
+    }
+
+    const updateDisplay = () => {
         if (valEl) {
             valEl.textContent = `(${parseFloat(rangeEl.value).toFixed(2)})`;
         }
     };
 
-    // ✅ WICHTIG: Initial setzen
-    update();
+    // Initial update
+    updateDisplay();
 
     rangeEl.addEventListener("input", (e) => {
-        onChange(parseFloat(e.target.value));
-        update();
+        const val = parseFloat(e.target.value);
+        onChange(val);
+        updateDisplay();
         saveSettings();
     });
+
+    // Also update on change (for keyboard users etc.)
+    rangeEl.addEventListener("change", updateDisplay);
 }
 
 // ===== Bindings =====
