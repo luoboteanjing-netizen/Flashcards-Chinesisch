@@ -94,7 +94,7 @@ const TRANSLATIONS = {
         trainingStart: "Start Training ▶",
         trainingStop: "Stop Training ■",
         prev: "◀ Zurück",
-        reveal: "Aufdecken",
+        reveal: "Antwort zeigen",
         next: "Nächste ▶",
         rateUnknown: "❌ Nicht gewusst",
         rateKnown: "✅ Gewusst",
@@ -159,7 +159,7 @@ const TRANSLATIONS = {
         trainingStart: "Start Training ▶",
         trainingStop: "Stop Training ■",
         prev: "◀ Back",
-        reveal: "Reveal",
+        reveal: "Show answer",
         next: "Next ▶",
         rateUnknown: "❌ Didn't know",
         rateKnown: "✅ Knew it",
@@ -224,7 +224,7 @@ const TRANSLATIONS = {
         trainingStart: "开始学习 ▶",
         trainingStop: "停止学习 ■",
         prev: "◀ 上一张",
-        reveal: "显示",
+        reveal: "显示答案",
         next: "下一张 ▶",
         rateUnknown: "❌ 不会",
         rateKnown: "✅ 会了",
@@ -289,7 +289,7 @@ const TRANSLATIONS = {
         trainingStart: "démarrer ▶",
         trainingStop: "arrêter ■",
         prev: "◀ Précédent",
-        reveal: "Révéler",
+        reveal: "Afficher la réponse",
         next: "Suivant ▶",
         rateUnknown: "❌ Ne savait pas",
         rateKnown: "✅ Savait",
@@ -1675,76 +1675,66 @@ function updateVoiceList() {
         return;
     }
 
-    list.forEach(v => {
+list.forEach(v => {
+    const row = document.createElement("div");
+    row.className = "voice";
 
-        const row  = document.createElement("div");
-        row.className = "voice";
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = v.name || translate("namelessVoice");
 
-        const name = document.createElement("div");
-        name.className = "name";
-        name.textContent = v.name || "(namenlos)";
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
 
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
+    const actions = document.createElement("div");
+    actions.className = "actions";
 
-        const actions = document.createElement("div");
-        actions.style.display = "flex";
-        actions.style.gap = "6px";
-        actions.style.marginLeft = "auto";
+    const btnPick = document.createElement("button");
+    btnPick.className = "btn";
+    btnPick.textContent = translate("pickVoice");
 
-        const btnPick = document.createElement("button");
-        btnPick.className = "btn";
-        btnPick.textContent = translate("pickVoice");
-
-        btnPick.onclick = () => {
-            if (state.voicePanelTarget === "zh") {
-                state.browserVoice.zh = v;
-                state.settings.browserVoiceZh =
-                    v.name || v.voiceURI;
-            } else {
-                state.browserVoice.de = v;
-                state.settings.browserVoiceDe =
-                    v.name || v.voiceURI;
-            }
-            saveSettings();
-            closeVoices();
-        };
-
-        const btnTest = document.createElement("button");
-        btnTest.className = "btn ghost";
-        btnTest.textContent = translate("testVoice");
-
-        btnTest.onclick = () => {
-            const u = new SpeechSynthesisUtterance(
-                state.voicePanelTarget === "zh"
-                    ? "这是一个测试。"
-                    : "Dies ist ein Test."
-            );
-            u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
-            u.voice = v;
-            speechSynthesis.cancel();
-            speechSynthesis.speak(u);
-        };
-
-        const active = state.voicePanelTarget === "zh"
-            ? state.browserVoice.zh
-            : state.browserVoice.de;
-
-        if (active &&
-            (active.name === v.name || active.voiceURI === v.voiceURI)) {
-            name.textContent += ` ${translate("voiceActiveSuffix")}`;
+    btnPick.onclick = () => {
+        if (state.voicePanelTarget === "zh") {
+            state.browserVoice.zh = v;
+            state.settings.browserVoiceZh = v.name || v.voiceURI;
+        } else {
+            state.browserVoice.de = v;
+            state.settings.browserVoiceDe = v.name || v.voiceURI;
         }
+        saveSettings();
+        closeVoices();
+    };
 
-        actions.appendChild(btnPick);
-        actions.appendChild(btnTest);
+    const btnTest = document.createElement("button");
+    btnTest.className = "btn ghost";
+    btnTest.textContent = translate("testVoice");
 
-        row.appendChild(name);
-        row.appendChild(meta);
-        row.appendChild(actions);
+    btnTest.onclick = () => {
+        const u = new SpeechSynthesisUtterance(
+            state.voicePanelTarget === "zh" ? "这是一个测试。" : "Dies ist ein Test."
+        );
+        u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
+        u.voice = v;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+    };
 
-        box.appendChild(row);
-    });
+    // Aktive Stimme markieren
+    const active = state.voicePanelTarget === "zh" ? state.browserVoice.zh : state.browserVoice.de;
+    if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
+        name.textContent += ` ${translate("voiceActiveSuffix")}`;
+    }
+
+    actions.appendChild(btnPick);
+    actions.appendChild(btnTest);
+
+    row.appendChild(name);
+    row.appendChild(meta);
+    row.appendChild(actions);
+
+    box.appendChild(row);
+});
 }
 
 
@@ -2114,6 +2104,10 @@ window.addEventListener("DOMContentLoaded", () => {
 const css = document.querySelector("#cssMain");
 const js  = document.querySelector("#jsMain");
 
+console.log("rateZhRange", document.getElementById("rateZhRange"));
+console.log("rateZhVal", document.getElementById("rateZhVal"));
+
+
 if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
 if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 
@@ -2321,37 +2315,57 @@ if (uiLangSelect) {
     /* ============================================================
        STIMMEN-EINSTELLUNG
        ============================================================ */
-    rateDeRange?.addEventListener("input", (e) => {
-     
-        state.rateDe = parseFloat(e.target.value);
-        state.settings.rateDe = state.rateDe;
+/* ============================================================
+   STIMMEN-EINSTELLUNG (robust gegen DOM-Änderungen)
+   ============================================================ */
+
+rateDeRange?.addEventListener("input", (e) => {
+    state.rateDe = parseFloat(e.target.value);
+    state.settings.rateDe = state.rateDe;
+
+    const rateDeVal = document.getElementById("rateDeVal");
+    if (rateDeVal) {
         rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
-        saveSettings();
-    });
+    }
 
-    pitchDeRange?.addEventListener("input", (e) => {
-      
-        state.pitchDe = parseFloat(e.target.value);
-        state.settings.pitchDe = state.pitchDe;
+    saveSettings();
+});
+
+pitchDeRange?.addEventListener("input", (e) => {
+    state.pitchDe = parseFloat(e.target.value);
+    state.settings.pitchDe = state.pitchDe;
+
+    const pitchDeVal = document.getElementById("pitchDeVal");
+    if (pitchDeVal) {
         pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
-        saveSettings();
-    });
+    }
 
-    rateZhRange?.addEventListener("input", (e) => {
-      
-        state.rateZh = parseFloat(e.target.value);
-        state.settings.rateZh = state.rateZh;
+    saveSettings();
+});
+
+rateZhRange?.addEventListener("input", (e) => {
+    state.rateZh = parseFloat(e.target.value);
+    state.settings.rateZh = state.rateZh;
+
+    const rateZhVal = document.getElementById("rateZhVal");
+    if (rateZhVal) {
         rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
-        saveSettings();
-    });
+    }
 
-    pitchZhRange?.addEventListener("input", (e) => {
-     
-        state.pitchZh = parseFloat(e.target.value);
-        state.settings.pitchZh = state.pitchZh;
+    saveSettings();
+});
+
+pitchZhRange?.addEventListener("input", (e) => {
+    state.pitchZh = parseFloat(e.target.value);
+    state.settings.pitchZh = state.pitchZh;
+
+    const pitchZhVal = document.getElementById("pitchZhVal");
+    if (pitchZhVal) {
         pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
-        saveSettings();
-    });
+    }
+
+    saveSettings();
+});
 
     document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
     
