@@ -612,7 +612,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 #btnPrev, #btnNext {
  flex: 0 0 100px;
- min-height: 48px;
+ min-height: 49px;
  border-radius: 12px;
  text-align:center;
 }
@@ -663,7 +663,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     width: auto;                           /* bleibt kompakt */
 	border-radius: 12px;
     max-width: 100px; 		        	   /* Überlauf in XS vermeiden */
-	min-height: 50px;
+	min-height: 49px;
 	white-space: normal;	
 }
 
@@ -676,7 +676,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Falls nötig: min-width entfernen für volle Flexibilität */
 #btnPrev, #btnNext {
     min-width: 0 !important;       		   /* kein Überlaufen */
-	min-height: 50px;
+	min-height: 49px;
     white-space: nowrap;                   /* Text bleibt auf einer Zeile */
 }
 
