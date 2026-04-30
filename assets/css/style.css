@@ -606,7 +606,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: var(--accent-text) !important;
 	 flex: 1 1 auto;
 	max-width: 100px;
-	min-height: 28px;
+	min-height: 36px;
 	margin: 0 auto;
 	text-align:center;
 	font-weight: 600
