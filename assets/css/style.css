@@ -606,6 +606,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: var(--accent-text) !important;
 	 flex: 1 1 auto;
 	max-width: 100px;
+	min-height: 28px;
 	margin: 0 auto;
 	text-align:center;
 	font-weight: 600
@@ -622,6 +623,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 #btnPrev, #btnNext {
  flex: 0 0 100px;
+ min-height: 28px;
  border-radius: 12px;
  text-align:center;
 }
@@ -661,10 +663,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #btnReveal {
     justify-self: center;                  /* absolute Zentrierung */
     padding: 8px 20px;                     /* angenehme Breite */
-    min-width: 100px;                      /* nicht zu klein */
+    min-width: 80px;                      /* nicht zu klein */
     width: auto;                           /* bleibt kompakt */
 	border-radius: 12px;
-    max-width: 130px; 		        	   /* Überlauf in XS vermeiden */
+    max-width: 120px; 		        	   /* Überlauf in XS vermeiden */
 	white-space: normal;	
 }
 
