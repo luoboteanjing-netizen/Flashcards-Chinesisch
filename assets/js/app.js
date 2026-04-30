@@ -94,7 +94,7 @@ const TRANSLATIONS = {
         trainingStart: "Start Training ▶",
         trainingStop: "Stop Training ■",
         prev: "◀ Zurück",
-        reveal: "Aufdecken",
+        reveal: "Antwort zeigen",
         next: "Nächste ▶",
         rateUnknown: "❌ Nicht gewusst",
         rateKnown: "✅ Gewusst",
