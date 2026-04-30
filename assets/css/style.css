@@ -664,7 +664,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     min-width: 120px;                      /* nicht zu klein */
     width: auto;                           /* bleibt kompakt */
 	border-radius: 12px;
-    max-width: 200px;                      /* Überlauf in XS vermeiden */
+    max-width: 160px; 		        	   /* Überlauf in XS vermeiden */
+	white-space: normal;	
 }
 
 /* Rechter Button = VOLLE rechte Fläche */
@@ -1136,7 +1137,7 @@ body.menu-open #menuToggle::before {
 #btnReveal {
     padding-top: 6px !important;
     padding-bottom: 6px !important;
-	white-space: normal;
+
 }
 /* ============================================================
    Navigationsbuttons 4px tiefer positionieren
