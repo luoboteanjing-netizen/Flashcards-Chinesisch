@@ -282,8 +282,10 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 	margin-bottom:14px
 }
 
-.lbl{display:block;margin-bottom:6px;color:var(--muted)}
-.hint{color:var(--muted);font-size:12px}
+.lbl{color:var(--muted)}
+
+.hint{color:var(--muted)}
+
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 .pane{
