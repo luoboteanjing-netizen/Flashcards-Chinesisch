@@ -660,7 +660,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Mittlerer Button = kompakt, exakt zentriert */
 #btnReveal {
     justify-self: center;                  /* absolute Zentrierung */
-    padding: 1px 20px;                     /* angenehme Breite */
+    padding: 8px 20px;                     /* angenehme Breite */
     min-width: 120px;                      /* nicht zu klein */
     width: auto;                           /* bleibt kompakt */
 	border-radius: 12px;
@@ -673,6 +673,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     width: 100%;
 }
 
+/* Falls nötig: min-width entfernen für volle Flexibilität */
+#btnPrev, #btnNext {
+    min-width: 0 !important;               /* kein Überlaufen */
+    white-space: nowrap;                   /* Text bleibt auf einer Zeile */
+}
 
 /* ============================================= */
 /* ✅ Lautsprecher – sichtbar in Dark & Light    */
@@ -1129,8 +1134,8 @@ body.menu-open #menuToggle::before {
 
 .card-controls .btn,
 #btnReveal {
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
 	white-space: normal;
 }
 /* ============================================================
