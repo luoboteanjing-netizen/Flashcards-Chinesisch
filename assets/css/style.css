@@ -1344,3 +1344,20 @@ html, body {
     color: var(--color-muted);
     white-space: nowrap;
 }
+
+/* Fix for slider value displays */
+#rateZhVal, #pitchZhVal,
+#rateDeVal, #pitchDeVal,
+#gapVal {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 4px;           /* better spacing */
+    white-space: nowrap;
+}
+
+/* Make sure they are visible inside labels */
+.lbl .hint,
+.lbl span[id*="Val"] {
+    display: inline !important;
+}
