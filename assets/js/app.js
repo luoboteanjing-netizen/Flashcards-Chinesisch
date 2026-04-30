@@ -2312,60 +2312,52 @@ if (uiLangSelect) {
         });
     }
 
-    /* ============================================================
-       STIMMEN-EINSTELLUNG
-       ============================================================ */
 /* ============================================================
-   STIMMEN-EINSTELLUNG (robust gegen DOM-Änderungen)
+   STIMMEN-EINSTELLUNG (KORRIGIERT + INITIALISIERT)
    ============================================================ */
 
-rateDeRange?.addEventListener("input", (e) => {
-    state.rateDe = parseFloat(e.target.value);
-    state.settings.rateDe = state.rateDe;
+function bindSlider(rangeEl, valueId, onChange) {
+    if (!rangeEl) return;
 
-    const rateDeVal = document.getElementById("rateDeVal");
-    if (rateDeVal) {
-        rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
-    }
+    const update = () => {
+        const valEl = document.getElementById(valueId);
+        if (valEl) {
+            valEl.textContent = `(${parseFloat(rangeEl.value).toFixed(2)})`;
+        }
+    };
 
-    saveSettings();
+    // ✅ WICHTIG: Initial setzen
+    update();
+
+    rangeEl.addEventListener("input", (e) => {
+        onChange(parseFloat(e.target.value));
+        update();
+        saveSettings();
+    });
+}
+
+// ===== Bindings =====
+
+bindSlider(rateDeRange, "rateDeVal", v => {
+    state.rateDe = v;
+    state.settings.rateDe = v;
 });
 
-pitchDeRange?.addEventListener("input", (e) => {
-    state.pitchDe = parseFloat(e.target.value);
-    state.settings.pitchDe = state.pitchDe;
-
-    const pitchDeVal = document.getElementById("pitchDeVal");
-    if (pitchDeVal) {
-        pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
-    }
-
-    saveSettings();
+bindSlider(pitchDeRange, "pitchDeVal", v => {
+    state.pitchDe = v;
+    state.settings.pitchDe = v;
 });
 
-rateZhRange?.addEventListener("input", (e) => {
-    state.rateZh = parseFloat(e.target.value);
-    state.settings.rateZh = state.rateZh;
-
-    const rateZhVal = document.getElementById("rateZhVal");
-    if (rateZhVal) {
-        rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
-    }
-
-    saveSettings();
+bindSlider(rateZhRange, "rateZhVal", v => {
+    state.rateZh = v;
+    state.settings.rateZh = v;
 });
 
-pitchZhRange?.addEventListener("input", (e) => {
-    state.pitchZh = parseFloat(e.target.value);
-    state.settings.pitchZh = state.pitchZh;
-
-    const pitchZhVal = document.getElementById("pitchZhVal");
-    if (pitchZhVal) {
-        pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
-    }
-
-    saveSettings();
+bindSlider(pitchZhRange, "pitchZhVal", v => {
+    state.pitchZh = v;
+    state.settings.pitchZh = v;
 });
+
 
     document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
     
