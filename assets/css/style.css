@@ -606,7 +606,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: var(--accent-text) !important;
 	 flex: 1 1 auto;
 	max-width: 100px;
-	min-height: 50px;
 	margin: 0 auto;
 	text-align:center;
 	font-weight: 600
@@ -662,7 +661,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Mittlerer Button = kompakt, exakt zentriert */
 #btnReveal {
     justify-self: center;                  /* absolute Zentrierung */
-    padding: 8px 20px;                     /* angenehme Breite */
+    padding: 8px 16px;                     /* angenehme Breite */
     min-width: 80px;                      /* nicht zu klein */
     width: auto;                           /* bleibt kompakt */
 	border-radius: 12px;
@@ -1179,16 +1178,12 @@ body.menu-open #menuToggle::before {
 #btnRateKnown,
 #btnRateUnknown {
     min-width: 0 !important;
+	min-height: 48px !important;
 }
 
 /* Gewusst & Nicht gewusst: schmaler */
 #btnRateKnown,
 #btnRateUnknown {
-    flex: 0.8 1 0 !important;
-}
-
-/* Unsicher: darf mehr Platz haben */
-#btnRateUnsure {
     flex: 0.8 1 0 !important;
 }
 
