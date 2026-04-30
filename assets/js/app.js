@@ -94,7 +94,7 @@ const TRANSLATIONS = {
         trainingStart: "Start Training ▶",
         trainingStop: "Stop Training ■",
         prev: "◀ Zurück",
-        reveal: "Antwort zeigen",
+        reveal: "Aufdecken",
         next: "Nächste ▶",
         rateUnknown: "❌ Nicht gewusst",
         rateKnown: "✅ Gewusst",
@@ -159,7 +159,7 @@ const TRANSLATIONS = {
         trainingStart: "Start Training ▶",
         trainingStop: "Stop Training ■",
         prev: "◀ Back",
-        reveal: "Show answer",
+        reveal: "Reveal",
         next: "Next ▶",
         rateUnknown: "❌ Didn't know",
         rateKnown: "✅ Knew it",
@@ -224,7 +224,7 @@ const TRANSLATIONS = {
         trainingStart: "开始学习 ▶",
         trainingStop: "停止学习 ■",
         prev: "◀ 上一张",
-        reveal: "显示答案",
+        reveal: "显示",
         next: "下一张 ▶",
         rateUnknown: "❌ 不会",
         rateKnown: "✅ 会了",
@@ -289,7 +289,7 @@ const TRANSLATIONS = {
         trainingStart: "démarrer ▶",
         trainingStop: "arrêter ■",
         prev: "◀ Précédent",
-        reveal: "Afficher la réponse",
+        reveal: "Révéler",
         next: "Suivant ▶",
         rateUnknown: "❌ Ne savait pas",
         rateKnown: "✅ Savait",
@@ -460,32 +460,51 @@ function translateAllUI() {
     document.documentElement.lang = state.settings.lang || "de";
     document.title = `${translate("appTitle")} – v${APP_VERSION}`;
 
+    // 🔧 FIX: Text setzen ohne Kinder zu zerstören
     document.querySelectorAll("[data-i18n]").forEach((node) => {
         const key = node.dataset.i18n;
         if (!key) return;
-        node.textContent = translate(key);
+
+        const text = translate(key);
+
+        // 👉 Wenn das Element KEINE Kinder hat → normal ersetzen
+        if (node.children.length === 0) {
+            node.textContent = text;
+        } else {
+            // 👉 Wenn Kinder existieren → NUR ersten Textknoten ersetzen
+            const firstTextNode = [...node.childNodes].find(n => n.nodeType === Node.TEXT_NODE);
+
+            if (firstTextNode) {
+                firstTextNode.nodeValue = text + " ";
+            } else {
+                // Falls kein Textknoten existiert → vorne einfügen
+                node.insertBefore(document.createTextNode(text + " "), node.firstChild);
+            }
+        }
     });
 
-    // Speziell für option elements in selects
+    // Option-Elemente (unverändert ok)
     document.querySelectorAll("option[data-i18n]").forEach((option) => {
         const key = option.dataset.i18n;
         if (!key) return;
         option.textContent = translate(key);
     });
 
+    // Title-Attribute
     document.querySelectorAll("[data-i18n-title]").forEach((node) => {
         const key = node.dataset.i18nTitle;
         if (!key) return;
         node.title = translate(key);
     });
 
-    // Update lesson table headers
+    // Table Headers
     const lessonHeader = document.querySelector("#lessonTableHeaderLesson");
     if (lessonHeader) lessonHeader.textContent = translate("lessonTableLesson");
 
     const cardsHeader = document.querySelector("#lessonTableHeaderCards");
     if (cardsHeader) cardsHeader.textContent = translate("lessonTableCards");
 
+    // Selects synchronisieren
     const uiLangSelect = document.querySelector("#uiLangSelect");
     if (uiLangSelect) uiLangSelect.value = state.settings.lang || "de";
 
@@ -2104,10 +2123,6 @@ window.addEventListener("DOMContentLoaded", () => {
 const css = document.querySelector("#cssMain");
 const js  = document.querySelector("#jsMain");
 
-console.log("rateZhRange", document.getElementById("rateZhRange"));
-console.log("rateZhVal", document.getElementById("rateZhVal"));
-
-
 if (css) css.href = `assets/css/style.css?v=${APP_VERSION}`;
 if (js)  js.src  = `assets/js/app.js?v=${APP_VERSION}`;
 
@@ -2312,63 +2327,40 @@ if (uiLangSelect) {
         });
     }
 
-/* ============================================================
-   STIMMEN-EINSTELLUNG (KORRIGIERT + INITIALISIERT)
-   ============================================================ */
-
-function bindSlider(rangeEl, valueId, onChange) {
-    if (!rangeEl) {
-        console.warn(`bindSlider: range element not found for ${valueId}`);
-        return;
-    }
-
-    const valEl = document.getElementById(valueId);
-    if (!valEl) {
-        console.warn(`bindSlider: value element #${valueId} not found`);
-    }
-
-    const updateDisplay = () => {
-        if (valEl) {
-            valEl.textContent = `(${parseFloat(rangeEl.value).toFixed(2)})`;
-        }
-    };
-
-    // Initial update
-    updateDisplay();
-
-    rangeEl.addEventListener("input", (e) => {
-        const val = parseFloat(e.target.value);
-        onChange(val);
-        updateDisplay();
+    /* ============================================================
+       STIMMEN-EINSTELLUNG
+       ============================================================ */
+    rateDeRange?.addEventListener("input", (e) => {
+     
+        state.rateDe = parseFloat(e.target.value);
+        state.settings.rateDe = state.rateDe;
+        rateDeVal.textContent = `(${state.rateDe.toFixed(2)})`;
         saveSettings();
     });
 
-    // Also update on change (for keyboard users etc.)
-    rangeEl.addEventListener("change", updateDisplay);
-}
+    pitchDeRange?.addEventListener("input", (e) => {
+      
+        state.pitchDe = parseFloat(e.target.value);
+        state.settings.pitchDe = state.pitchDe;
+        pitchDeVal.textContent = `(${state.pitchDe.toFixed(2)})`;
+        saveSettings();
+    });
 
-// ===== Bindings =====
+    rateZhRange?.addEventListener("input", (e) => {
+      
+        state.rateZh = parseFloat(e.target.value);
+        state.settings.rateZh = state.rateZh;
+        rateZhVal.textContent = `(${state.rateZh.toFixed(2)})`;
+        saveSettings();
+    });
 
-bindSlider(rateDeRange, "rateDeVal", v => {
-    state.rateDe = v;
-    state.settings.rateDe = v;
-});
-
-bindSlider(pitchDeRange, "pitchDeVal", v => {
-    state.pitchDe = v;
-    state.settings.pitchDe = v;
-});
-
-bindSlider(rateZhRange, "rateZhVal", v => {
-    state.rateZh = v;
-    state.settings.rateZh = v;
-});
-
-bindSlider(pitchZhRange, "pitchZhVal", v => {
-    state.pitchZh = v;
-    state.settings.pitchZh = v;
-});
-
+    pitchZhRange?.addEventListener("input", (e) => {
+     
+        state.pitchZh = parseFloat(e.target.value);
+        state.settings.pitchZh = state.pitchZh;
+        pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
+        saveSettings();
+    });
 
     document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
     
