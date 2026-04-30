@@ -1325,3 +1325,20 @@ html, body {
 #solBox {
     border: 2px solid var(--color-border);
 }
+
+/* ============================================================
+   Slider-Wertanzeige (Rate / Pitch / Gap)
+   ============================================================ */
+
+.lbl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lbl .hint {
+    display: inline;
+    font-size: 12px;
+    color: var(--color-muted);
+    white-space: nowrap;
+}
