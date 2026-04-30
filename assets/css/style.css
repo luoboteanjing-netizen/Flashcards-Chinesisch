@@ -598,18 +598,8 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .card-controls .btn, .ratebar .btn { min-width:100px; }
 .ratebar { gap:28px; }
 .card-controls { gap:8px; }
-/* ================== JETZT AUFDECKEN in blau ================== */
+/* ================== JETZT AUFDECKEN ================== */
 
-#btnReveal {
-    background: var(--accent) !important;
-    border-color: var(--accent) !important;
-    color: var(--accent-text) !important;
-	 flex: 1 1 auto;
-	max-width: 100px;
-	margin: 0 auto;
-	text-align:center;
-	font-weight: 600
-}
 
 /* Flex Layout */
 .card-controls {
@@ -660,6 +650,13 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 /* Mittlerer Button = kompakt, exakt zentriert */
 #btnReveal {
+	background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent-text) !important;
+	flex: 1 1 auto;
+	margin: 0 auto;
+	text-align:center;
+	font-weight: 600;
     justify-self: center;                  /* absolute Zentrierung */
     padding: 8px 16px;                     /* angenehme Breite */
     min-width: 80px;                      /* nicht zu klein */
@@ -679,7 +676,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* Falls nötig: min-width entfernen für volle Flexibilität */
 #btnPrev, #btnNext {
     min-width: 0 !important;       		   /* kein Überlaufen */
-	min-height: 48px;
+	min-height: 50px;
     white-space: nowrap;                   /* Text bleibt auf einer Zeile */
 }
 
