@@ -664,7 +664,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     min-width: 100px;                      /* nicht zu klein */
     width: auto;                           /* bleibt kompakt */
 	border-radius: 12px;
-    max-width: 140px; 		        	   /* Überlauf in XS vermeiden */
+    max-width: 130px; 		        	   /* Überlauf in XS vermeiden */
 	white-space: normal;	
 }
 
