@@ -1,4 +1,32 @@
 <!DOCTYPE html>
+<script>
+(function () {
+  const origin = location.origin;
+  let path = location.pathname;
+
+  // help.html entfernen
+  path = path.replace(/\/help\.html$/, "");
+
+  // führenden Slash entfernen
+  const parts = path.split("/").filter(Boolean);
+
+  // GitHub Pages Standard:
+  // https://username.github.io/repo-name/
+  if (origin.endsWith(".github.io") && parts.length >= 1) {
+    const username = origin.replace("https://", "").replace(".github.io", "");
+    const repo = parts[0];
+
+    const repoUrl = `https://github.com/${username}/${repo}`;
+
+    const el = document.getElementById("repo-link");
+    if (el) {
+      el.href = repoUrl;
+      el.textContent = repoUrl;
+    }
+  }
+})();
+</script>
+
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -256,7 +284,31 @@
     <hr>
 
     <a href="index.html" class="back-btn">← Zurück zur App</a>
+	<h2>Lizenz</h2>
 
+	<p>
+	Diese App, einschließlich Quellcode und der mitgelieferten Inhalte
+	(z. B. Vokabellisten, CSV‑Dateien und Texte), steht unter der
+	<strong>MIT License</strong>, sofern nicht anders angegeben.
+	</p>
+
+	<p>
+	Die Software wird ohne Garantie („as is“) bereitgestellt.
+	Weitere Details findest du in der Datei <code>LICENSE</code>
+	im GitHub‑Repository.
+	</p>
+
+	<h2>Projekt & Quellcode</h2>
+
+	<p>
+	Der Quellcode dieses Projekts ist auf GitHub verfügbar:
+	<br>
+	GitHub‑Repository</a>
+	</p>
+	
+	<p>
+	© 2026 Robert Ruhe
+	</p>
     <p><strong>Viel Erfolg beim Lernen! 🇨🇳📚</strong></p>
 
   </main>
