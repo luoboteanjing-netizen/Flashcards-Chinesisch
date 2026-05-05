@@ -8,6 +8,7 @@ const CSV_CACHE = "learning-app-csv-v1";
 // ?? Statische Dateien (App-Shell)
 const STATIC_ASSETS = [
   "index.html",
+  "help.html",
   "assets/css/style.css",
   "assets/js/app.js",
   "manifest.json",
