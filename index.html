@@ -22,7 +22,26 @@
 <body>
 
     <!-- ✅ Such-Icon links neben dem Drei-Punkte-Symbol -->
-    <div id="searchToggle" class="menu-search-icon">🔍</div>
+    <div id="searchToggle" class="menu-search-icon" aria-label="Suche öffnen">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="70"
+             height="70"
+             viewBox="0 0 70 70"
+             fill="none"
+             aria-hidden="true"
+             focusable="false">
+            <circle cx="30" cy="30" r="18"
+                    fill="currentColor"
+                    fill-opacity="0.3"
+                    stroke="currentColor"
+                    stroke-width="4"/>
+            <line x1="43" y1="43"
+                  x2="58" y2="58"
+                  stroke="currentColor"
+                  stroke-width="6"
+                  stroke-linecap="round"/>
+        </svg>
+    </div>
     <!-- ✅ Drei-Punkte-Menü Icon (oben rechts) -->
     <div id="menuToggle" class="menu-toggle-icon">⋮</div>
 
