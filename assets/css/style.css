@@ -958,8 +958,8 @@ body.menu-open #menuToggle::before {
 
 #searchToggle {
     position: absolute;
-    top: 0px;
-    right: 20px;
+    top: -5px;
+    right: 16px;
     width: 86px;
     height: 86px;
     display: flex;
