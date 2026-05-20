@@ -1049,109 +1049,102 @@ function setCard(entry, fromHistory = false) {
     const cardTitle  = document.querySelector("#cardTitle");
     const cardLesson = document.querySelector("#cardLesson");
 
-  
-	
-if (cardTitle) {
-    const p = ensureCardProgress(entry);
-    const ascii = getLeitnerAscii(p.box);
+    if (cardTitle) {
+        const p = ensureCardProgress(entry);
+        const ascii = getLeitnerAscii(p.box);
 
-    const revealCount = state.session.revealedCount;  // Nur aufgedeckte Karten
-    const cardsInLesson = state.lessons.get(entry.lesson) ?? [];
-    const total = cardsInLesson.length;
+        const revealCount = state.session.revealedCount;
+        const cardsInLesson = state.lessons.get(entry.lesson) ?? [];
+        const total = cardsInLesson.length;
 
-    cardTitle.innerHTML = `
-        <span class="card-title-left">
-            ${revealCount} / ${total}
-        </span>
-        <span class="card-title-right leitner-ascii">
-            ${ascii}
-        </span>
-    `;
-	}
-
-    if (cardLesson) cardLesson.textContent = translate("cardLessonTitle", { id: entry.id });
-
-// NEUER Fortschrittsbalken mit 5 Farbabstufungen (Leitner)
-// Box 1 = rot
-// Box 2 = gelb
-// Box 3 = hellgrün
-// Box 4 = mittelgrün
-// Box 5 = dunkelgrün
-// Reihenfolge von links nach rechts: dunkelgrün → mittel → hell → gelb → rot → grau
-// ----------------------------------------------------------
-const stats = document.querySelector("#lessonStats");
-if (stats) {
-    const cards = state.lessons.get(entry.lesson) ?? [];
-    const total = cards.length;
-
-    let red     = 0;   // Box 1
-    let yellow  = 0;   // Box 2
-    let green1  = 0;   // Box 3 → hellgrün
-    let green2  = 0;   // Box 4 → mittelgrün
-    let green3  = 0;   // Box 5 → dunkelgrün
-    let grey    = 0;   // Box 0 (neu / nie gesehen)
-
-    for (const c of cards) {
-        const p = state.progress.cards[c.id] ?? { box: 0 };
-        const box = p.box || 0;
-
-        if      (box === 0) grey++;
-        else if (box === 1) red++;
-        else if (box === 2) yellow++;
-        else if (box === 3) green1++;
-        else if (box === 4) green2++;
-        else if (box === 5) green3++;
+        cardTitle.innerHTML = `
+            <span class="card-title-left">
+                ${revealCount} / ${total}
+            </span>
+            <span class="card-title-right leitner-ascii">
+                ${ascii}
+            </span>
+        `;
     }
 
-    const redPct    = total ? (red    / total) * 100 : 0;
-    const yellowPct = total ? (yellow / total) * 100 : 0;
-    const green1Pct = total ? (green1 / total) * 100 : 0;
-    const green2Pct = total ? (green2 / total) * 100 : 0;
-    const green3Pct = total ? (green3 / total) * 100 : 0;
-    const greyPct   = total ? (grey   / total) * 100 : 0;
+    if (cardLesson) {
+        cardLesson.textContent = translate("cardLessonTitle", { id: entry.id });
+    }
 
-    // Positionen von links nach rechts berechnen
-    const leftGreen2 = green3Pct;
-    const leftGreen1 = green3Pct + green2Pct;
-    const leftYellow = green3Pct + green2Pct + green1Pct;
-    const leftRed    = green3Pct + green2Pct + green1Pct + yellowPct;
-    const leftGrey   = green3Pct + green2Pct + green1Pct + yellowPct + redPct;
+    /* -------- Fortschrittsbalken -------- */
+    const stats = document.querySelector("#lessonStats");
 
-    stats.innerHTML = `
-        <div class="lesson-bar-large">
-            <div class="lesson-bar-green3" style="left:0%;                width:${green3Pct}%"></div>
-            <div class="lesson-bar-green2" style="left:${leftGreen2}%;   width:${green2Pct}%"></div>
-            <div class="lesson-bar-green1" style="left:${leftGreen1}%;   width:${green1Pct}%"></div>
-            <div class="lesson-bar-yellow" style="left:${leftYellow}%;   width:${yellowPct}%"></div>
-            <div class="lesson-bar-red"    style="left:${leftRed}%;      width:${redPct}%"></div>
-            <div class="lesson-bar-grey"   style="left:${leftGrey}%;     width:${greyPct}%"></div>
-        </div>
-    `;
-}
+    if (stats) {
+        const cards = state.lessons.get(entry.lesson) ?? [];
+        const total = cards.length;
+
+        let red = 0, yellow = 0, green1 = 0, green2 = 0, green3 = 0, grey = 0;
+
+        for (const c of cards) {
+            const p = state.progress.cards[c.id] ?? { box: 0 };
+            const box = p.box || 0;
+
+            if (box === 0) grey++;
+            else if (box === 1) red++;
+            else if (box === 2) yellow++;
+            else if (box === 3) green1++;
+            else if (box === 4) green2++;
+            else if (box === 5) green3++;
+        }
+
+        const redPct    = total ? (red    / total) * 100 : 0;
+        const yellowPct = total ? (yellow / total) * 100 : 0;
+        const green1Pct = total ? (green1 / total) * 100 : 0;
+        const green2Pct = total ? (green2 / total) * 100 : 0;
+        const green3Pct = total ? (green3 / total) * 100 : 0;
+        const greyPct   = total ? (grey   / total) * 100 : 0;
+
+        const leftGreen2 = green3Pct;
+        const leftGreen1 = green3Pct + green2Pct;
+        const leftYellow = green3Pct + green2Pct + green1Pct;
+        const leftRed    = green3Pct + green2Pct + green1Pct + yellowPct;
+        const leftGrey   = green3Pct + green2Pct + green1Pct + yellowPct + redPct;
+
+        stats.innerHTML = `
+            <div class="lesson-bar-large">
+                <div class="lesson-bar-green3" style="left:0%; width:${green3Pct}%"></div>
+                <div class="lesson-bar-green2" style="left:${leftGreen2}%; width:${green2Pct}%"></div>
+                <div class="lesson-bar-green1" style="left:${leftGreen1}%; width:${green1Pct}%"></div>
+                <div class="lesson-bar-yellow" style="left:${leftYellow}%; width:${yellowPct}%"></div>
+                <div class="lesson-bar-red" style="left:${leftRed}%; width:${redPct}%"></div>
+                <div class="lesson-bar-grey" style="left:${leftGrey}%; width:${greyPct}%"></div>
+            </div>
+        `;
+    }
 
     /* -------- Karte anzeigen -------- */
     const sol = $("#solBox");
     sol.classList.add("masked");
 
-    /* Wort, Pinyin & POS werden immer sofort angezeigt */
+    /* ✅ Hilfsfunktionen */
+    const hasWordZh = entry.word?.zh && entry.word.zh.trim() !== "";
+    const hasWordDe = entry.word?.de && entry.word.de.trim() !== "";
+
     if (state.mode === "zh2de") {
         /* ---- CH → DE ---- */
 
         renderPromptWord(entry);
         $("#promptPOS").textContent = entry.pos || "";
-
-        /* ✅ Satz NICHT sofort anzeigen */
         $("#promptSent").innerHTML = "";
 
-        /* ✅ Lösungskarte sofort setzen */
         $("#solWord").textContent = entry.word.de;
         $("#solSent").textContent = entry.sent.de;
 
-        /* ✅ Verzögertes Einblenden des Satzes */
-        state.delayedSentenceTimer = setTimeout(() => {
+        /* ✅ KEIN Wort → kein Delay */
+        if (!hasWordZh && !hasWordDe) {
             renderPromptSentence(entry);
             syncCardHeights();
-        }, state.sentenceDelay);
+        } else {
+            state.delayedSentenceTimer = setTimeout(() => {
+                renderPromptSentence(entry);
+                syncCardHeights();
+            }, state.sentenceDelay);
+        }
 
     } else {
         /* ---- DE → CH ---- */
@@ -1159,21 +1152,24 @@ if (stats) {
         $("#promptWord").textContent = entry.word.de || "—";
         $("#promptWordSub").innerHTML = "";
         $("#promptPOS").textContent = entry.pos || "";
-
-        /* ✅ Satz NICHT sofort anzeigen */
         $("#promptSent").textContent = "";
 
-        /* ✅ Lösungskarte: CH + Pinyin */
         $("#solWord").innerHTML =
             `${entry.word.zh}<br><span class="zh-pinyin">${entry.word.py}</span>`;
+
         $("#solSent").innerHTML =
             `${entry.sent.zh}<br><span class="zh-pinyin">${entry.sent.py}</span>`;
 
-        /* ✅ Verzögertes Einblenden des Satzes (Deutsch) */
-        state.delayedSentenceTimer = setTimeout(() => {
+        /* ✅ KEIN Wort → kein Delay */
+        if (!hasWordDe) {
             $("#promptSent").textContent = entry.sent.de || "—";
             syncCardHeights();
-        }, state.sentenceDelay);
+        } else {
+            state.delayedSentenceTimer = setTimeout(() => {
+                $("#promptSent").textContent = entry.sent.de || "—";
+                syncCardHeights();
+            }, state.sentenceDelay);
+        }
     }
 
     /* -------- Buttons setzen -------- */
@@ -1185,7 +1181,6 @@ if (stats) {
 
     syncCardHeights();
 }
-
 // =====================================================
 // LEITNER: pro-Karte Status sicherstellen
 // =====================================================
