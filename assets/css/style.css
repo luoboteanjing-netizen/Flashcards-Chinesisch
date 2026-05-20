@@ -788,6 +788,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 8px;
     font-family: inherit;
     font-size: 14px;
+	white-space: pre-line;
     padding: 4px 6px;
 }
 
@@ -864,6 +865,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
+	white-space: pre-line;
     align-items: center;
     background: var(--color-card);
     border-radius: 6px;
