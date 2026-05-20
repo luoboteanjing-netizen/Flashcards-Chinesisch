@@ -960,8 +960,8 @@ body.menu-open #menuToggle::before {
     position: absolute;
     top: -5px;
     right: 16px;
-    width: 86px;
-    height: 86px;
+    width: 94px;
+    height: 94px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -969,7 +969,7 @@ body.menu-open #menuToggle::before {
     border-radius: 12px;
     background: transparent;
     border: none;
-    color: var(--text);
+    color: var(--bad);
     cursor: pointer;
     z-index: 1000;
 }
