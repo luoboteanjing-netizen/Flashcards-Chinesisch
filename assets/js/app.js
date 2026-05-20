@@ -112,6 +112,14 @@ const TRANSLATIONS = {
         voicePanelHintTitle: "Hinweis",
         voicePanelHint: "Wähle eine Stimme für die aktuell geöffnete Sprache.",
         voiceListTitle: "Stimmenliste",
+        searchTitle: "Suche",
+        searchLabel: "Begriff suchen",
+        searchButton: "Suchen",
+        searchResultsTitle: "Ergebnisse",
+        searchPlaceholderDe: "z. B. Wort oder Satz (Deutsch)",
+        searchPlaceholderZh: "z. B. 词或句子 (中文)",
+        searchHint: "Tippe einen Begriff ein und drücke Enter.",
+        searchEmptyResults: "Keine Treffer gefunden.",
         noVoicesFound: "Keine passenden Stimmen gefunden.",
         namelessVoice: "(namenlos)",
         pickVoice: "Diese Stimme wählen",
@@ -177,6 +185,14 @@ const TRANSLATIONS = {
         voicePanelHintTitle: "Hint",
         voicePanelHint: "Choose a voice for the currently open language.",
         voiceListTitle: "Voice list",
+        searchTitle: "Search",
+        searchLabel: "Search term",
+        searchButton: "Search",
+        searchResultsTitle: "Results",
+        searchPlaceholderDe: "e.g. word or sentence (German)",
+        searchPlaceholderZh: "e.g. 词 or sentence (Chinese)",
+        searchHint: "Type a term and press Enter.",
+        searchEmptyResults: "No results found.",
         noVoicesFound: "No matching voices found.",
         namelessVoice: "(nameless)",
         pickVoice: "Pick this voice",
@@ -242,6 +258,14 @@ const TRANSLATIONS = {
         voicePanelHintTitle: "提示",
         voicePanelHint: "为当前语言选择语音。",
         voiceListTitle: "语音列表",
+        searchTitle: "搜索",
+        searchLabel: "搜索词",
+        searchButton: "搜索",
+        searchResultsTitle: "结果",
+        searchPlaceholderDe: "例如：单词或句子（德语）",
+        searchPlaceholderZh: "例如：词或句子（中文）",
+        searchHint: "输入一个词并按回车。",
+        searchEmptyResults: "未找到结果。",
         noVoicesFound: "未找到匹配语音。",
         namelessVoice: "(无名)",
         pickVoice: "选择此语音",
@@ -307,6 +331,14 @@ const TRANSLATIONS = {
         voicePanelHintTitle: "Astuce",
         voicePanelHint: "Choisissez une voix pour la langue actuellement ouverte.",
         voiceListTitle: "Liste des voix",
+        searchTitle: "Recherche",
+        searchLabel: "Rechercher",
+        searchButton: "Rechercher",
+        searchResultsTitle: "Résultats",
+        searchPlaceholderDe: "ex. mot ou phrase (allemand)",
+        searchPlaceholderZh: "ex. 词 ou phrase (chinois)",
+        searchHint: "Tapez un terme et appuyez sur Entrée.",
+        searchEmptyResults: "Aucun résultat trouvé.",
         noVoicesFound: "Aucune voix correspondante trouvée.",
         namelessVoice: "(sans nom)",
         pickVoice: "Choisir cette voix",
@@ -496,6 +528,8 @@ function translateAllUI() {
         node.title = translate(key);
     });
 
+    updateSearchPlaceholder();
+
     // Table Headers
     const lessonHeader = document.querySelector("#lessonTableHeaderLesson");
     if (lessonHeader) lessonHeader.textContent = translate("lessonTableLesson");
@@ -512,6 +546,15 @@ function translateAllUI() {
 
     updateTrainingBtn();
     updateAutoplayBtn();
+}
+
+function updateSearchPlaceholder() {
+    const searchInput = document.querySelector("#searchInput");
+    const langDeBtn = document.querySelector('#searchLangDe');
+    const activeLang = (langDeBtn && langDeBtn.classList.contains('active')) ? 'de' : 'zh';
+    if (!searchInput) return;
+    const key = activeLang === 'de' ? 'searchPlaceholderDe' : 'searchPlaceholderZh';
+    searchInput.placeholder = translate(key);
 }
 
 function setUILanguage(lang) {
@@ -1767,7 +1810,7 @@ function searchCSV(query) {
     const resultsBox = $("#searchResults");
     if (!resultsBox) return;
     if (!query) {
-        resultsBox.innerHTML = `<div class="search-hint">Bitte einen Begriff eingeben und Enter drücken.</div>`;
+        resultsBox.innerHTML = `<div class="search-hint">${translate('searchHint')}</div>`;
         return;
     }
 
@@ -1812,7 +1855,7 @@ function searchCSV(query) {
     });
 
     if (!matched.length) {
-        resultsBox.innerHTML = `<div class="search-empty">Keine Treffer gefunden.</div>`;
+        resultsBox.innerHTML = `<div class="search-empty">${translate('searchEmptyResults')}</div>`;
         return;
     }
 
@@ -2590,11 +2633,11 @@ if (uiLangSelect) {
         if (lang === 'de') {
             searchLangDeBtn?.classList.add('active');
             searchLangZhBtn?.classList.remove('active');
-            if (searchInput) searchInput.placeholder = 'z.\u202fB. Wort oder Satz (Deutsch)';
+            if (searchInput) searchInput.placeholder = translate('searchPlaceholderDe');
         } else {
             searchLangZhBtn?.classList.add('active');
             searchLangDeBtn?.classList.remove('active');
-            if (searchInput) searchInput.placeholder = 'z.\u202fB. 词或句子 (中文)';
+            if (searchInput) searchInput.placeholder = translate('searchPlaceholderZh');
         }
     };
 
