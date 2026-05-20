@@ -1670,6 +1670,201 @@ function closeVoices() {
     $("#voicePanel").classList.add("hidden");
 }
 
+function openSearchPanel() {
+    closeVoices();
+    const panel = $("#searchPanel");
+    const overlay = $("#searchOverlay");
+    if (!panel) return;
+    panel.classList.remove("hidden");
+    overlay?.classList.add("active");
+    setTimeout(() => {
+        $("#searchInput")?.focus();
+    }, 60);
+}
+
+function closeSearchPanel() {
+    $("#searchPanel").classList.add("hidden");
+    $("#searchOverlay")?.classList.remove("active");
+}
+
+function getAllCards() {
+    const cards = [];
+    for (const lessonCards of state.lessons.values()) {
+        cards.push(...lessonCards);
+    }
+    return cards;
+}
+function normalizeRemoveDiacritics(s){
+    if (!s) return "";
+    return s.normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[0-9]/g,'').replace(/[^\p{L}\s]/gu,'').toLowerCase();
+}
+
+function escapeHtml(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function highlightNormalized(original, query) {
+    if (!original || !query) return escapeHtml(original || '');
+
+    const originalChars = Array.from(original);
+    const normChars = [];
+    const mapping = [];
+
+    originalChars.forEach((char, i) => {
+        const parts = char.normalize('NFD');
+        for (const part of parts) {
+            if (!/\p{Diacritic}/u.test(part)) {
+                normChars.push(part.toLowerCase());
+                mapping.push(i);
+            }
+        }
+    });
+
+    const normText = normChars.join('');
+    const normQuery = normalizeRemoveDiacritics(query).replace(/\s+/g, ' ').trim();
+    if (!normQuery) return escapeHtml(original);
+
+    let start = 0;
+    const ranges = [];
+    while (start < normText.length) {
+        const idx = normText.indexOf(normQuery, start);
+        if (idx === -1) break;
+        const endMapIndex = idx + normQuery.length - 1;
+        const origStart = mapping[idx];
+        const origEnd = mapping[endMapIndex] + 1;
+        ranges.push([origStart, origEnd]);
+        start = idx + normQuery.length;
+    }
+
+    if (!ranges.length) return escapeHtml(original);
+
+    let last = 0;
+    const result = [];
+    ranges.forEach(([from, to]) => {
+        if (from > last) result.push(escapeHtml(original.slice(last, from)));
+        result.push(`<mark>${escapeHtml(original.slice(from, to))}</mark>`);
+        last = to;
+    });
+    if (last < original.length) result.push(escapeHtml(original.slice(last)));
+
+    return result.join('');
+}
+
+function highlightSimple(original, query) {
+    if (!original || !query) return escapeHtml(original || '');
+    const escapedQuery = escapeHtml(query);
+    const regex = new RegExp(escapedQuery.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+    return escapeHtml(original).replace(regex, match => `<mark>${match}</mark>`);
+}
+
+function searchCSV(query) {
+    query = (query || "").trim();
+    const resultsBox = $("#searchResults");
+    if (!resultsBox) return;
+    if (!query) {
+        resultsBox.innerHTML = `<div class="search-hint">Bitte einen Begriff eingeben und Enter drücken.</div>`;
+        return;
+    }
+
+    // Bestimme gewählte Suche-Language (DE oder ZH)
+    const langDeBtn = document.querySelector('#searchLangDe');
+    const lang = (langDeBtn && langDeBtn.classList.contains('active')) ? 'de' : 'zh';
+
+    const qRaw = query.toLowerCase();
+    const qNorm = normalizeRemoveDiacritics(query).replace(/\s+/g, ' ').trim();
+    const qNormNoSpace = qNorm.replace(/\s+/g, '');
+
+    const matched = getAllCards().filter((entry) => {
+        if (lang === 'de') {
+            // Nur deutsche Wörter und deutsche Sätze durchsuchen (case-insensitive)
+            return [entry.word.de, entry.sent.de]
+                .filter(Boolean)
+                .some(value => value.toLowerCase().includes(qRaw));
+        } else {
+            // Chinesisch: match on zh characters, pinyin (normalize), or chinese sentence
+            const zhWord = (entry.word.zh || '').toLowerCase();
+            const py = entry.word.py || '';
+            const sentZh = (entry.sent.zh || '').toLowerCase();
+            const sentPy = entry.sent.py || '';
+
+            if ((zhWord && zhWord.includes(qRaw)) || (sentZh && sentZh.includes(qRaw))) return true;
+
+            const pyNorm = normalizeRemoveDiacritics(py).replace(/\s+/g, ' ').trim();
+            const sentPyNorm = normalizeRemoveDiacritics(sentPy).replace(/\s+/g, ' ').trim();
+            const pyNormNoSpace = pyNorm.replace(/\s+/g, '');
+
+            const queryTokens = qNorm.split(' ').filter(Boolean);
+            const tokenMatch = queryTokens.length > 0 && queryTokens.every(token =>
+                pyNorm.includes(token) || pyNormNoSpace.includes(token) || (sentPyNorm && sentPyNorm.includes(token))
+            );
+
+            if (queryTokens.length && tokenMatch) return true;
+            if (pyNorm && qNorm && (pyNorm.includes(qNorm) || pyNormNoSpace.includes(qNormNoSpace))) return true;
+            if (sentPyNorm && qNorm && (sentPyNorm.includes(qNorm) || sentPyNorm.replace(/\s+/g, '').includes(qNormNoSpace))) return true;
+
+            return false;
+        }
+    });
+
+    if (!matched.length) {
+        resultsBox.innerHTML = `<div class="search-empty">Keine Treffer gefunden.</div>`;
+        return;
+    }
+
+    resultsBox.innerHTML = matched.map((entry) => {
+        const deWordRaw = entry.word.de || '-';
+        const pyWordRaw = entry.word.py || '-';
+        const zhWordRaw = entry.word.zh || '-';
+
+        const deSentRaw = entry.sent.de || '';
+        const pySentRaw = entry.sent.py || '';
+        const zhSentRaw = entry.sent.zh || '';
+
+        const deWord = lang === 'de' ? highlightSimple(deWordRaw, qRaw) : escapeHtml(deWordRaw);
+        const deSent = lang === 'de' ? highlightSimple(deSentRaw, qRaw) : escapeHtml(deSentRaw);
+        const pyWord = highlightNormalized(pyWordRaw, query);
+        const pySent = highlightNormalized(pySentRaw, query);
+        const zhWord = highlightSimple(zhWordRaw, qRaw);
+        const zhSent = highlightSimple(zhSentRaw, qRaw);
+
+        return `
+            <div class="search-result" data-entry-id="${escapeHtml(entry.id)}">
+                <div class="search-result-main">
+                    <strong>${deWord}</strong>
+                    <span class="search-result-lesson">${escapeHtml(entry.lesson || '–')}</span>
+                </div>
+
+                <div class="search-result-row">
+                    <div class="search-result-col"><span class="search-result-label">DE:</span> ${deWord}</div>
+                    <div class="search-result-col"><span class="search-result-label">PY:</span> ${pyWord}</div>
+                    <div class="search-result-col"><span class="search-result-label">ZH:</span> ${zhWord}</div>
+                </div>
+
+                <div class="search-sentences">
+                    <div class="search-sent-de">${deSent}</div>
+                    <div class="search-sent-py">${pySent}</div>
+                    <div class="search-sent-zh">${zhSent}</div>
+                </div>
+            </div>`;
+    }).join("");
+
+    resultsBox.querySelectorAll(".search-result").forEach((node) => {
+        node.addEventListener("click", () => {
+            const id = node.dataset.entryId;
+            const selected = matched.find((entry) => entry.id === id);
+            if (selected) {
+                setCard(selected);
+                closeSearchPanel();
+            }
+        });
+    });
+}
+
 
 /* ============================ UPDATE VOICE LIST ============================ */
 
@@ -2368,6 +2563,56 @@ if (uiLangSelect) {
 
     document.querySelector("#btnCloseVoices")?.addEventListener("click", () => {
         closeVoices();
+    });
+
+    document.querySelector("#searchToggle")?.addEventListener("click", () => {
+        const panel = $("#searchPanel");
+        if (panel && !panel.classList.contains("hidden")) {
+            closeSearchPanel();
+            return;
+        }
+        openSearchPanel();
+    });
+
+    document.querySelector("#btnCloseSearch")?.addEventListener("click", () => {
+        closeSearchPanel();
+    });
+
+    document.querySelector("#searchOverlay")?.addEventListener("click", () => {
+        closeSearchPanel();
+    });
+
+    const searchInput = document.querySelector("#searchInput");
+    // Suchsprache Umschalter (DE / ZH)
+    const searchLangDeBtn = document.querySelector("#searchLangDe");
+    const searchLangZhBtn = document.querySelector("#searchLangZh");
+    const setSearchLang = (lang) => {
+        if (lang === 'de') {
+            searchLangDeBtn?.classList.add('active');
+            searchLangZhBtn?.classList.remove('active');
+            if (searchInput) searchInput.placeholder = 'z.\u202fB. Wort oder Satz (Deutsch)';
+        } else {
+            searchLangZhBtn?.classList.add('active');
+            searchLangDeBtn?.classList.remove('active');
+            if (searchInput) searchInput.placeholder = 'z.\u202fB. 词或句子 (中文)';
+        }
+    };
+
+    // Default bleibt DE
+    setSearchLang('de');
+
+    searchLangDeBtn?.addEventListener('click', () => setSearchLang('de'));
+    searchLangZhBtn?.addEventListener('click', () => setSearchLang('zh'));
+
+    searchInput?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchCSV(searchInput.value);
+        }
+    });
+
+    document.querySelector("#searchButton")?.addEventListener("click", () => {
+        searchCSV(searchInput?.value || "");
     });
 
     /* ============================================================
