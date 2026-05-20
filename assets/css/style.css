@@ -971,7 +971,7 @@ body.menu-open #menuToggle::before {
     border: none;
     color: var(--bad);
     cursor: pointer;
-    z-index: 1000;
+    z-index: 998;
 }
 
 #searchToggle svg {
