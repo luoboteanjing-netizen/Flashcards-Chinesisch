@@ -44,6 +44,7 @@ Sie, Ihnen;nín;Pronomen;Nín guì xìng?;Wie ist Ihr Nachname?;您;您贵姓？
 ich, mich, mir, (mein);wǒ;Pronomen;Wǒ shì xuéshēng.;Ich bin Student.;我;我是学生。;L01-1-14;L01 - Vokabeln Begrüßung
 Johann;Yuēhàn;Name;Yuēhàn shì měiguórén.;Johann ist Amerikaner.;约翰;约翰是美国人。;L01-1-15;L01 - Vokabeln Begrüßung
 Auf Wiedersehen!;zàijiàn;Phrase;Zàijiàn!;Auf Wiedersehen!;再见;再见！;L01-1-16;L01 - Vokabeln Begrüßung
+Hallo;Nǐ hǎo!;Phrase;Nǐ hǎo!;Guten Tag!;;你好！;L01-1-17;L01 - Dialog   Begrüßung
 * Lektion 1 Dialoge;*Lektion 1 Dialoge;* Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;*Lektion 1 Dialoge;LD01-1-00;L01 - Dialog   Begrüßung
 ;;;Nǐ hǎo!;Guten Tag!;;你好！;LD01-1-01;L01 - Dialog   Begrüßung
 ;;;Nǐ hǎo!;Guten Tag!;;你好！;LD01-1-02;L01 - Dialog   Begrüßung
@@ -92,31 +93,31 @@ Name;míngzì;Subst.;Nǐ de míngzì shì shénme?;Wie ist dein Name?;名字;你
 sie, er, es;tā;Pronomen;Tā shì wǒ de péngyou.;Sie ist meine Freundin.;她;她是我的朋友。;L02-2-12;L02 - Vokabeln sich vorstellen
 Wang Gang;Wánggāng;Name;Wǒmen de mìshū jiào Wánggāng.;Unser Sekretär heißt Wang Gang.;王刚;我们的秘书叫王刚。;L02-2-13;L02 - Vokabeln sich vorstellen
 wir;wǒmen;Pronomen;Wǒmen shì péngyou.;Wir sind Freunde.;我们;我们是朋友。;L02-2-14;L02 - Vokabeln sich vorstellen
-* Lektion 2 Dialoge;*Lektion 2 Dialoge;* Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;LD02-1-00;L02 - Dialog<br>sich vorstellen
-;;;Qǐng wèn, nín jiào shénme míngzì?;Entschuldigung, wie ist Ihr Name?;;请问，您叫什么名字？;LD02-1-01;L02 - Dialog<br>sich vorstellen
-;;;Wǒ xìng Lǐ, jiào Lǐ Lì.;Mein Familienname ist Li. Ich heiße Li Li.;;我姓李，叫李丽。;LD02-1-02;L02 - Dialog<br>sich vorstellen
-;;;Nín guì xìng?;Wie ist Ihr werter Name?;;您贵姓？;LD02-1-03;L02 - Dialog<br>sich vorstellen
-;;;Wǒ xìng Mǐlē, jiào Yuēhàn Mǐlē;Mein Familienname ist Müller, ich heiße Johann Müller.;;我姓米勒，叫约翰米勒。;LD02-1-04;L02 - Dialog<br>sich vorstellen
-;;;Duìbuqǐ, nǐ shì lǎoshī ma?;Entschuldigung, sind Sie Lehrer?;;对不起，你是老师吗？;LD02-1-05;L02 - Dialog<br>sich vorstellen
-;;;Bù, wǒ bù shì lǎoshī, wǒ shì gōngchéngshī, tā shì lǎoshī.;Nein, ich bin kein Lehrer, ich bin Ingenieur, sie ist Lehrerin.;;不，我不是老师，我是工程师，她是老师。;LD02-1-06;L02 - Dialog<br>sich vorstellen
-;;;Shì de, wǒ shì lǎoshī, nǐ ne?;Ja, ich bin Lehrerin, und ihr?;;是的，我是老师，你呢？;LD02-1-07;L02 - Dialog<br>sich vorstellen
-;;;Wǒ shì mìshū.;Ich bin Sekretärin.;;我是秘书。;LD02-1-08;L02 - Dialog<br>sich vorstellen
-;;;Wǒ shì xuéshēng.;Ich bin Student.;;我是学生。;LD02-1-09;L02 - Dialog<br>sich vorstellen
-;;;Yuēhàn! Wǒ jièshào yīxià, tā shì wǒ de péngyǒu.;Johann! Lass mich ihn vorstellen. Er ist mein Freund.;;约翰！我介绍一下，他是我的朋友。;LD02-1-10;L02 - Dialog<br>sich vorstellen
-;;;Wáng Gāng, tā shì wǒ de lǎoshī.;Wang Gāng, sie ist meine Lehrerin.;;王刚，她是我的老师。;LD02-1-11;L02 - Dialog<br>sich vorstellen
-;;;Nǐmen hǎo, wǒ jiào Yuēhàn Mǐlē.;Hallo zusammen, ich heiße Johann Müller.;;你们好，我叫约翰米勒。;LD02-1-12;L02 - Dialog<br>sich vorstellen
-;;;Wǒ xìng Dèng, jiào Dèng xiǎomíng;Mein Familienname ist Dèng, ich heiße Dèng xiǎomíng.;;我姓邓，叫邓小明。;LD02-1-13;L02 - Dialog<br>sich vorstellen
-;;;Rènshi nǐmen, wǒ hěn gāoxìng;Ich freue mich, Sie kennenzulernen.;;认识你们，我很高兴。;LD02-1-14;L02 - Dialog<br>sich vorstellen
-;;;Wǒmen yě hěn gāoxìng rènshi nǐ.;Wir freuen uns auch, Sie kennenzulernen.;;我们也很高兴认识你。;LD02-1-15;L02 - Dialog<br>sich vorstellen
-;;;Mǐlē xiānsheng, zhè shì wǒ de míngpiàn.;Herr Müller, hier ist meine Visitenkarte.;;米勒先生，这是我的名片。;LD02-1-16;L02 - Dialog<br>sich vorstellen
-;;;Xièxiè! Dèng lǎoshī, zhè shì wǒ de míngpiàn.;Vielen Dank! Lehrerin Deng, das ist meine Visitenkarte.;;谢谢！邓老师，这是我的名片。;LD02-1-17;L02 - Dialog<br>sich vorstellen
-;;;Wǒ xìng Wáng, wǒ jiào Wáng Gāng.;Mein Familienname ist Wang, mein Name ist Wang Gang.;;我姓王，我叫王刚。;LD02-1-18;L02 - Dialog<br>sich vorstellen
-;;;Wǒ shì xuéshēng.;Ich bin Schüler/-in oder Student/-in.;;我是学生。;LD02-1-19;L02 - Dialog<br>sich vorstellen
-;;;Tā bù shì lǎoshī.;Er ist nicht Lehrer.;;他不是老师。;LD02-1-20;L02 - Dialog<br>sich vorstellen
-;;;Zhè shì wǒ de nǚ péngyǒu.;Das ist mein/-e Freund/-in.;;这是我的女朋友。;LD02-1-21;L02 - Dialog<br>sich vorstellen
-;;;Wèile rènshi nǐ, wǒ hěn gāoxìng;Dich kennen zu lernen, freut mich sehr.;;为了认识你，我很高兴。;LD02-1-22;L02 - Dialog<br>sich vorstellen
-;;;Xièxiè!;Danke!;;谢谢！;LD02-1-23;L02 - Dialog<br>sich vorstellen
-;;;Xièxiè!;Danke!;;谢谢！;LD02-1-24;L02 - Dialog<br>sich vorstellen
+* Lektion 2 Dialoge;*Lektion 2 Dialoge;* Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;*Lektion 2 Dialoge;LD02-1-00;L02 - Dialog    sich vorstellen
+;;;Qǐng wèn, nín jiào shénme míngzì?;Entschuldigung, wie ist Ihr Name?;;请问，您叫什么名字？;LD02-1-01;L02 - Dialog    sich vorstellen
+;;;Wǒ xìng Lǐ, jiào Lǐ Lì.;Mein Familienname ist Li. Ich heiße Li Li.;;我姓李，叫李丽。;LD02-1-02;L02 - Dialog    sich vorstellen
+;;;Nín guì xìng?;Wie ist Ihr werter Name?;;您贵姓？;LD02-1-03;L02 - Dialog    sich vorstellen
+;;;Wǒ xìng Mǐlē, jiào Yuēhàn Mǐlē;Mein Familienname ist Müller, ich heiße Johann Müller.;;我姓米勒，叫约翰米勒。;LD02-1-04;L02 - Dialog    sich vorstellen
+;;;Duìbuqǐ, nǐ shì lǎoshī ma?;Entschuldigung, sind Sie Lehrer?;;对不起，你是老师吗？;LD02-1-05;L02 - Dialog    sich vorstellen
+;;;Bù, wǒ bù shì lǎoshī, wǒ shì gōngchéngshī, tā shì lǎoshī.;Nein, ich bin kein Lehrer, ich bin Ingenieur, sie ist Lehrerin.;;不，我不是老师，我是工程师，她是老师。;LD02-1-06;L02 - Dialog    sich vorstellen
+;;;Shì de, wǒ shì lǎoshī, nǐ ne?;Ja, ich bin Lehrerin, und ihr?;;是的，我是老师，你呢？;LD02-1-07;L02 - Dialog    sich vorstellen
+;;;Wǒ shì mìshū.;Ich bin Sekretärin.;;我是秘书。;LD02-1-08;L02 - Dialog    sich vorstellen
+;;;Wǒ shì xuéshēng.;Ich bin Student.;;我是学生。;LD02-1-09;L02 - Dialog    sich vorstellen
+;;;Yuēhàn! Wǒ jièshào yīxià, tā shì wǒ de péngyǒu.;Johann! Lass mich ihn vorstellen. Er ist mein Freund.;;约翰！我介绍一下，他是我的朋友。;LD02-1-10;L02 - Dialog    sich vorstellen
+;;;Wáng Gāng, tā shì wǒ de lǎoshī.;Wang Gāng, sie ist meine Lehrerin.;;王刚，她是我的老师。;LD02-1-11;L02 - Dialog    sich vorstellen
+;;;Nǐmen hǎo, wǒ jiào Yuēhàn Mǐlē.;Hallo zusammen, ich heiße Johann Müller.;;你们好，我叫约翰米勒。;LD02-1-12;L02 - Dialog    sich vorstellen
+;;;Wǒ xìng Dèng, jiào Dèng xiǎomíng;Mein Familienname ist Dèng, ich heiße Dèng xiǎomíng.;;我姓邓，叫邓小明。;LD02-1-13;L02 - Dialog    sich vorstellen
+;;;Rènshi nǐmen, wǒ hěn gāoxìng;Ich freue mich, Sie kennenzulernen.;;认识你们，我很高兴。;LD02-1-14;L02 - Dialog    sich vorstellen
+;;;Wǒmen yě hěn gāoxìng rènshi nǐ.;Wir freuen uns auch, Sie kennenzulernen.;;我们也很高兴认识你。;LD02-1-15;L02 - Dialog    sich vorstellen
+;;;Mǐlē xiānsheng, zhè shì wǒ de míngpiàn.;Herr Müller, hier ist meine Visitenkarte.;;米勒先生，这是我的名片。;LD02-1-16;L02 - Dialog    sich vorstellen
+;;;Xièxiè! Dèng lǎoshī, zhè shì wǒ de míngpiàn.;Vielen Dank! Lehrerin Deng, das ist meine Visitenkarte.;;谢谢！邓老师，这是我的名片。;LD02-1-17;L02 - Dialog    sich vorstellen
+;;;Wǒ xìng Wáng, wǒ jiào Wáng Gāng.;Mein Familienname ist Wang, mein Name ist Wang Gang.;;我姓王，我叫王刚。;LD02-1-18;L02 - Dialog    sich vorstellen
+;;;Wǒ shì xuéshēng.;Ich bin Schüler/-in oder Student/-in.;;我是学生。;LD02-1-19;L02 - Dialog    sich vorstellen
+;;;Tā bù shì lǎoshī.;Er ist nicht Lehrer.;;他不是老师。;LD02-1-20;L02 - Dialog    sich vorstellen
+;;;Zhè shì wǒ de nǚ péngyǒu.;Das ist mein/-e Freund/-in.;;这是我的女朋友。;LD02-1-21;L02 - Dialog    sich vorstellen
+;;;Wèile rènshi nǐ, wǒ hěn gāoxìng;Dich kennen zu lernen, freut mich sehr.;;为了认识你，我很高兴。;LD02-1-22;L02 - Dialog    sich vorstellen
+;;;Xièxiè!;Danke!;;谢谢！;LD02-1-23;L02 - Dialog    sich vorstellen
+;;;Xièxiè!;Danke!;;谢谢！;LD02-1-24;L02 - Dialog    sich vorstellen
 * Lektion 3;*Lektion 3;* Lektion 3;*Lektion 3;*Lektion 3;*Lektion 3;*Lektion 3;L03-1-00;L03 - Vokabeln Orte, Länder, Schule, Arbeit
 Österreich;Àodìlì;Subst.;Wǒ xiǎng qù Àodìlì.;Ich möchte nach Österreich gehen.;奥地利;我想去奥地利。;L03-1-01;L03 - Vokabeln Orte, Länder, Schule, Arbeit
 Peking;Běijīng;Subst.;Wǒ zài Běijīng dāng lǎoshī.;Ich arbeite als Lehrer in Peking.;北京;我在北京当老师。;L03-1-02;L03 - Vokabeln Orte, Länder, Schule, Arbeit
