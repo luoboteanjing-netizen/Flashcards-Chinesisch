@@ -1907,10 +1907,12 @@ function searchCSV(query) {
 
         return `
             <div class="search-result" data-entry-id="${escapeHtml(entry.id)}">
+                <div class="search-result-lesson">${escapeHtml(entry.lesson || '–')}</div>
+
                 <div class="search-result-main">
                     <div>${wordLine}</div>
-                    <span class="search-result-lesson">${escapeHtml(entry.lesson || '–')}</span>
                 </div>
+
                 <div class="search-result-line">${sentLine}</div>
                 <div class="search-result-line">${pyWord}</div>
                 <div class="search-result-line">${pySent}</div>

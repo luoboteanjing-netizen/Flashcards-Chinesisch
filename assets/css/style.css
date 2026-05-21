@@ -1079,6 +1079,13 @@ body.menu-open #menuToggle::before {
     color: var(--muted);
     font-size: 13px;
 }
+/* Make lesson title occupy its own row and align left */
+.search-result-lesson {
+    display: block;
+    text-align: left;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
 
 .search-result-sub,
 .search-result-sent {
