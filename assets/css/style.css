@@ -1001,11 +1001,12 @@ body.menu-open #menuToggle::before {
 #searchPanel {
     max-width: 520px;
     left: 50%;
-    top: 10%;
+    top: 80px; /* Align with voice panel */
     transform: translateX(-50%);
     right: auto;
     bottom: auto;
     width: calc(100% - 32px);
+    z-index: 1000;
 }
 
 .search-input-row {
