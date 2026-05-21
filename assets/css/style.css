@@ -1088,6 +1088,7 @@ body.menu-open #menuToggle::before {
 }
 
 .search-result-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.search-result-line{display:block;margin-top:8px}
 .search-result-col{flex:1 1 120px}
 .search-sentences{margin-top:10px;display:flex;flex-direction:column;gap:6px}
 .search-sent-de,.search-sent-py,.search-sent-zh{font-size:14px}
