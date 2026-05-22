@@ -802,17 +802,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     font-weight: 600;
 }
 
-.lesson-table {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
 
-.lt-head {
-    background: var(--color-card);
-    border-bottom: 2px solid var(--color-border);
-    font-weight: 600;
-}
 
 /* ================================
    Neue Spalte: Schwach (⚠️)
@@ -862,7 +852,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
         30px   /* weak   (🤔) */
         30px;  /* unknown (❌) */
 
-    gap: 13px;
+    gap: 8px;
     padding: 4px 6px;
     font-size: 14px;
 	white-space: pre-line;
