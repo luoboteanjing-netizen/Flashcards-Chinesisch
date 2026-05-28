@@ -1047,7 +1047,7 @@ body.menu-open #menuToggle::before {
 
 .search-result mark,
 .search-result mark {
-    background: #ffd54f;
+    background: #4fd54f;
     color: inherit;
     padding: 0 2px;
     border-radius: 3px;
