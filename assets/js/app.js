@@ -1985,20 +1985,18 @@ async function translateOnlineCached(text) {
     return result;
 }
 
-
 async function translateOnline(text) {
-    const proxy = "https://api.allorigins.win/raw?url=";
+    const proxy = "https://cors.eu.org/";
     
     const googleUrl = 
         `https://translate.googleapis.com/translate_a/single` +
         `?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`;
 
-    const finalUrl = proxy + encodeURIComponent(googleUrl);
+    const finalUrl = proxy + googleUrl;   // KEIN encodeURIComponent hier!
 
     const res = await fetch(finalUrl);
     const data = await res.json();
 
-    // Google-Antwort auslesen
     const zh = data[0].map(item => item[0]).join("");
 
     return {
@@ -2007,6 +2005,7 @@ async function translateOnline(text) {
         py: getPinyin(zh)
     };
 }
+
 
 /* ============================ UPDATE VOICE LIST ============================ */
 
