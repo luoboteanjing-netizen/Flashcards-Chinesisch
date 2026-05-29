@@ -1987,21 +1987,19 @@ async function translateOnlineCached(text) {
 
 
 async function translateOnline(text) {
-    const proxy = "https://corsproxy.io/?";
-    const url = proxy + "https://libretranslate.de/translate";
+    const proxy = "https://api.allorigins.win/raw?url=";
+    
+    const googleUrl = 
+        `https://translate.googleapis.com/translate_a/single` +
+        `?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`;
 
-    const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            q: text,
-            source: "auto",
-            target: "zh"
-        })
-    });
+    const finalUrl = proxy + encodeURIComponent(googleUrl);
 
+    const res = await fetch(finalUrl);
     const data = await res.json();
-    const zh = data.translatedText;
+
+    // Google-Antwort auslesen
+    const zh = data[0].map(item => item[0]).join("");
 
     return {
         de: text,
@@ -2009,7 +2007,6 @@ async function translateOnline(text) {
         py: getPinyin(zh)
     };
 }
-
 
 /* ============================ UPDATE VOICE LIST ============================ */
 
