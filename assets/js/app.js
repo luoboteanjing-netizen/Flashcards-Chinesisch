@@ -1986,13 +1986,13 @@ async function translateOnlineCached(text) {
 }
 
 async function translateOnline(text) {
-    const proxy = "https://cors.eu.org/";
+    const proxy = "https://api.codetabs.com/v1/proxy?quest=";
     
     const googleUrl = 
         `https://translate.googleapis.com/translate_a/single` +
         `?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`;
 
-    const finalUrl = proxy + googleUrl;   // KEIN encodeURIComponent hier!
+    const finalUrl = proxy + encodeURIComponent(googleUrl);
 
     const res = await fetch(finalUrl);
     const data = await res.json();
