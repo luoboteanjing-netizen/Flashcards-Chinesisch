@@ -17,6 +17,22 @@
     <!-- Styles & Script mit Versionierung -->
 	<link id="cssMain" rel="stylesheet" href="./assets/css/style.css">
     <script id="jsMain" src="./assets/js/app.js"></script>
+	<script 
+		data-goatcounter="https://cilong.goatcounter.com/count"
+		async 
+		src="//gc.zgo.at/count.js">
+	</script>	
+	<script>
+	window.addEventListener("load", function () {
+	  if (window.goatcounter) {
+		window.goatcounter.count({
+		  path: '/app-start',
+		  title: 'App gestartet'
+		});
+	  }
+	});
+	</script>
+
 </head>
 
 <body>
@@ -318,6 +334,10 @@
                     <button id="searchLangDe" class="btn toggle active">DE</button>
                     <button id="searchLangZh" class="btn toggle">ZH</button>
                 </div>
+				<label style="display:flex; gap:6px; align-items:center;">
+				  <input type="checkbox" id="onlineToggle">
+				  🌐 Online-Übersetzung
+				</label>
                 <input id="searchInput" class="input" type="search" placeholder="z. B. 汉字, Pinyin, Satz...">
                 <button id="searchButton" class="btn" data-i18n="searchButton">Suchen</button>
             </div>
