@@ -1987,14 +1987,17 @@ async function translateOnlineCached(text) {
 
 
 async function translateOnline(text) {
-    const res = await fetch("https://libretranslate.de/translate", {
+    const proxy = "https://corsproxy.io/?";
+    const url = proxy + "https://libretranslate.de/translate";
+
+    const res = await fetch(url, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             q: text,
             source: "auto",
             target: "zh"
-        }),
-        headers: { "Content-Type": "application/json" }
+        })
     });
 
     const data = await res.json();
