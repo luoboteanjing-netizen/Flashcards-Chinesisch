@@ -1804,17 +1804,18 @@ function highlightSimple(original, query) {
     const regex = new RegExp(escapedQuery.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
     return escapeHtml(original).replace(regex, match => `<mark>${match}</mark>`);
 }
+/* ============================ search CSV ============================ */
 
-function searchCSV(query) {
+async function searchCSV(query) {
     query = (query || "").trim();
     const resultsBox = $("#searchResults");
     if (!resultsBox) return;
+
     if (!query) {
         resultsBox.innerHTML = `<div class="search-hint">${translate('searchHint')}</div>`;
         return;
     }
 
-    // Bestimme gewählte Suche-Language (DE oder ZH)
     const langDeBtn = document.querySelector('#searchLangDe');
     const lang = (langDeBtn && langDeBtn.classList.contains('active')) ? 'de' : 'zh';
 
@@ -1840,8 +1841,10 @@ function searchCSV(query) {
             const sentZh = (entry.sent.zh || '').toLowerCase();
             const pyWordRaw = entry.word.py || '';
             const pySentRaw = entry.sent.py || '';
+
             const pyWord = normalizeRemoveDiacritics(pyWordRaw).replace(/\s+/g, ' ').trim();
             const pySent = normalizeRemoveDiacritics(pySentRaw).replace(/\s+/g, ' ').trim();
+
             const pyWordNoSpace = pyWord.replace(/\s+/g, '');
             const pySentNoSpace = pySent.replace(/\s+/g, '');
 
@@ -1850,9 +1853,10 @@ function searchCSV(query) {
 
             if (!isWordMatch) {
                 const queryTokens = qNorm.split(' ').filter(Boolean);
-                const tokenMatch = queryTokens.length > 0 && queryTokens.every(token =>
-                    pyWord.includes(token) || pyWordNoSpace.includes(token)
-                );
+                const tokenMatch = queryTokens.length > 0 &&
+                    queryTokens.every(token =>
+                        pyWord.includes(token) || pyWordNoSpace.includes(token)
+                    );
                 if (tokenMatch) isWordMatch = true;
             }
 
@@ -1862,9 +1866,10 @@ function searchCSV(query) {
 
                 if (!isSentenceMatch) {
                     const queryTokens = qNorm.split(' ').filter(Boolean);
-                    const tokenMatch = queryTokens.length > 0 && queryTokens.every(token =>
-                        pySent.includes(token) || pySentNoSpace.includes(token)
-                    );
+                    const tokenMatch = queryTokens.length > 0 &&
+                        queryTokens.every(token =>
+                            pySent.includes(token) || pySentNoSpace.includes(token)
+                        );
                     if (tokenMatch) isSentenceMatch = true;
                 }
             }
@@ -1879,12 +1884,58 @@ function searchCSV(query) {
 
     const matched = [...matchedWord, ...matchedSentence];
 
-    if (!matched.length) {
+    // ✅ 1. OFFLINE TREFFER → WIE BISHER
+    if (matched.length) {
+        renderResults(resultsBox, matched, query, qRaw, lang, false);
+        return;
+    }
+
+    // ✅ 2. ONLINE FALLBACK
+    const onlineEnabled = document.querySelector('#onlineToggle')?.checked;
+
+    if (!onlineEnabled || !navigator.onLine) {
         resultsBox.innerHTML = `<div class="search-empty">${translate('searchEmptyResults')}</div>`;
         return;
     }
 
+    // Ladeanzeige
+    resultsBox.innerHTML = `<div class="search-hint">🌐 Online Suche...</div>`;
+
+    try {
+        const onlineResult = await translateOnlineCached(query);
+
+        if (!onlineResult) {
+            resultsBox.innerHTML = `<div class="search-empty">${translate('searchEmptyResults')}</div>`;
+            return;
+        }
+
+        // Fake-Entry im gleichen Format erzeugen
+        const entry = {
+            id: "online",
+            lesson: "🌐",
+            word: {
+                de: onlineResult.de,
+                zh: onlineResult.zh,
+                py: onlineResult.py
+            },
+            sent: {
+                de: "-",
+                zh: "-",
+                py: "-"
+            }
+        };
+
+        renderResults(resultsBox, [entry], query, qRaw, lang, true);
+
+    } catch (err) {
+        console.error(err);
+        resultsBox.innerHTML = `<div class="search-empty">Online Fehler</div>`;
+    }
+}
+
+function renderResults(resultsBox, matched, query, qRaw, lang, isOnline) {
     resultsBox.innerHTML = matched.map((entry) => {
+
         const deWordRaw = entry.word.de || '-';
         const pyWordRaw = entry.word.py || '-';
         const zhWordRaw = entry.word.zh || '-';
@@ -1906,34 +1957,54 @@ function searchCSV(query) {
         const sentLineZh = lang === 'zh' ? `<strong>${zhSent}</strong>` : zhSent;
 
         return `
-            <div class="search-result" data-entry-id="${escapeHtml(entry.id)}">
-                <div class="search-result-header">
-                    <span class="search-result-lesson">${escapeHtml(entry.lesson || '–')}</span>
-                    <span class="search-result-id">${escapeHtml(entry.id || '–')}</span>
-                </div>
+        <div class="search-result">
+            <div class="search-result-header">
+                <span>${isOnline ? "🌐 Online Ergebnis" : escapeHtml(entry.lesson || '–')}</span>
+            </div>
 
-                <div class="search-result-main">
-                    <div>${wordLine}</div>
-                </div>
-
-                <div class="search-result-line">${sentLine}</div>
-                <div class="search-result-line">${pyWord}</div>
-                <div class="search-result-line">${pySent}</div>
-                <div class="search-result-line">${wordLineZh}</div>
-                <div class="search-result-line">${sentLineZh}</div>
-            </div>`;
+            <div><strong>${wordLine}</strong></div>
+            <div>${pyWord}</div>
+            <div>${wordLineZh}</div>
+        </div>`;
     }).join("");
+}
 
-    resultsBox.querySelectorAll(".search-result").forEach((node) => {
-        node.addEventListener("click", () => {
-            const id = node.dataset.entryId;
-            const selected = matched.find((entry) => entry.id === id);
-            if (selected) {
-                setCard(selected);
-                closeSearchPanel();
-            }
-        });
+async function translateOnlineCached(text) {
+    const key = "trans_" + text;
+
+    // Cache
+    const cached = localStorage.getItem(key);
+    if (cached) return JSON.parse(cached);
+
+    const result = await translateOnline(text);
+
+    if (result) {
+        localStorage.setItem(key, JSON.stringify(result));
+    }
+
+    return result;
+}
+
+
+async function translateOnline(text) {
+    const res = await fetch("https://libretranslate.de/translate", {
+        method: "POST",
+        body: JSON.stringify({
+            q: text,
+            source: "auto",
+            target: "zh"
+        }),
+        headers: { "Content-Type": "application/json" }
     });
+
+    const data = await res.json();
+    const zh = data.translatedText;
+
+    return {
+        de: text,
+        zh: zh,
+        py: getPinyin(zh)
+    };
 }
 
 
