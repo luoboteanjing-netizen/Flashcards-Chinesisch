@@ -366,9 +366,13 @@ const AUDIO_BASE = './data/audio';
 const GITHUB_VOICES = ['xiaoxiao', 'yunjian'];
 const GITHUB_SPEEDS = ['slow'];
 const CACHE_PREFIX = 'fc-audio-';
-// ZIP-Dateiname pro Stimme: data/audio/<voice>_slow.zip
+
+// ZIP-Dateien werden als GitHub Release Assets gehostet
+// Release-Tag bei Bedarf hier anpassen (z.B. 'audio-v2')
+const RELEASE_BASE = 'https://github.com/luoboteanjing-netizen/Flashcards-Chinesisch/releases/download/audio-v1';
+
 function buildZipUrl(voice) {
-    return `${AUDIO_BASE}/${voice}_slow.zip`;
+    return `${RELEASE_BASE}/${voice}_slow.zip`;
 }
 
 function sanitizeFileName(fn) {
@@ -421,7 +425,7 @@ function playPreviewAudio(voice, speed, kind) {
     a.play().catch(e => console.warn('Play preview failed', e));
 }
 
-// Prüft ob eine Stimme bereits im Cache vorhanden ist (mind. 1 MP3)
+// Prüft ob eine Stimme bereits im Cache vorhanden ist
 async function isVoiceCached(voice) {
     try {
         const cache = await caches.open(CACHE_PREFIX + voice);
@@ -441,25 +445,24 @@ async function deleteVoiceCache(voice) {
     }
 }
 
-// Lädt die ZIP für eine Stimme von GitHub, entpackt sie und
+// Lädt die ZIP vom GitHub Release, entpackt sie und
 // speichert alle MP3s im Browser-Cache.
 // onProgress(percent, statusText) wird während des Downloads aufgerufen.
 async function downloadVoiceZip(voice, onProgress) {
     const zipUrl = buildZipUrl(voice);
     onProgress && onProgress(0, 'Verbinde…');
 
-    // ── ZIP herunterladen ────────────────────────────────────
+    // ZIP herunterladen mit Fortschrittsanzeige
     let response;
     try {
         response = await fetch(zipUrl);
     } catch (e) {
-        throw new Error(`Netzwerkfehler: ${e.message}`);
+        throw new Error('Netzwerkfehler: ' + e.message);
     }
     if (!response.ok) {
-        throw new Error(`ZIP nicht gefunden (${response.status}): ${zipUrl}`);
+        throw new Error('ZIP nicht gefunden (' + response.status + '): ' + zipUrl);
     }
 
-    // Fortschritt beim Herunterladen verfolgen
     const contentLength = response.headers.get('Content-Length');
     const total = contentLength ? parseInt(contentLength, 10) : null;
     let received = 0;
@@ -471,31 +474,32 @@ async function downloadVoiceZip(voice, onProgress) {
         if (done) break;
         chunks.push(value);
         received += value.length;
+        const mb = Math.round(received / 1024 / 1024 * 10) / 10;
         if (total) {
-            const pct = Math.round(received / total * 60); // 0–60% = Download
-            onProgress && onProgress(pct, `Herunterladen… ${Math.round(received/1024/1024*10)/10} MB`);
+            const pct = Math.round(received / total * 60);
+            onProgress && onProgress(pct, 'Herunterladen… ' + mb + ' MB');
         } else {
-            onProgress && onProgress(10, `Herunterladen… ${Math.round(received/1024/1024*10)/10} MB`);
+            onProgress && onProgress(10, 'Herunterladen… ' + mb + ' MB');
         }
     }
 
-    // Chunks zu einem ArrayBuffer zusammenführen
+    // Chunks zusammenführen
     const zipBuffer = new Uint8Array(received);
     let offset = 0;
     for (const chunk of chunks) { zipBuffer.set(chunk, offset); offset += chunk.length; }
 
     onProgress && onProgress(62, 'Entpacke ZIP…');
 
-    // ── ZIP entpacken (fflate via CDN, einmalig laden) ──────
+    // fflate einmalig laden (ZIP-Bibliothek, ~40 KB)
     if (!window._fflate) {
         await new Promise((resolve, reject) => {
             const s = document.createElement('script');
             s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
             s.onload = resolve;
-            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden (kein Internet?)'));
+            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden'));
             document.head.appendChild(s);
         });
-        window._fflate = fflate; // eslint-disable-line no-undef
+        window._fflate = fflate;
     }
 
     const unzipped = await new Promise((resolve, reject) => {
@@ -504,33 +508,26 @@ async function downloadVoiceZip(voice, onProgress) {
         });
     });
 
-    // ── MP3s in den Browser-Cache schreiben ──────────────────
+    // MP3s in den Browser-Cache schreiben
     const cache = await caches.open(CACHE_PREFIX + voice);
     const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
     const fileCount = files.length;
     let done = 0;
 
     for (const [zipPath, data] of files) {
-        // Dateiname aus ZIP-Pfad extrahieren (letztes Segment)
         const filename = zipPath.split('/').pop();
-        // Cache-Key muss mit buildAudioUrl übereinstimmen:
-        // ./data/audio/<voice>/slow/<filename>
-        const cacheUrl = `${AUDIO_BASE}/${voice}/slow/${encodeURIComponent(filename)}`;
-
+        // Cache-Key muss mit buildAudioUrl übereinstimmen
+        const cacheUrl = AUDIO_BASE + '/' + voice + '/slow/' + encodeURIComponent(filename);
         const blob = new Blob([data], { type: 'audio/mpeg' });
-        const fakeResponse = new Response(blob, {
-            headers: { 'Content-Type': 'audio/mpeg' }
-        });
-        await cache.put(cacheUrl, fakeResponse);
-
+        await cache.put(cacheUrl, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg' } }));
         done++;
-        const pct = 62 + Math.round(done / fileCount * 38); // 62–100%
-        if (done % 50 === 0 || done === fileCount) {
-            onProgress && onProgress(pct, `Speichere… ${done} / ${fileCount} Dateien`);
+        if (done % 100 === 0 || done === fileCount) {
+            const pct = 62 + Math.round(done / fileCount * 38);
+            onProgress && onProgress(pct, 'Speichere… ' + done + ' / ' + fileCount + ' Dateien');
         }
     }
 
-    onProgress && onProgress(100, `Fertig! ${fileCount} Dateien gespeichert.`);
+    onProgress && onProgress(100, 'Fertig! ' + fileCount + ' Dateien gespeichert.');
     return fileCount;
 }
 
@@ -2225,16 +2222,19 @@ function updateVoiceList() {
         const name = document.createElement('div');
         name.className = 'name';
         name.textContent = voiceName + ' (MP3)';
+        if (state.settings.githubVoiceZh === voiceName) {
+            name.textContent += ' ' + translate('voiceActiveSuffix');
+        }
 
-        // Status: gecacht oder nicht
+        // Cache-Status (wird asynchron befüllt)
         const meta = document.createElement('div');
         meta.className = 'meta';
         meta.textContent = 'Prüfe Cache…';
         isVoiceCached(voiceName).then(cached => {
-            meta.textContent = cached ? '✅ Lokal gespeichert' : '☁️ Noch nicht geladen';
+            meta.textContent = cached ? '✅ Lokal gespeichert' : '☁️ Noch nicht heruntergeladen';
         });
 
-        // Fortschrittsanzeige (zunächst versteckt)
+        // Fortschrittszeile (zunächst versteckt)
         const progress = document.createElement('div');
         progress.className = 'meta';
         progress.style.display = 'none';
@@ -2243,46 +2243,38 @@ function updateVoiceList() {
         const actions = document.createElement('div');
         actions.className = 'actions';
 
-        // ▶ Probehören
         const btnPreview = document.createElement('button');
         btnPreview.className = 'btn ghost';
         btnPreview.textContent = '▶ Probehören';
         btnPreview.onclick = () => playPreviewAudio(voiceName, 'slow', 'sentences');
 
-        // ⬇ Herunterladen
         const btnDownload = document.createElement('button');
         btnDownload.className = 'btn ghost';
         btnDownload.textContent = '⬇ Herunterladen';
         btnDownload.onclick = async () => {
-            btnDownload.disabled = true;
-            btnPick.disabled = true;
-            btnPreview.disabled = true;
+            [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = true);
             progress.style.display = '';
             try {
                 const count = await downloadVoiceZip(voiceName, (pct, text) => {
-                    progress.textContent = `${pct}% – ${text}`;
+                    progress.textContent = pct + '% – ' + text;
                 });
-                meta.textContent = `✅ Lokal gespeichert (${count} Dateien)`;
+                meta.textContent = '✅ Lokal gespeichert (' + count + ' Dateien)';
                 progress.style.display = 'none';
             } catch (e) {
-                progress.textContent = `❌ Fehler: ${e.message}`;
+                progress.textContent = '❌ Fehler: ' + e.message;
             } finally {
-                btnDownload.disabled = false;
-                btnPick.disabled = false;
-                btnPreview.disabled = false;
+                [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = false);
             }
         };
 
-        // 🗑 Cache löschen
         const btnDelete = document.createElement('button');
         btnDelete.className = 'btn ghost';
         btnDelete.textContent = '🗑 Cache löschen';
         btnDelete.onclick = async () => {
             await deleteVoiceCache(voiceName);
-            meta.textContent = '☁️ Noch nicht geladen';
+            meta.textContent = '☁️ Noch nicht heruntergeladen';
         };
 
-        // ✓ Übernehmen
         const btnPick = document.createElement('button');
         btnPick.className = 'btn';
         btnPick.textContent = '✓ Übernehmen';
@@ -2292,11 +2284,6 @@ function updateVoiceList() {
             saveSettings();
             closeVoices();
         };
-
-        // Aktive Stimme markieren
-        if (state.settings.githubVoiceZh === voiceName) {
-            name.textContent += ` ${translate('voiceActiveSuffix')}`;
-        }
 
         actions.appendChild(btnPreview);
         actions.appendChild(btnDownload);
