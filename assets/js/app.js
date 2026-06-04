@@ -369,8 +369,8 @@ const CACHE_PREFIX = 'fc-audio-';
 
 // ZIP-Dateien werden als GitHub Release Assets gehostet
 // Release-Tag bei Bedarf hier anpassen (z.B. 'audio-v2')
-// ZIPs werden von Cloudflare R2 geladen (kein CORS-Problem)
-const RELEASE_BASE = 'https://pub-368b54c806bb458385aedf5cd96ac804.r2.dev';
+// jsDelivr liefert GitHub Release Assets mit CORS-Headern aus
+const RELEASE_BASE = 'https://cdn.jsdelivr.net/gh/luoboteanjing-netizen/Flashcards-Chinesisch@audio-v1';
 
 function buildZipUrl(voice) {
     return `${RELEASE_BASE}/${voice}_slow.zip`;
