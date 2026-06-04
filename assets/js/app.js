@@ -369,8 +369,8 @@ const CACHE_PREFIX = 'fc-audio-';
 
 // ZIP-Dateien werden als GitHub Release Assets gehostet
 // Release-Tag bei Bedarf hier anpassen (z.B. 'audio-v2')
-// jsDelivr liefert GitHub Release Assets mit CORS-Headern aus
-const RELEASE_BASE = 'https://cdn.jsdelivr.net/gh/luoboteanjing-netizen/Flashcards-Chinesisch@audio-v1';
+// ZIPs liegen direkt im Repo unter data/audio/
+const RELEASE_BASE = 'https://cdn.jsdelivr.net/gh/luoboteanjing-netizen/Flashcards-Chinesisch@main/data/audio';
 
 function buildZipUrl(voice) {
     return `${RELEASE_BASE}/${voice}_slow.zip`;
