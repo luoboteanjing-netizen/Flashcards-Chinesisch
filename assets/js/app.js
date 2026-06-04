@@ -360,6 +360,181 @@ const TRANSLATIONS = {
 };
 const $ = (s) => document.querySelector(s);
 
+/* ============================ GITHUB AUDIO CONFIG ======================= */
+// Audio files live next to the CSV inside `data/audio` for easier syncing
+const AUDIO_BASE = './data/audio';
+const GITHUB_VOICES = ['xiaoxiao', 'yunjian'];
+const GITHUB_SPEEDS = ['slow'];
+const CACHE_PREFIX = 'fc-audio-';
+// ZIP-Dateiname pro Stimme: data/audio/<voice>_slow.zip
+function buildZipUrl(voice) {
+    return `${AUDIO_BASE}/${voice}_slow.zip`;
+}
+
+function sanitizeFileName(fn) {
+    if (!fn) return null;
+    let name = fn.trim();
+    name = name.replace(/^\/+/, '');
+    if (!/\.mp3$/i.test(name)) name += '.mp3';
+    return name;
+}
+
+function buildAudioUrl(entry, voice, speed, kind) {
+    if (!entry || !entry.audio) return null;
+
+    // Determine raw filename from CSV (may already include suffix and .mp3)
+    let raw = kind === 'words' ? entry.audio.wordFile : entry.audio.sentFile;
+    if (!raw) return null;
+    raw = raw.trim();
+
+    // If CSV contains a full filename (ends with .mp3) use it directly.
+    // Otherwise, treat value as base id and append suffixes.
+    let filename = raw;
+    if (!/\.mp3$/i.test(raw)) {
+        // not ending with .mp3 — append suffix based on kind
+        const suffix = kind === 'words' ? '_wrd.mp3' : '_snt.mp3';
+        filename = raw + suffix;
+    }
+
+    // sanitize and ensure no leading slashes
+    filename = sanitizeFileName(filename);
+    if (!filename) return null;
+
+    // Files are stored directly in the voice/speed folder (no separate words/sentences subfolder)
+    return `${AUDIO_BASE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
+}
+
+function playPreviewAudio(voice, speed, kind) {
+    // Fester Beispieleintrag – unabhängig von laufendem Training
+    const previewEntry = {
+        audio: {
+            wordFile: 'L01-1-04_wrd.mp3',
+            sentFile: 'L01-1-04_snt.mp3'
+        }
+    };
+    const url = buildAudioUrl(previewEntry, voice, speed, kind);
+    if (!url) {
+        console.warn('Keine Vorschau-URL erzeugt.');
+        return;
+    }
+    const a = new Audio(url);
+    a.play().catch(e => console.warn('Play preview failed', e));
+}
+
+// Prüft ob eine Stimme bereits im Cache vorhanden ist (mind. 1 MP3)
+async function isVoiceCached(voice) {
+    try {
+        const cache = await caches.open(CACHE_PREFIX + voice);
+        const keys = await cache.keys();
+        return keys.length > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
+// Löscht alle gecachten MP3s einer Stimme
+async function deleteVoiceCache(voice) {
+    try {
+        await caches.delete(CACHE_PREFIX + voice);
+    } catch (e) {
+        console.warn('Cache löschen fehlgeschlagen', e);
+    }
+}
+
+// Lädt die ZIP für eine Stimme von GitHub, entpackt sie und
+// speichert alle MP3s im Browser-Cache.
+// onProgress(percent, statusText) wird während des Downloads aufgerufen.
+async function downloadVoiceZip(voice, onProgress) {
+    const zipUrl = buildZipUrl(voice);
+    onProgress && onProgress(0, 'Verbinde…');
+
+    // ── ZIP herunterladen ────────────────────────────────────
+    let response;
+    try {
+        response = await fetch(zipUrl);
+    } catch (e) {
+        throw new Error(`Netzwerkfehler: ${e.message}`);
+    }
+    if (!response.ok) {
+        throw new Error(`ZIP nicht gefunden (${response.status}): ${zipUrl}`);
+    }
+
+    // Fortschritt beim Herunterladen verfolgen
+    const contentLength = response.headers.get('Content-Length');
+    const total = contentLength ? parseInt(contentLength, 10) : null;
+    let received = 0;
+    const chunks = [];
+    const reader = response.body.getReader();
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total) {
+            const pct = Math.round(received / total * 60); // 0–60% = Download
+            onProgress && onProgress(pct, `Herunterladen… ${Math.round(received/1024/1024*10)/10} MB`);
+        } else {
+            onProgress && onProgress(10, `Herunterladen… ${Math.round(received/1024/1024*10)/10} MB`);
+        }
+    }
+
+    // Chunks zu einem ArrayBuffer zusammenführen
+    const zipBuffer = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) { zipBuffer.set(chunk, offset); offset += chunk.length; }
+
+    onProgress && onProgress(62, 'Entpacke ZIP…');
+
+    // ── ZIP entpacken (fflate via CDN, einmalig laden) ──────
+    if (!window._fflate) {
+        await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
+            s.onload = resolve;
+            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden (kein Internet?)'));
+            document.head.appendChild(s);
+        });
+        window._fflate = fflate; // eslint-disable-line no-undef
+    }
+
+    const unzipped = await new Promise((resolve, reject) => {
+        window._fflate.unzip(zipBuffer, (err, result) => {
+            if (err) reject(err); else resolve(result);
+        });
+    });
+
+    // ── MP3s in den Browser-Cache schreiben ──────────────────
+    const cache = await caches.open(CACHE_PREFIX + voice);
+    const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
+    const fileCount = files.length;
+    let done = 0;
+
+    for (const [zipPath, data] of files) {
+        // Dateiname aus ZIP-Pfad extrahieren (letztes Segment)
+        const filename = zipPath.split('/').pop();
+        // Cache-Key muss mit buildAudioUrl übereinstimmen:
+        // ./data/audio/<voice>/slow/<filename>
+        const cacheUrl = `${AUDIO_BASE}/${voice}/slow/${encodeURIComponent(filename)}`;
+
+        const blob = new Blob([data], { type: 'audio/mpeg' });
+        const fakeResponse = new Response(blob, {
+            headers: { 'Content-Type': 'audio/mpeg' }
+        });
+        await cache.put(cacheUrl, fakeResponse);
+
+        done++;
+        const pct = 62 + Math.round(done / fileCount * 38); // 62–100%
+        if (done % 50 === 0 || done === fileCount) {
+            onProgress && onProgress(pct, `Speichere… ${done} / ${fileCount} Dateien`);
+        }
+    }
+
+    onProgress && onProgress(100, `Fertig! ${fileCount} Dateien gespeichert.`);
+    return fileCount;
+}
+
+
 /* ============================ GLOBAL STATE =============================== */
 
 const state = {
@@ -618,6 +793,15 @@ function parseCSV(text) {
     const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
     if (lines.length < 2) return;
 
+    const headerCols = parseCSVLine(lines[0]).map(h => (h || "").replace(/\uFEFF/g, "").trim().toLowerCase());
+    const headerIndex = (name, fallback) => {
+        const idx = headerCols.indexOf(name.toLowerCase());
+        return idx !== -1 ? idx : fallback;
+    };
+
+    const audioWortIdx = headerIndex("Audio Wort", 9);
+    const audioSatzIdx = headerIndex("Audio Satz", 10);
+
     for (let i = 1; i < lines.length; i++) {
 
         const cols = parseCSVLine(lines[i]);
@@ -645,7 +829,11 @@ function parseCSV(text) {
                 zh: (cols[6] || "").trim()
             },
             id: (cols[7] || "").trim(),
-            lesson
+            lesson,
+            audio: {
+                wordFile: (cols[audioWortIdx] || "").trim(),
+                sentFile: (cols[audioSatzIdx] || "").trim()
+            }
         };
 
         // ✅ Insert lesson & entry into the map
@@ -1728,6 +1916,7 @@ function openSearchPanel() {
 function closeSearchPanel() {
     $("#searchPanel").classList.add("hidden");
     $("#searchOverlay")?.classList.remove("active");
+	
 }
 
 function getAllCards() {
@@ -1804,18 +1993,17 @@ function highlightSimple(original, query) {
     const regex = new RegExp(escapedQuery.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
     return escapeHtml(original).replace(regex, match => `<mark>${match}</mark>`);
 }
-/* ============================ search CSV ============================ */
 
-async function searchCSV(query) {
+function searchCSV(query) {
     query = (query || "").trim();
     const resultsBox = $("#searchResults");
     if (!resultsBox) return;
-
     if (!query) {
         resultsBox.innerHTML = `<div class="search-hint">${translate('searchHint')}</div>`;
         return;
     }
 
+    // Bestimme gewählte Suche-Language (DE oder ZH)
     const langDeBtn = document.querySelector('#searchLangDe');
     const lang = (langDeBtn && langDeBtn.classList.contains('active')) ? 'de' : 'zh';
 
@@ -1841,10 +2029,8 @@ async function searchCSV(query) {
             const sentZh = (entry.sent.zh || '').toLowerCase();
             const pyWordRaw = entry.word.py || '';
             const pySentRaw = entry.sent.py || '';
-
             const pyWord = normalizeRemoveDiacritics(pyWordRaw).replace(/\s+/g, ' ').trim();
             const pySent = normalizeRemoveDiacritics(pySentRaw).replace(/\s+/g, ' ').trim();
-
             const pyWordNoSpace = pyWord.replace(/\s+/g, '');
             const pySentNoSpace = pySent.replace(/\s+/g, '');
 
@@ -1853,10 +2039,9 @@ async function searchCSV(query) {
 
             if (!isWordMatch) {
                 const queryTokens = qNorm.split(' ').filter(Boolean);
-                const tokenMatch = queryTokens.length > 0 &&
-                    queryTokens.every(token =>
-                        pyWord.includes(token) || pyWordNoSpace.includes(token)
-                    );
+                const tokenMatch = queryTokens.length > 0 && queryTokens.every(token =>
+                    pyWord.includes(token) || pyWordNoSpace.includes(token)
+                );
                 if (tokenMatch) isWordMatch = true;
             }
 
@@ -1866,10 +2051,9 @@ async function searchCSV(query) {
 
                 if (!isSentenceMatch) {
                     const queryTokens = qNorm.split(' ').filter(Boolean);
-                    const tokenMatch = queryTokens.length > 0 &&
-                        queryTokens.every(token =>
-                            pySent.includes(token) || pySentNoSpace.includes(token)
-                        );
+                    const tokenMatch = queryTokens.length > 0 && queryTokens.every(token =>
+                        pySent.includes(token) || pySentNoSpace.includes(token)
+                    );
                     if (tokenMatch) isSentenceMatch = true;
                 }
             }
@@ -1884,58 +2068,12 @@ async function searchCSV(query) {
 
     const matched = [...matchedWord, ...matchedSentence];
 
-    // ✅ 1. OFFLINE TREFFER → WIE BISHER
-    if (matched.length) {
-        renderResults(resultsBox, matched, query, qRaw, lang, false);
-        return;
-    }
-
-    // ✅ 2. ONLINE FALLBACK
-    const onlineEnabled = document.querySelector('#onlineToggle')?.checked;
-
-    if (!onlineEnabled || !navigator.onLine) {
+    if (!matched.length) {
         resultsBox.innerHTML = `<div class="search-empty">${translate('searchEmptyResults')}</div>`;
         return;
     }
 
-    // Ladeanzeige
-    resultsBox.innerHTML = `<div class="search-hint">🌐 Online Suche...</div>`;
-
-    try {
-        const onlineResult = await translateOnlineCached(query);
-
-        if (!onlineResult) {
-            resultsBox.innerHTML = `<div class="search-empty">${translate('searchEmptyResults')}</div>`;
-            return;
-        }
-
-        // Fake-Entry im gleichen Format erzeugen
-        const entry = {
-            id: "online",
-            lesson: "🌐",
-            word: {
-                de: onlineResult.de,
-                zh: onlineResult.zh,
-                py: onlineResult.py
-            },
-            sent: {
-                de: "-",
-                zh: "-",
-                py: "-"
-            }
-        };
-
-        renderResults(resultsBox, [entry], query, qRaw, lang, true);
-
-    } catch (err) {
-        console.error(err);
-        resultsBox.innerHTML = `<div class="search-empty">Online Fehler</div>`;
-    }
-}
-
-function renderResults(resultsBox, matched, query, qRaw, lang, isOnline) {
     resultsBox.innerHTML = matched.map((entry) => {
-
         const deWordRaw = entry.word.de || '-';
         const pyWordRaw = entry.word.py || '-';
         const zhWordRaw = entry.word.zh || '-';
@@ -1957,53 +2095,38 @@ function renderResults(resultsBox, matched, query, qRaw, lang, isOnline) {
         const sentLineZh = lang === 'zh' ? `<strong>${zhSent}</strong>` : zhSent;
 
         return `
-        <div class="search-result">
-            <div class="search-result-header">
-                <span>${isOnline ? "🌐 Online Ergebnis" : escapeHtml(entry.lesson || '–')}</span>
+            <div class="search-result" data-entry-id="${escapeHtml(entry.id)}">
+                <div class="search-result-header">
+                    <span class="search-result-lesson">${escapeHtml(entry.lesson || '–')}</span>
+                    <span class="search-result-id">${escapeHtml(entry.id || '–')}</span>
+                </div>
+
+                <div class="search-result-main">
+                <div>
+                    ${wordLine}
+                    ${entry.pos ? `<span class="search-pos">(${escapeHtml(entry.pos)})</span>` : ''}
+                </div>
             </div>
 
-            <div><strong>${wordLine}</strong></div>
-            <div>${pyWord}</div>
-            <div>${wordLineZh}</div>
-        </div>`;
+                <div class="search-result-line">${sentLine}</div>
+                <div class="search-result-line">${pyWord}</div>
+                <div class="search-result-line">${pySent}</div>
+                <div class="search-result-line">${wordLineZh}</div>
+                <div class="search-result-line">${sentLineZh}</div>
+            </div>`;
     }).join("");
-}
 
-async function translateOnlineCached(text) {
-    const key = "trans_" + text;
-
-    // Cache
-    const cached = localStorage.getItem(key);
-    if (cached) return JSON.parse(cached);
-
-    const result = await translateOnline(text);
-
-    if (result) {
-        localStorage.setItem(key, JSON.stringify(result));
-    }
-
-    return result;
-}
-
-async function translateOnline(text) {
-    const proxy = "https://api.codetabs.com/v1/proxy?quest=";
-    
-    const googleUrl = 
-        `https://translate.googleapis.com/translate_a/single` +
-        `?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`;
-
-    const finalUrl = proxy + encodeURIComponent(googleUrl);
-
-    const res = await fetch(finalUrl);
-    const data = await res.json();
-
-    const zh = data[0].map(item => item[0]).join("");
-
-    return {
-        de: text,
-        zh: zh,
-        py: getPinyin(zh)
-    };
+    resultsBox.querySelectorAll(".search-result").forEach((node) => {
+        node.addEventListener("click", () => {
+            const id = node.dataset.entryId;
+            const selected = matched.find((entry) => entry.id === id);
+            if (selected) {
+                setCard(selected);
+                closeSearchPanel();
+                doReveal();
+            }
+        });
+    });
 }
 
 
@@ -2020,70 +2143,173 @@ function updateVoiceList() {
     );
 
     if (!list.length) {
-        box.innerHTML = `<div>${translate("noVoicesFound")}</div>`;
+        const emptyMessage = document.createElement('div');
+        emptyMessage.textContent = translate("noVoicesFound");
+        box.appendChild(emptyMessage);
+    } else {
+        list.forEach(v => {
+            const row = document.createElement("div");
+            row.className = "voice";
+
+            const name = document.createElement("div");
+            name.className = "name";
+            name.textContent = v.name || translate("namelessVoice");
+
+            const meta = document.createElement("div");
+            meta.className = "meta";
+            meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
+
+            const actions = document.createElement("div");
+            actions.className = "actions";
+
+            const btnTest = document.createElement("button");
+            btnTest.className = "btn ghost";
+            btnTest.textContent = "▶ Probehören";
+
+            btnTest.onclick = () => {
+                const u = new SpeechSynthesisUtterance(
+                    state.voicePanelTarget === "zh" ? " 我很高兴见到你。" : "Dies ist ein Test."
+                );
+                u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
+                u.voice = v;
+                speechSynthesis.cancel();
+                speechSynthesis.speak(u);
+            };
+
+            const btnPick = document.createElement("button");
+            btnPick.className = "btn";
+            btnPick.textContent = "✓ Übernehmen";
+
+            btnPick.onclick = () => {
+                if (state.voicePanelTarget === "zh") {
+                    state.browserVoice.zh = v;
+                    state.settings.browserVoiceZh = v.name || v.voiceURI;
+                } else {
+                    state.browserVoice.de = v;
+                    state.settings.browserVoiceDe = v.name || v.voiceURI;
+                }
+                saveSettings();
+                closeVoices();
+            };
+
+            const active = state.voicePanelTarget === "zh" ? state.browserVoice.zh : state.browserVoice.de;
+            if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
+                name.textContent += ` ${translate("voiceActiveSuffix")}`;
+            }
+
+            actions.appendChild(btnTest);
+            actions.appendChild(btnPick);
+
+            row.appendChild(name);
+            row.appendChild(meta);
+            row.appendChild(actions);
+
+            box.appendChild(row);
+        });
+    }
+
+    // --- GitHub MP3 voices (custom) ---
+     if (state.voicePanelTarget !== "zh") {
         return;
     }
 
-list.forEach(v => {
-    const row = document.createElement("div");
-    row.className = "voice";
+    const ghHeader = document.createElement('div');
+    ghHeader.className = 'dbg-section';
+    ghHeader.innerHTML = '<div class="h">GitHub Stimmen (MP3)</div>';
+    box.appendChild(ghHeader);
 
-    const name = document.createElement("div");
-    name.className = "name";
-    name.textContent = v.name || translate("namelessVoice");
+    GITHUB_VOICES.forEach((voiceName) => {
+        const row = document.createElement('div');
+        row.className = 'voice';
 
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = voiceName + ' (MP3)';
 
-    const actions = document.createElement("div");
-    actions.className = "actions";
+        // Status: gecacht oder nicht
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = 'Prüfe Cache…';
+        isVoiceCached(voiceName).then(cached => {
+            meta.textContent = cached ? '✅ Lokal gespeichert' : '☁️ Noch nicht geladen';
+        });
 
-    const btnPick = document.createElement("button");
-    btnPick.className = "btn";
-    btnPick.textContent = translate("pickVoice");
+        // Fortschrittsanzeige (zunächst versteckt)
+        const progress = document.createElement('div');
+        progress.className = 'meta';
+        progress.style.display = 'none';
+        progress.style.color = 'var(--accent)';
 
-    btnPick.onclick = () => {
-        if (state.voicePanelTarget === "zh") {
-            state.browserVoice.zh = v;
-            state.settings.browserVoiceZh = v.name || v.voiceURI;
-        } else {
-            state.browserVoice.de = v;
-            state.settings.browserVoiceDe = v.name || v.voiceURI;
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        // ▶ Probehören
+        const btnPreview = document.createElement('button');
+        btnPreview.className = 'btn ghost';
+        btnPreview.textContent = '▶ Probehören';
+        btnPreview.onclick = () => playPreviewAudio(voiceName, 'slow', 'sentences');
+
+        // ⬇ Herunterladen
+        const btnDownload = document.createElement('button');
+        btnDownload.className = 'btn ghost';
+        btnDownload.textContent = '⬇ Herunterladen';
+        btnDownload.onclick = async () => {
+            btnDownload.disabled = true;
+            btnPick.disabled = true;
+            btnPreview.disabled = true;
+            progress.style.display = '';
+            try {
+                const count = await downloadVoiceZip(voiceName, (pct, text) => {
+                    progress.textContent = `${pct}% – ${text}`;
+                });
+                meta.textContent = `✅ Lokal gespeichert (${count} Dateien)`;
+                progress.style.display = 'none';
+            } catch (e) {
+                progress.textContent = `❌ Fehler: ${e.message}`;
+            } finally {
+                btnDownload.disabled = false;
+                btnPick.disabled = false;
+                btnPreview.disabled = false;
+            }
+        };
+
+        // 🗑 Cache löschen
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn ghost';
+        btnDelete.textContent = '🗑 Cache löschen';
+        btnDelete.onclick = async () => {
+            await deleteVoiceCache(voiceName);
+            meta.textContent = '☁️ Noch nicht geladen';
+        };
+
+        // ✓ Übernehmen
+        const btnPick = document.createElement('button');
+        btnPick.className = 'btn';
+        btnPick.textContent = '✓ Übernehmen';
+        btnPick.onclick = () => {
+            state.settings.githubVoiceZh = voiceName;
+            state.settings.githubSpeedZh = 'slow';
+            saveSettings();
+            closeVoices();
+        };
+
+        // Aktive Stimme markieren
+        if (state.settings.githubVoiceZh === voiceName) {
+            name.textContent += ` ${translate('voiceActiveSuffix')}`;
         }
-        saveSettings();
-        closeVoices();
-    };
 
-    const btnTest = document.createElement("button");
-    btnTest.className = "btn ghost";
-    btnTest.textContent = translate("testVoice");
+        actions.appendChild(btnPreview);
+        actions.appendChild(btnDownload);
+        actions.appendChild(btnDelete);
+        actions.appendChild(btnPick);
 
-    btnTest.onclick = () => {
-        const u = new SpeechSynthesisUtterance(
-            state.voicePanelTarget === "zh" ? "这是一个测试。" : "Dies ist ein Test."
-        );
-        u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
-        u.voice = v;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(u);
-    };
+        row.appendChild(name);
+        row.appendChild(meta);
+        row.appendChild(progress);
+        row.appendChild(actions);
 
-    // Aktive Stimme markieren
-    const active = state.voicePanelTarget === "zh" ? state.browserVoice.zh : state.browserVoice.de;
-    if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
-        name.textContent += ` ${translate("voiceActiveSuffix")}`;
-    }
-
-    actions.appendChild(btnPick);
-    actions.appendChild(btnTest);
-
-    row.appendChild(name);
-    row.appendChild(meta);
-    row.appendChild(actions);
-
-    box.appendChild(row);
-});
+        box.appendChild(row);
+    });
 }
 
 
@@ -2099,10 +2325,21 @@ function playQuestion() {
         );
     } else {
         speechSynthesis.cancel();
+        const ghVoice = state.settings.githubVoiceZh;
+        const ghSpeed = state.settings.githubSpeedZh || 'normal';
+        if (ghVoice) {
+            const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
+            const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
+            (async () => {
+                if (wUrl) await playAudioResource(wUrl);
+                if (sUrl) await new Promise(r => setTimeout(r, 400));
+                if (sUrl) await playAudioResource(sUrl);
+            })();
+            return;
+        }
+
         ttsSpeak(state.current.word.zh, "zh");
-        setTimeout(() =>
-            ttsSpeak(state.current.sent.zh, "zh"),
-        600);
+        setTimeout(() => ttsSpeak(state.current.sent.zh, "zh"), 600);
     }
 }
 
@@ -2110,10 +2347,21 @@ function playAnswer() {
     if (!state.current) return;
 
     if (state.mode === "de2zh") {
+        const ghVoice = state.settings.githubVoiceZh;
+        const ghSpeed = state.settings.githubSpeedZh || 'normal';
+        if (ghVoice) {
+            const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
+            const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
+            (async () => {
+                if (wUrl) await playAudioResource(wUrl);
+                if (sUrl) await new Promise(r => setTimeout(r, 400));
+                if (sUrl) await playAudioResource(sUrl);
+            })();
+            return;
+        }
+
         ttsSpeak(state.current.word.zh, "zh");
-        setTimeout(() =>
-            ttsSpeak(state.current.sent.zh, "zh"),
-        600);
+        setTimeout(() => ttsSpeak(state.current.sent.zh, "zh"), 600);
     } else {
         playSequence(
             state.current.word.de, "de",
@@ -2204,10 +2452,31 @@ function ensurePoolForAutoplay() {
 }
 
 
-function speakPair(word, sent, langKey, done) {
+async function speakPair(word, sent, langKey, done) {
 
     if (!state.autoplay.on) return;
 
+    const ghVoice = state.settings.githubVoiceZh;
+    const ghSpeed = state.settings.githubSpeedZh || 'slow';
+
+    // ── MP3-Pfad wenn GitHub-Stimme gewählt und Chinesisch ──
+    if (ghVoice && langKey === 'zh') {
+        const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
+        const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
+
+        if (wUrl) await playAudioResource(wUrl);
+        if (!state.autoplay.on) return;
+        if (sUrl) {
+            await new Promise(r => setTimeout(r, 400));
+            if (!state.autoplay.on) return;
+            await playAudioResource(sUrl);
+        }
+        if (!state.autoplay.on) return;
+        done && done();
+        return;
+    }
+
+    // ── Fallback: Browser-TTS ────────────────────────────────
     const u1 = buildUtterance(word, langKey);
 
     u1.onend = () => {
@@ -2240,7 +2509,22 @@ function playChineseOnReveal(entry) {
 
     speechSynthesis.cancel();
 
-    // Wort zuerst
+    const ghVoice = state.settings.githubVoiceZh;
+    const ghSpeed = state.settings.githubSpeedZh || 'normal';
+    if (ghVoice) {
+        // play word then sentence from cached/network mp3s
+        const wUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'words');
+        const sUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'sentences');
+
+        (async () => {
+            if (wUrl) await playAudioResource(wUrl);
+            if (sUrl) await new Promise(r => setTimeout(r, 600));
+            if (sUrl) await playAudioResource(sUrl);
+        })();
+        return;
+    }
+
+    // Fallback: browser TTS
     ttsSpeak(entry.word.zh, "zh");
 
     // Satz leicht verzögert danach
@@ -2249,7 +2533,39 @@ function playChineseOnReveal(entry) {
     }, 600);
 }
 
-function autoplayStep() {
+async function playAudioResource(url) {
+    // Hilfsfunktion: spielt einen Blob ab und wartet bis er fertig ist
+    function playBlob(blob) {
+        return new Promise((resolve) => {
+            const obj = URL.createObjectURL(blob);
+            const a = new Audio(obj);
+            a.onended = () => { URL.revokeObjectURL(obj); resolve(); };
+            a.onerror = () => { URL.revokeObjectURL(obj); resolve(); };
+            a.play().catch(() => resolve());
+        });
+    }
+
+    try {
+        // Zuerst im Browser-Cache nachschauen
+        const cached = await caches.match(url);
+        if (cached) {
+            const blob = await cached.blob();
+            await playBlob(blob);
+            return;
+        }
+
+        // Nicht gecacht → vom Server laden
+        const res = await fetch(url);
+        if (res.ok) {
+            const blob = await res.blob();
+            await playBlob(blob);
+        }
+    } catch (e) {
+        console.warn('playAudioResource error', e);
+    }
+}
+
+async function autoplayStep() {
 
     if (!state.autoplay.on) return;
 
@@ -2264,56 +2580,51 @@ function autoplayStep() {
     const qLang = (state.mode === "de2zh") ? "de" : "zh";
     const aLang = (state.mode === "de2zh") ? "zh" : "de";
 
-    ttsPrime(() => {
+    await new Promise(resolve => ttsPrime(resolve));
 
-        speechSynthesis.cancel();
+    speechSynthesis.cancel();
 
-        speakPair(
-            state.current.word[qLang],
-            state.current.sent[qLang],
-            qLang,
+    // Frage abspielen
+    await speakPair(
+        state.current.word[qLang],
+        state.current.sent[qLang],
+        qLang,
+        null
+    );
 
-            () => {
+    if (!state.autoplay.on) return;
 
-                if (!state.autoplay.on) return;
+    // Antwort aufdecken
+    $("#solBox").classList.remove("masked");
 
-                $("#solBox").classList.remove("masked");
+    // Antwort abspielen
+    await speakPair(
+        state.current.word[aLang],
+        state.current.sent[aLang],
+        aLang,
+        null
+    );
 
-                speakPair(
-                    state.current.word[aLang],
-                    state.current.sent[aLang],
-                    aLang,
+    if (!state.autoplay.on) return;
 
-                    () => {
+    // Pause zwischen Karten, dann nächste Karte
+    const t = setTimeout(() => {
 
-                        if (!state.autoplay.on) return;
+        if (!state.autoplay.on) return;
 
-                        const t = setTimeout(() => {
+        if (state.order === "seq") {
+            if (state.idx == null) state.idx = 0;
+            else state.idx = (state.idx + 1) % state.pool.length;
+            setCard(state.pool[state.idx]);
+        } else {
+            setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
+        }
 
-                            if (!state.autoplay.on) return;
+        autoplayStep();
 
-                            if (state.order === "seq") {
-                                if (state.idx == null) state.idx = 0;
-                                else state.idx = (state.idx + 1) % state.pool.length;
+    }, state.autoplay.gapMs);
 
-                                setCard(state.pool[state.idx]);
-                            } else {
-                                setCard(
-                                    state.pool[Math.floor(Math.random() * state.pool.length)]
-                                );
-                            }
-
-                            autoplayStep();
-
-                        }, state.autoplay.gapMs);
-
-                        state.autoplay.timers.push(t);
-                    }
-                );
-            }
-        );
-
-    });
+    state.autoplay.timers.push(t);
 }
 
 
