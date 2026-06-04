@@ -369,7 +369,8 @@ const CACHE_PREFIX = 'fc-audio-';
 
 // ZIP-Dateien werden als GitHub Release Assets gehostet
 // Release-Tag bei Bedarf hier anpassen (z.B. 'audio-v2')
-const RELEASE_BASE = 'https://github.com/luoboteanjing-netizen/Flashcards-Chinesisch/releases/download/audio-v1';
+// ZIPs werden von Cloudflare R2 geladen (kein CORS-Problem)
+const RELEASE_BASE = 'https://pub-368b54c806bb458385aedf5cd96ac804.r2.dev';
 
 function buildZipUrl(voice) {
     return `${RELEASE_BASE}/${voice}_slow.zip`;
@@ -2439,27 +2440,28 @@ function ensurePoolForAutoplay() {
 }
 
 
-async function speakPair(word, sent, langKey, done) {
+function speakPair(word, sent, langKey, done) {
 
-    if (!state.autoplay.on) return;
+    if (!state.autoplay.on) { done && done(); return; }
 
     const ghVoice = state.settings.githubVoiceZh;
     const ghSpeed = state.settings.githubSpeedZh || 'slow';
 
-    // ── MP3-Pfad wenn GitHub-Stimme gewählt und Chinesisch ──
+    // ── MP3-Zweig: GitHub-Stimme und Chinesisch ──────────────
     if (ghVoice && langKey === 'zh') {
-        const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
-        const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
-
-        if (wUrl) await playAudioResource(wUrl);
-        if (!state.autoplay.on) return;
-        if (sUrl) {
-            await new Promise(r => setTimeout(r, 400));
+        (async () => {
+            const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
+            const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
+            if (wUrl) await playAudioResource(wUrl);
             if (!state.autoplay.on) return;
-            await playAudioResource(sUrl);
-        }
-        if (!state.autoplay.on) return;
-        done && done();
+            if (sUrl) {
+                await new Promise(r => setTimeout(r, 400));
+                if (!state.autoplay.on) return;
+                await playAudioResource(sUrl);
+            }
+            if (!state.autoplay.on) return;
+            done && done();
+        })();
         return;
     }
 
@@ -2571,26 +2573,31 @@ async function autoplayStep() {
 
     speechSynthesis.cancel();
 
-    // Frage abspielen
-    await speakPair(
+    // Frage abspielen – warten bis fertig
+    await new Promise(resolve => speakPair(
         state.current.word[qLang],
         state.current.sent[qLang],
         qLang,
-        null
-    );
+        resolve
+    ));
+
+    if (!state.autoplay.on) return;
+
+    // Einstellbares Delay vor der Antwort
+    await new Promise(r => setTimeout(r, state.sentenceDelay || 1000));
 
     if (!state.autoplay.on) return;
 
     // Antwort aufdecken
     $("#solBox").classList.remove("masked");
 
-    // Antwort abspielen
-    await speakPair(
+    // Antwort abspielen – warten bis fertig
+    await new Promise(resolve => speakPair(
         state.current.word[aLang],
         state.current.sent[aLang],
         aLang,
-        null
-    );
+        resolve
+    ));
 
     if (!state.autoplay.on) return;
 
