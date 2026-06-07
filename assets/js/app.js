@@ -1500,6 +1500,25 @@ function setCard(entry, fromHistory = false) {
         $("#solWord").textContent = entry.word.de;
         $("#solSent").textContent = entry.sent.de;
 
+        /* ✅ Hanzi UND Pinyin ausgeblendet → Audio automatisch abspielen */
+        if (!state.showHanzi && !state.showPinyin) {
+            // Wort sofort abspielen
+            const ghVoice = state.settings.githubVoiceZh;
+            const ghSpeed = state.settings.githubSpeedZh || 'slow';
+            if (ghVoice) {
+                const wUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'words');
+                const sUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'sentences');
+                (async () => {
+                    if (wUrl) await playAudioResource(wUrl);
+                    if (sUrl) await new Promise(r => setTimeout(r, 600));
+                    if (sUrl) await playAudioResource(sUrl);
+                })();
+            } else {
+                ttsSpeak(entry.word.zh, "zh");
+                setTimeout(() => ttsSpeak(entry.sent.zh, "zh"), 600);
+            }
+        }
+
         /* ✅ KEIN Wort → kein Delay */
         if (!hasWordZh && !hasWordDe) {
             renderPromptSentence(entry);
@@ -1666,8 +1685,8 @@ function doReveal() {
 		}
 	}
 	
-    // ✅ Beim Aufdecken IMMER Chinesisch abspielen
-	playChineseOnReveal(state.current);
+    // ✅ Beim Aufdecken die Antwort-Sprache abspielen (ZH bei DE→ZH, DE bei ZH→DE)
+    playOnReveal(state.current);
 
 
     // -----------------------------------------
@@ -2762,33 +2781,55 @@ function speakPair(word, sent, langKey, done) {
     speechSynthesis.speak(u1);
 }
 
-function playChineseOnReveal(entry) {
+// Spielt beim Aufdecken die Antwort-Sprache ab:
+// DE→ZH: Chinesisch (Antwort ist ZH)
+// ZH→DE: Deutsch (Antwort ist DE)
+function playOnReveal(entry) {
     if (!entry) return;
 
     speechSynthesis.cancel();
 
-    const ghVoice = state.settings.githubVoiceZh;
-    const ghSpeed = state.settings.githubSpeedZh || 'normal';
-    if (ghVoice) {
-        // play word then sentence from cached/network mp3s
-        const wUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'words');
-        const sUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'sentences');
+    if (state.mode === "de2zh") {
+        // ── Antwort ist Chinesisch ───────────────────────────
+        const ghVoice = state.settings.githubVoiceZh;
+        const ghSpeed = state.settings.githubSpeedZh || 'normal';
+        if (ghVoice) {
+            const wUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'words');
+            const sUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'sentences');
+            (async () => {
+                if (wUrl) await playAudioResource(wUrl);
+                if (sUrl) await new Promise(r => setTimeout(r, 600));
+                if (sUrl) await playAudioResource(sUrl);
+            })();
+            return;
+        }
+        // Fallback: Browser-TTS Chinesisch
+        ttsSpeak(entry.word.zh, "zh");
+        setTimeout(() => ttsSpeak(entry.sent.zh, "zh"), 600);
 
-        (async () => {
-            if (wUrl) await playAudioResource(wUrl);
-            if (sUrl) await new Promise(r => setTimeout(r, 600));
-            if (sUrl) await playAudioResource(sUrl);
-        })();
-        return;
+    } else {
+        // ── Antwort ist Deutsch ──────────────────────────────
+        const ghVoiceDe = state.settings.githubVoiceDe;
+        const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
+        if (ghVoiceDe) {
+            const wUrl = buildAudioUrlDe(entry, ghVoiceDe, ghSpeedDe, 'words');
+            const sUrl = buildAudioUrlDe(entry, ghVoiceDe, ghSpeedDe, 'sentences');
+            (async () => {
+                if (wUrl) await playAudioResource(wUrl);
+                if (sUrl) await new Promise(r => setTimeout(r, 600));
+                if (sUrl) await playAudioResource(sUrl);
+            })();
+            return;
+        }
+        // Fallback: Browser-TTS Deutsch
+        ttsSpeak(entry.word.de, "de");
+        setTimeout(() => ttsSpeak(entry.sent.de, "de"), 600);
     }
+}
 
-    // Fallback: browser TTS
-    ttsSpeak(entry.word.zh, "zh");
-
-    // Satz leicht verzögert danach
-    setTimeout(() => {
-        ttsSpeak(entry.sent.zh, "zh");
-    }, 600);
+// Abwärtskompatibilität – falls irgendwo noch direkt aufgerufen
+function playChineseOnReveal(entry) {
+    playOnReveal(entry);
 }
 
 async function playAudioResource(url) {
