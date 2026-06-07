@@ -363,8 +363,11 @@ const $ = (s) => document.querySelector(s);
 /* ============================ GITHUB AUDIO CONFIG ======================= */
 // Audio files live next to the CSV inside `data/audio` for easier syncing
 const AUDIO_BASE = './data/audio';
+const AUDIO_BASE_DE = './data/audio_de';
 const GITHUB_VOICES = ['xiaoxiao', 'yunjian'];
+const GITHUB_VOICES_DE = ['katja', 'conrad'];
 const GITHUB_SPEEDS = ['slow'];
+const GITHUB_SPEEDS_DE = ['normal'];
 const CACHE_PREFIX = 'fc-audio-';
 
 // ZIP-Dateien werden als GitHub Release Assets gehostet
@@ -409,6 +412,22 @@ function buildAudioUrl(entry, voice, speed, kind) {
     return `${AUDIO_BASE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
 }
 
+function buildAudioUrlDe(entry, voice, speed, kind) {
+    if (!entry || !entry.audio) return null;
+    let raw = kind === 'words' ? entry.audio.wordFile : entry.audio.sentFile;
+    if (!raw) return null;
+    raw = raw.trim();
+    // Dateiname ableiten (gleiche Logik wie ZH, nur anderer Basisordner)
+    let filename = raw;
+    if (!/\.mp3$/i.test(raw)) {
+        const suffix = kind === 'words' ? '_wrd.mp3' : '_snt.mp3';
+        filename = raw + suffix;
+    }
+    filename = sanitizeFileName(filename);
+    if (!filename) return null;
+    return `${AUDIO_BASE_DE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
+}
+
 function playPreviewAudio(voice, speed, kind) {
     // Fester Beispieleintrag – unabhängig von laufendem Training
     const previewEntry = {
@@ -424,6 +443,23 @@ function playPreviewAudio(voice, speed, kind) {
     }
     const a = new Audio(url);
     a.play().catch(e => console.warn('Play preview failed', e));
+}
+
+function playPreviewAudioDe(voice, speed, kind) {
+    // Fester Beispieleintrag – gleiche ID wie beim Chinesischen
+    const previewEntry = {
+        audio: {
+            wordFile: 'L01-1-04_wrd.mp3',
+            sentFile: 'L01-1-04_snt.mp3'
+        }
+    };
+    const url = buildAudioUrlDe(previewEntry, voice, speed, kind);
+    if (!url) {
+        console.warn('Keine DE-Vorschau-URL erzeugt.');
+        return;
+    }
+    const a = new Audio(url);
+    a.play().catch(e => console.warn('Play DE preview failed', e));
 }
 
 // Prüft ob eine Stimme bereits im Cache vorhanden ist
@@ -533,6 +569,104 @@ async function downloadVoiceZip(voice, onProgress) {
 }
 
 
+// Lädt die deutsche ZIP und speichert MP3s im Cache (Ordner audio_de)
+async function downloadVoiceZipDe(voice, onProgress) {
+    const zipUrl = `${RELEASE_BASE}/${voice}_normal.zip`;
+    onProgress && onProgress(0, 'Verbinde…');
+
+    let response;
+    try {
+        response = await fetch(zipUrl);
+    } catch (e) {
+        throw new Error('Netzwerkfehler: ' + e.message);
+    }
+    if (!response.ok) {
+        throw new Error('ZIP nicht gefunden (' + response.status + '): ' + zipUrl);
+    }
+
+    const contentLength = response.headers.get('Content-Length');
+    const total = contentLength ? parseInt(contentLength, 10) : null;
+    let received = 0;
+    const chunks = [];
+    const reader = response.body.getReader();
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        const mb = Math.round(received / 1024 / 1024 * 10) / 10;
+        if (total) {
+            const pct = Math.round(received / total * 60);
+            onProgress && onProgress(pct, 'Herunterladen… ' + mb + ' MB');
+        } else {
+            onProgress && onProgress(10, 'Herunterladen… ' + mb + ' MB');
+        }
+    }
+
+    const zipBuffer = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) { zipBuffer.set(chunk, offset); offset += chunk.length; }
+
+    onProgress && onProgress(62, 'Entpacke ZIP…');
+
+    if (!window._fflate) {
+        await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
+            s.onload = resolve;
+            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden'));
+            document.head.appendChild(s);
+        });
+        window._fflate = fflate;
+    }
+
+    const unzipped = await new Promise((resolve, reject) => {
+        window._fflate.unzip(zipBuffer, (err, result) => {
+            if (err) reject(err); else resolve(result);
+        });
+    });
+
+    const cache = await caches.open(CACHE_PREFIX + 'de-' + voice);
+    const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
+    const fileCount = files.length;
+    let done = 0;
+
+    for (const [zipPath, data] of files) {
+        const filename = zipPath.split('/').pop();
+        const cacheUrl = AUDIO_BASE_DE + '/' + voice + '/normal/' + encodeURIComponent(filename);
+        const blob = new Blob([data], { type: 'audio/mpeg' });
+        await cache.put(cacheUrl, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg' } }));
+        done++;
+        if (done % 100 === 0 || done === fileCount) {
+            const pct = 62 + Math.round(done / fileCount * 38);
+            onProgress && onProgress(pct, 'Speichere… ' + done + ' / ' + fileCount + ' Dateien');
+        }
+    }
+
+    onProgress && onProgress(100, 'Fertig! ' + fileCount + ' Dateien gespeichert.');
+    return fileCount;
+}
+
+async function isVoiceCachedDe(voice) {
+    try {
+        const cache = await caches.open(CACHE_PREFIX + 'de-' + voice);
+        const keys = await cache.keys();
+        return keys.length > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function deleteVoiceCacheDe(voice) {
+    try {
+        await caches.delete(CACHE_PREFIX + 'de-' + voice);
+    } catch (e) {
+        console.warn('DE Cache löschen fehlgeschlagen', e);
+    }
+}
+
+
 /* ============================ GLOBAL STATE =============================== */
 
 const state = {
@@ -583,7 +717,9 @@ const state = {
         browserVoiceZh: null,
         browserVoiceDe: null,
         autoplayGap: 800,
-        resumeIndexByLesson: {}
+        resumeIndexByLesson: {},
+        githubVoiceDe: null,
+        githubSpeedDe: 'normal'
     },
 
     session: {
@@ -2208,6 +2344,93 @@ function updateVoiceList() {
 
     // --- GitHub MP3 voices (custom) ---
      if (state.voicePanelTarget !== "zh") {
+        // --- Deutsche GitHub MP3-Stimmen ---
+        const deHeader = document.createElement('div');
+        deHeader.className = 'dbg-section';
+        deHeader.innerHTML = '<div class="h">GitHub Stimmen DE (MP3)</div>';
+        box.appendChild(deHeader);
+
+        GITHUB_VOICES_DE.forEach((voiceName) => {
+            const row = document.createElement('div');
+            row.className = 'voice';
+
+            const name = document.createElement('div');
+            name.className = 'name';
+            name.textContent = voiceName + ' (MP3)';
+            if (state.settings.githubVoiceDe === voiceName) {
+                name.textContent += ' ' + translate('voiceActiveSuffix');
+            }
+
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.textContent = 'Prüfe Cache…';
+            isVoiceCachedDe(voiceName).then(cached => {
+                meta.textContent = cached ? '✅ Lokal gespeichert' : '☁️ Noch nicht heruntergeladen';
+            });
+
+            const progress = document.createElement('div');
+            progress.className = 'meta';
+            progress.style.display = 'none';
+            progress.style.color = 'var(--accent)';
+
+            const actions = document.createElement('div');
+            actions.className = 'actions';
+
+            const btnPreview = document.createElement('button');
+            btnPreview.className = 'btn ghost';
+            btnPreview.textContent = '▶ Probehören';
+            btnPreview.onclick = () => playPreviewAudioDe(voiceName, 'normal', 'sentences');
+
+            const btnDownload = document.createElement('button');
+            btnDownload.className = 'btn ghost';
+            btnDownload.textContent = '⬇ Herunterladen';
+            btnDownload.onclick = async () => {
+                [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = true);
+                progress.style.display = '';
+                try {
+                    const count = await downloadVoiceZipDe(voiceName, (pct, text) => {
+                        progress.textContent = pct + '% – ' + text;
+                    });
+                    meta.textContent = '✅ Lokal gespeichert (' + count + ' Dateien)';
+                    progress.style.display = 'none';
+                } catch (e) {
+                    progress.textContent = '❌ Fehler: ' + e.message;
+                } finally {
+                    [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = false);
+                }
+            };
+
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'btn ghost';
+            btnDelete.textContent = '🗑 Cache löschen';
+            btnDelete.onclick = async () => {
+                await deleteVoiceCacheDe(voiceName);
+                meta.textContent = '☁️ Noch nicht heruntergeladen';
+            };
+
+            const btnPick = document.createElement('button');
+            btnPick.className = 'btn';
+            btnPick.textContent = '✓ Übernehmen';
+            btnPick.onclick = () => {
+                state.settings.githubVoiceDe = voiceName;
+                state.settings.githubSpeedDe = 'normal';
+                saveSettings();
+                closeVoices();
+            };
+
+            actions.appendChild(btnPreview);
+            actions.appendChild(btnDownload);
+            actions.appendChild(btnDelete);
+            actions.appendChild(btnPick);
+
+            row.appendChild(name);
+            row.appendChild(meta);
+            row.appendChild(progress);
+            row.appendChild(actions);
+
+            box.appendChild(row);
+        });
+
         return;
     }
 
@@ -2307,6 +2530,19 @@ function playQuestion() {
     if (!state.current) return;
 
     if (state.mode === "de2zh") {
+        speechSynthesis.cancel();
+        const ghVoiceDe = state.settings.githubVoiceDe;
+        const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
+        if (ghVoiceDe) {
+            const wUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'words');
+            const sUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'sentences');
+            (async () => {
+                if (wUrl) await playAudioResource(wUrl);
+                if (sUrl) await new Promise(r => setTimeout(r, 400));
+                if (sUrl) await playAudioResource(sUrl);
+            })();
+            return;
+        }
         playSequence(
             state.current.word.de, "de",
             state.current.sent.de, "de"
@@ -2351,6 +2587,19 @@ function playAnswer() {
         ttsSpeak(state.current.word.zh, "zh");
         setTimeout(() => ttsSpeak(state.current.sent.zh, "zh"), 600);
     } else {
+        speechSynthesis.cancel();
+        const ghVoiceDe = state.settings.githubVoiceDe;
+        const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
+        if (ghVoiceDe) {
+            const wUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'words');
+            const sUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'sentences');
+            (async () => {
+                if (wUrl) await playAudioResource(wUrl);
+                if (sUrl) await new Promise(r => setTimeout(r, 400));
+                if (sUrl) await playAudioResource(sUrl);
+            })();
+            return;
+        }
         playSequence(
             state.current.word.de, "de",
             state.current.sent.de, "de"
@@ -2452,6 +2701,26 @@ function speakPair(word, sent, langKey, done) {
         (async () => {
             const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
             const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
+            if (wUrl) await playAudioResource(wUrl);
+            if (!state.autoplay.on) return;
+            if (sUrl) {
+                await new Promise(r => setTimeout(r, 400));
+                if (!state.autoplay.on) return;
+                await playAudioResource(sUrl);
+            }
+            if (!state.autoplay.on) return;
+            done && done();
+        })();
+        return;
+    }
+
+    // ── MP3-Zweig: GitHub-Stimme und Deutsch ─────────────────
+    const ghVoiceDe = state.settings.githubVoiceDe;
+    const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
+    if (ghVoiceDe && langKey === 'de') {
+        (async () => {
+            const wUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'words');
+            const sUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'sentences');
             if (wUrl) await playAudioResource(wUrl);
             if (!state.autoplay.on) return;
             if (sUrl) {
