@@ -1344,19 +1344,23 @@ function hideNavButtons() {
 }
 
 function showNavButtons() {
-    if (!state.trainingOn || state.autoplay.on) return;  // Nur im Training UND nicht im Autoplay zeigen!
-    $("#btnPrev").style.display = "";
-	
-	if (state.browseMode) {
-		$("#btnReveal").style.display = "none";
-	} else {
-		$("#btnReveal").style.display = "";
-	}
-	
-    $("#btnNext").style.display = "";
-	scrollToBottom();
-}
 
+    if ((!state.trainingOn && !state.browseMode) || state.autoplay.on) {
+        return;
+    }
+
+    $("#btnPrev").style.display = "";
+
+    if (state.browseMode) {
+        $("#btnReveal").style.display = "none";
+    } else {
+        $("#btnReveal").style.display = "";
+    }
+
+    $("#btnNext").style.display = "";
+
+    scrollToBottom();
+}
 
 /* ============================ REVEAL / RATING ============================ */
 
