@@ -17,6 +17,22 @@
     <!-- Styles & Script mit Versionierung -->
 	<link id="cssMain" rel="stylesheet" href="./assets/css/style.css">
     <script id="jsMain" src="./assets/js/app.js"></script>
+	<script 
+		data-goatcounter="https://cilong.goatcounter.com/count"
+		async 
+		src="//gc.zgo.at/count.js">
+	</script>	
+	<script>
+	window.addEventListener("load", function () {
+	  if (window.goatcounter) {
+		window.goatcounter.count({
+		  path: '/app-start',
+		  title: 'App gestartet'
+		});
+	  }
+	});
+	</script>
+
 </head>
 
 <body>
@@ -191,6 +207,9 @@
             <div class="stack mt12">
                 <div class="training-group">
                     <button id="btnStart" class="btn primary" data-i18n="trainingStart">Training starten ▶</button>
+					<button id="btnBrowse" class="btn primary large">
+						📖 Karten ansehen
+					</button>
                     <button id="btnAutoplay" class="btn ghost" data-i18n="autoPlay">Autoplay ▶︎</button>
                 </div>
             </div>
