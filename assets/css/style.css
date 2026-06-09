@@ -181,9 +181,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     padding: 7px 10px;
 }
 .btn.toggle.active {
-    background: var(--primary-bg, var(--accent));
-    border-color: var(--primary-border, var(--accent));
-    color: var(--accent-text);
+    background: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-accent-text) !important;
 }
 
 .actions-inline {
@@ -200,6 +200,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .actions-inline .btn {
     flex: 1 1 0;                  /* wichtig: gleichmäßig wachsen + schrumpfen */
     min-width: 0;                 /* erlaubt Schrumpfen unter Inhaltsbreite */
+    background: color-mix(in srgb, var(--color-text) 10%, var(--color-card));
     padding: 8px 8px;            /* etwas mehr vertikales Padding für bessere Höhe */
     font-weight: 600;
     font-size: 14px;
@@ -212,11 +213,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .training-group .btn {
  flex: 1 1 0;
  min-width: 110px;
- width: auto;
  white-space: normal;
+ background: color-mix(in srgb, var(--color-text) 10%, var(--color-card));
  line-height: 1.2;
  padding: 10px;
  text-align: center;
+ font-weight: 600;
 }
 
 .training-group .btn:active {
@@ -227,18 +229,6 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 .training-group .btn.primary:active {
  border-color: var(--primary-border, var(--accent));
-}
-
-#btnAutoplay {
- background: var(--primary-bg, var(--accent)) !important;
- border-color: var(--primary-border, var(--accent)) !important;
- color: var(--accent-text) !important;
-}
-
-#btnAutoplay.primary {
- background: var(--primary-bg, var(--accent)) !important;
- border-color: var(--primary-border, var(--accent)) !important;
- color: var(--accent-text) !important;
 }
 
 /* NEU: Gruppe für Training + Autoplay (unter Sliders) – Flex-Row für nebeneinander */
@@ -1513,9 +1503,9 @@ html, body {
 
 .training-group .btn.active-mode {
 
-    background: var(--color-positive) !important;
-    border-color: var(--color-positive) !important;
-    color: white !important;
+    background: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-accent-text) !important;
 
     box-shadow:
         0 0 0 2px rgba(255,255,255,0.06),
