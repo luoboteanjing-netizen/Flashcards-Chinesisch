@@ -2612,7 +2612,6 @@ if (installButton) {
 	renderModeUI();
 
 	updateTrainingBtn();
-	updateBrowseBtn();
 	updateModeButtons();
 
 	hideNavButtons();  // Buttons initial unsichtbar beim App-Start
