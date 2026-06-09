@@ -1634,7 +1634,7 @@ function startBrowse() {
     if (!state.browseMode) {
 
         stopAutoplayOnUserAction();
-
+		showNavButtons();
         state.trainingOn = false;
         state.browseMode = true;
 
