@@ -1339,7 +1339,7 @@ function prevCard() {
 
 function hideNavButtons() {
     $("#btnPrev").style.display = "none";
-    $("#btnReveal").style.display = "hidden";
+    $("#btnReveal").style.display = "none";
     $("#btnNext").style.display = "none";
 }
 
