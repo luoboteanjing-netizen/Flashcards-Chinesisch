@@ -1847,6 +1847,7 @@ function openVoicesPanelFor(target) {
 
 function closeVoices() {
     $("#voicePanel").classList.add("hidden");
+    document.querySelectorAll(".voice-btn").forEach(btn => btn.classList.remove("active"));
 }
 
 function openSearchPanel() {
@@ -2740,14 +2741,18 @@ if (uiLangSelect) {
         saveSettings();
     });
 
-    document.querySelector("#btnVoiceDe")?.addEventListener("click", () => {
-    
-        openVoicesPanelFor("de");
+    document.querySelector("#btnVoiceDe")?.addEventListener("click", function() {
+        this.classList.add("active");
+        setTimeout(() => {
+            openVoicesPanelFor("de");
+        }, 300);
     });
 
-    document.querySelector("#btnVoiceZh")?.addEventListener("click", () => {
-     
-        openVoicesPanelFor("zh");
+    document.querySelector("#btnVoiceZh")?.addEventListener("click", function() {
+        this.classList.add("active");
+        setTimeout(() => {
+            openVoicesPanelFor("zh");
+        }, 300);
     });
 
     document.querySelector("#btnCloseVoices")?.addEventListener("click", () => {
@@ -2807,13 +2812,19 @@ if (uiLangSelect) {
     /* ============================================================
        MODUS, REIHENFOLGE, AUTOPLAY
        ============================================================ */
-    $("#btnSwapMode").addEventListener("click", () => {
-   
+    $("#btnSwapMode").addEventListener("click", function() {
+        const btn = this;
+        btn.classList.add("active");
+
         state.mode = state.mode === "de2zh" ? "zh2de" : "de2zh";
         state.settings.mode = state.mode;
         saveSettings();
         renderModeUI();
         if (state.current) setCard(state.current);
+
+        setTimeout(() => {
+            btn.classList.remove("active");
+        }, 500);
     });
 
     $("#btnOrderToggle").addEventListener("click", () => {
