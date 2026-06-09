@@ -136,7 +136,7 @@ const TRANSLATIONS = {
         alertImportInvalid: "Ungültiges Format.",
         alertImportError: "Fehler beim Import.",
         csvLoadError: "Fehler beim Laden der CSV.",
-        cardLessonTitle: "Lektion {id}"
+        cardLessonTitle: "Lektion {id}",
 		browseStart: "📖 Karten ansehen",
 		browseStop: "📖 Browse beenden",
 
@@ -212,7 +212,7 @@ const TRANSLATIONS = {
         alertImportInvalid: "Invalid format.",
         alertImportError: "Import failed.",
         csvLoadError: "Error loading CSV.",
-        cardLessonTitle: "Lesson {id}"
+        cardLessonTitle: "Lesson {id}",
 		browseStart: "📖 Browse Cards",
 		browseStop: "📖 Stop Browse",
 
@@ -288,7 +288,7 @@ const TRANSLATIONS = {
         alertImportInvalid: "格式无效。",
         alertImportError: "导入失败。",
         csvLoadError: "加载 CSV 时出错。",
-        cardLessonTitle: "课程 {id}"
+        cardLessonTitle: "课程 {id}",
 		browseStart: "📖 浏览卡片",
 		browseStop: "📖 结束浏览",
 		
@@ -364,7 +364,7 @@ const TRANSLATIONS = {
         alertImportInvalid: "Format invalide.",
         alertImportError: "Échec de l'importation.",
         csvLoadError: "Erreur lors du chargement du CSV.",
-        cardLessonTitle: "Leçon {id}"
+        cardLessonTitle: "Leçon {id}",
 		browseStart: "📖 Parcourir",
 		browseStop: "📖 Arrêter",
 
