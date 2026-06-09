@@ -1352,7 +1352,7 @@ function showNavButtons() {
     $("#btnPrev").style.display = "";
 
 	if (state.browseMode) {
-
+		$("#btnReveal").style.display = "";
 		$("#btnReveal").style.visibility = "hidden";
 		$("#btnReveal").style.pointerEvents = "none";
 
@@ -1634,7 +1634,6 @@ function startBrowse() {
     if (!state.browseMode) {
 
         stopAutoplayOnUserAction();
-		showNavButtons();
         state.trainingOn = false;
         state.browseMode = true;
 
