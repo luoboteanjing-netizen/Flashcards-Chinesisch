@@ -89,7 +89,7 @@ const TRANSLATIONS = {
         settingsVersion: "Version:",
         modeSwitchTitle: "Richtung umschalten",
         orderRandom: "Zufällig",
-		browseStart: "lernen︎",
+		browseStart: "Lernen︎",
 		browseStop: "lernen",
         autoPlay: "Autoplay︎",
         autoPlayStop: "Autoplay",
@@ -1620,7 +1620,7 @@ function startTraining() {
 		$("#btnReveal").style.pointerEvents = "";
 		$("#btnReveal").style.opacity = "1";
 		
-        updateTrainingBtn();
+        updateModeButtons();
         showNavButtons();  // Buttons anzeigen beim Training-Start
         scrollToBottom();
 
@@ -1664,8 +1664,7 @@ function startBrowse() {
 
         setCard(state.pool[state.idx]);
 
-        updateTrainingBtn();
-        updateBrowseBtn();
+        updateModeButtons();
 
         showNavButtons();
 
@@ -1695,6 +1694,7 @@ if (state.current && state.current.lesson && state.idx !== null) {
     disableRating();
     hideRatingButtons();
 	updateLessonStatsUI();
+	updateModeButtons();
 
     $("#solBox").classList.add("masked");
 	scrollToTop();
@@ -1709,7 +1709,7 @@ function stopBrowse() {
 
     $("#solBox").classList.add("masked");
 
-    updateBrowseBtn();
+    updateModeButtons();
 
     scrollToTop();
 }
@@ -1719,14 +1719,23 @@ function updateTrainingBtn() {
         state.trainingOn ? translate("trainingStop") : translate("trainingStart");
 }
 
-function updateBrowseBtn() {
-    const btn = $("#btnBrowse");
-    if (!btn) return;
+function updateModeButtons() {
 
-    btn.textContent =
-        state.browseMode
-            ? translate("browseStop")
-            : translate("browseStart");
+    $("#btnStart").classList.remove("active-mode");
+    $("#btnBrowse").classList.remove("active-mode");
+    $("#btnAutoplay").classList.remove("active-mode");
+
+    if (state.trainingOn) {
+        $("#btnStart").classList.add("active-mode");
+    }
+
+    if (state.browseMode) {
+        $("#btnBrowse").classList.add("active-mode");
+    }
+
+    if (state.autoplay.on) {
+        $("#btnAutoplay").classList.add("active-mode");
+    }
 }
 
 /* ========================================================================== */
@@ -2202,7 +2211,7 @@ function playSequence(a, aLang, b, bLang) {
 function setAutoplay(on) {
  console.log("setAutoplay called:", on);
     state.autoplay.on = on;
-
+	updateModeButtons()
     if (!on) {
         speechSynthesis.cancel();
         state.autoplay.timers.forEach(x => clearTimeout(x));
@@ -2604,6 +2613,7 @@ if (installButton) {
 
 	updateTrainingBtn();
 	updateBrowseBtn();
+	updateModeButtons();
 
 	hideNavButtons();  // Buttons initial unsichtbar beim App-Start
 
