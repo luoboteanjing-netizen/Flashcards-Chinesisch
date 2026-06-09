@@ -2643,28 +2643,6 @@ if (installButton) {
     if (rateZhVal)  rateZhVal.textContent  = `(${state.rateZh.toFixed(2)})`;
     if (pitchZhVal) pitchZhVal.textContent = `(${state.pitchZh.toFixed(2)})`;
 
-    /* ============================================================
-       AUTOPLAY BUTTON In TRAINING-GRUPPE SETZEN
-       ============================================================ */
-    (function placeAutoplayButton() {
-        const trainingBtn = document.querySelector("#btnStart");
-        const autoplayBtn = document.querySelector("#btnAutoplay");
-
-        if (!trainingBtn || !autoplayBtn) return;
-
-        const parent = trainingBtn.parentNode;
-        let group = parent.querySelector(".training-group");
-
-        if (!group) {
-            group = document.createElement("div");
-            group.className = "training-group";
-            parent.insertBefore(group, trainingBtn);
-            group.appendChild(trainingBtn);
-        }
-
-        group.appendChild(autoplayBtn);
-        autoplayBtn.classList.add("primary");
-    })();
 
  
  /* ============================================================
