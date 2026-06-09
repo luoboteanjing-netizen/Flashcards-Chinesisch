@@ -243,12 +243,12 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 
 /* NEU: Gruppe für Training + Autoplay (unter Sliders) – Flex-Row für nebeneinander */
 .training-group {
- display: flex;
- gap: 16px;
- align-items: center;
- justify-content: center; /* Zentriert die Gruppe */
- margin-top: 1px; /* Abstand zu Sliders oben */
- flex-wrap: nowrap; /* NEU: Immer single-line auf Desktop (kein Wrap für die beiden Buttons) */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin-top: 1px;
+    align-items: stretch;
 }
 /* NEU: Autoplay als Primary (wenn Klasse hinzugefügt): Farblich identisch zum Training-Button */
 
@@ -499,12 +499,19 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
   flex-direction:row;
  }
 .training-group .btn {
-  flex: 1 1 0;
-  min-width: 92px;
-  width: auto;
-  font-size: 13px;
-  white-space: normal;
-  line-height: 1.2;
+    width: 100%;
+    min-width: 0;
+    min-height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    white-space: normal;
+    line-height: 1.2;
+
+    padding: 10px;
 }
 
  .btn.primary { margin-top:8px; }
