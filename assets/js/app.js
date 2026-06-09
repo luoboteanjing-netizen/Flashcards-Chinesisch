@@ -1351,17 +1351,16 @@ function showNavButtons() {
 
     $("#btnPrev").style.display = "";
 
-if (state.browseMode) {
+	if (state.browseMode) {
 
-    $("#btnReveal").style.visibility = "hidden";
-    $("#btnReveal").style.pointerEvents = "none";
+		$("#btnReveal").style.visibility = "hidden";
+		$("#btnReveal").style.pointerEvents = "none";
 
-} else {
+	} else {
 
-    $("#btnReveal").style.visibility = "visible";
-    $("#btnReveal").style.pointerEvents = "";
+		$("#btnReveal").style.display = "";
 
-}
+	}
 
     $("#btnNext").style.display = "";
 
