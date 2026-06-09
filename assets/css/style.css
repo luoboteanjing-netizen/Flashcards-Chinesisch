@@ -210,15 +210,14 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 
 .training-group .btn {
- flex: 0 0 170px;
- min-width: 170px;
- width: 170px;
- white-space: nowrap;
+ flex: 1 1 0;
+ min-width: 110px;
+ width: auto;
+ white-space: normal;
+ line-height: 1.2;
+ min-height: 64px;
+ padding: 10px;
  text-align: center;
- display: inline-flex;
- align-items: center;
- justify-content: center;
- box-sizing: border-box;
 }
 
 .training-group .btn:active {
@@ -500,11 +499,16 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
   flex-wrap:wrap;
   flex-direction:row;
  }
- .training-group .btn {
-  flex: 0 0 130px;
-  width: 130px;
-  min-width: 130px;
- }
+.training-group .btn {
+  flex: 1 1 0;
+  min-width: 92px;
+  width: auto;
+  min-height: 64px;
+  font-size: 13px;
+  white-space: normal;
+  line-height: 1.2;
+}
+
  .btn.primary { margin-top:8px; }
  .btn.swap { padding:8px 10px; min-height:38px; font-size:16px; }
  .mode-item { padding:8px 12px; min-height:38px; min-width:84px; font-size:13px; }
@@ -1114,12 +1118,7 @@ body.menu-open #menuToggle::before {
     font-size: 14px;
     padding: 12px 0;
 }
-.search-pos {
-    color: #888;
-    font-style: italic;
-    margin-left: 6px;
-    font-size: 0.9em;
-}
+
 /* =======================
    Einstellungen Menü
    ======================= */
