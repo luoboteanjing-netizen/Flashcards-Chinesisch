@@ -1613,6 +1613,13 @@ function startTraining() {
         // ✅ Training aktivieren
         // ----------------------------
         state.trainingOn = true;
+		
+		state.browseMode = false;
+
+		$("#btnReveal").style.visibility = "visible";
+		$("#btnReveal").style.pointerEvents = "";
+		$("#btnReveal").style.opacity = "1";
+		
         updateTrainingBtn();
         showNavButtons();  // Buttons anzeigen beim Training-Start
         scrollToBottom();
