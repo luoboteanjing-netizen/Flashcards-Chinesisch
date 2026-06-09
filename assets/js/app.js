@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.3.0";
+  window.APP_VERSION = "6.2.1";
 }
 
 
@@ -137,6 +137,9 @@ const TRANSLATIONS = {
         alertImportError: "Fehler beim Import.",
         csvLoadError: "Fehler beim Laden der CSV.",
         cardLessonTitle: "Lektion {id}"
+		browseStart: "📖 Karten ansehen",
+		browseStop: "📖 Browse beenden",
+
     },
     en: {
         appTitle: "Chinese Flashcards",
@@ -210,6 +213,9 @@ const TRANSLATIONS = {
         alertImportError: "Import failed.",
         csvLoadError: "Error loading CSV.",
         cardLessonTitle: "Lesson {id}"
+		browseStart: "📖 Browse Cards",
+		browseStop: "📖 Stop Browse",
+
     },
     zh: {
         appTitle: "中文抽认卡",
@@ -283,6 +289,9 @@ const TRANSLATIONS = {
         alertImportError: "导入失败。",
         csvLoadError: "加载 CSV 时出错。",
         cardLessonTitle: "课程 {id}"
+		browseStart: "📖 浏览卡片",
+		browseStop: "📖 结束浏览",
+		
     },
     fr: {
         appTitle: "Cartes Mémoire Chinois",
@@ -356,316 +365,12 @@ const TRANSLATIONS = {
         alertImportError: "Échec de l'importation.",
         csvLoadError: "Erreur lors du chargement du CSV.",
         cardLessonTitle: "Leçon {id}"
+		browseStart: "📖 Parcourir",
+		browseStop: "📖 Arrêter",
+
     }
 };
 const $ = (s) => document.querySelector(s);
-
-/* ============================ GITHUB AUDIO CONFIG ======================= */
-// Audio files live next to the CSV inside `data/audio` for easier syncing
-const AUDIO_BASE = './data/audio';
-const AUDIO_BASE_DE = './data/audio_de';
-const GITHUB_VOICES = ['xiaoxiao', 'yunjian'];
-const GITHUB_VOICES_DE = ['katja', 'conrad'];
-const GITHUB_SPEEDS = ['slow'];
-const GITHUB_SPEEDS_DE = ['normal'];
-const CACHE_PREFIX = 'fc-audio-';
-
-// ZIP-Dateien werden als GitHub Release Assets gehostet
-// Release-Tag bei Bedarf hier anpassen (z.B. 'audio-v2')
-// ZIPs werden von Cloudflare R2 geladen (kein CORS-Problem)
-const RELEASE_BASE = 'https://pub-368b54c806bb458385aedf5cd96ac804.r2.dev';
-
-function buildZipUrl(voice) {
-    return `${RELEASE_BASE}/${voice}_slow.zip`;
-}
-
-function sanitizeFileName(fn) {
-    if (!fn) return null;
-    let name = fn.trim();
-    name = name.replace(/^\/+/, '');
-    if (!/\.mp3$/i.test(name)) name += '.mp3';
-    return name;
-}
-
-function buildAudioUrl(entry, voice, speed, kind) {
-    if (!entry || !entry.audio) return null;
-
-    // Determine raw filename from CSV (may already include suffix and .mp3)
-    let raw = kind === 'words' ? entry.audio.wordFile : entry.audio.sentFile;
-    if (!raw) return null;
-    raw = raw.trim();
-
-    // If CSV contains a full filename (ends with .mp3) use it directly.
-    // Otherwise, treat value as base id and append suffixes.
-    let filename = raw;
-    if (!/\.mp3$/i.test(raw)) {
-        // not ending with .mp3 — append suffix based on kind
-        const suffix = kind === 'words' ? '_wrd.mp3' : '_snt.mp3';
-        filename = raw + suffix;
-    }
-
-    // sanitize and ensure no leading slashes
-    filename = sanitizeFileName(filename);
-    if (!filename) return null;
-
-    // Files are stored directly in the voice/speed folder (no separate words/sentences subfolder)
-    return `${AUDIO_BASE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
-}
-
-function buildAudioUrlDe(entry, voice, speed, kind) {
-    if (!entry || !entry.audio) return null;
-    let raw = kind === 'words' ? entry.audio.wordFile : entry.audio.sentFile;
-    if (!raw) return null;
-    raw = raw.trim();
-    // Dateiname ableiten (gleiche Logik wie ZH, nur anderer Basisordner)
-    let filename = raw;
-    if (!/\.mp3$/i.test(raw)) {
-        const suffix = kind === 'words' ? '_wrd.mp3' : '_snt.mp3';
-        filename = raw + suffix;
-    }
-    filename = sanitizeFileName(filename);
-    if (!filename) return null;
-    return `${AUDIO_BASE_DE}/${voice}/${speed}/${encodeURIComponent(filename)}`;
-}
-
-function playPreviewAudio(voice, speed, kind) {
-    // Fester Beispieleintrag – unabhängig von laufendem Training
-    const previewEntry = {
-        audio: {
-            wordFile: 'L01-1-04_wrd.mp3',
-            sentFile: 'L01-1-04_snt.mp3'
-        }
-    };
-    const url = buildAudioUrl(previewEntry, voice, speed, kind);
-    if (!url) {
-        console.warn('Keine Vorschau-URL erzeugt.');
-        return;
-    }
-    const a = new Audio(url);
-    a.play().catch(e => console.warn('Play preview failed', e));
-}
-
-function playPreviewAudioDe(voice, speed, kind) {
-    // Fester Beispieleintrag – gleiche ID wie beim Chinesischen
-    const previewEntry = {
-        audio: {
-            wordFile: 'L01-1-04_wrd.mp3',
-            sentFile: 'L01-1-04_snt.mp3'
-        }
-    };
-    const url = buildAudioUrlDe(previewEntry, voice, speed, kind);
-    if (!url) {
-        console.warn('Keine DE-Vorschau-URL erzeugt.');
-        return;
-    }
-    const a = new Audio(url);
-    a.play().catch(e => console.warn('Play DE preview failed', e));
-}
-
-// Prüft ob eine Stimme bereits im Cache vorhanden ist
-async function isVoiceCached(voice) {
-    try {
-        const cache = await caches.open(CACHE_PREFIX + voice);
-        const keys = await cache.keys();
-        return keys.length > 0;
-    } catch (e) {
-        return false;
-    }
-}
-
-// Löscht alle gecachten MP3s einer Stimme
-async function deleteVoiceCache(voice) {
-    try {
-        await caches.delete(CACHE_PREFIX + voice);
-    } catch (e) {
-        console.warn('Cache löschen fehlgeschlagen', e);
-    }
-}
-
-// Lädt die ZIP vom GitHub Release, entpackt sie und
-// speichert alle MP3s im Browser-Cache.
-// onProgress(percent, statusText) wird während des Downloads aufgerufen.
-async function downloadVoiceZip(voice, onProgress) {
-    const zipUrl = buildZipUrl(voice);
-    onProgress && onProgress(0, 'Verbinde…');
-
-    // ZIP herunterladen mit Fortschrittsanzeige
-    let response;
-    try {
-        response = await fetch(zipUrl);
-    } catch (e) {
-        throw new Error('Netzwerkfehler: ' + e.message);
-    }
-    if (!response.ok) {
-        throw new Error('ZIP nicht gefunden (' + response.status + '): ' + zipUrl);
-    }
-
-    const contentLength = response.headers.get('Content-Length');
-    const total = contentLength ? parseInt(contentLength, 10) : null;
-    let received = 0;
-    const chunks = [];
-    const reader = response.body.getReader();
-
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        received += value.length;
-        const mb = Math.round(received / 1024 / 1024 * 10) / 10;
-        if (total) {
-            const pct = Math.round(received / total * 60);
-            onProgress && onProgress(pct, 'Herunterladen… ' + mb + ' MB');
-        } else {
-            onProgress && onProgress(10, 'Herunterladen… ' + mb + ' MB');
-        }
-    }
-
-    // Chunks zusammenführen
-    const zipBuffer = new Uint8Array(received);
-    let offset = 0;
-    for (const chunk of chunks) { zipBuffer.set(chunk, offset); offset += chunk.length; }
-
-    onProgress && onProgress(62, 'Entpacke ZIP…');
-
-    // fflate einmalig laden (ZIP-Bibliothek, ~40 KB)
-    if (!window._fflate) {
-        await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
-            s.onload = resolve;
-            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden'));
-            document.head.appendChild(s);
-        });
-        window._fflate = fflate;
-    }
-
-    const unzipped = await new Promise((resolve, reject) => {
-        window._fflate.unzip(zipBuffer, (err, result) => {
-            if (err) reject(err); else resolve(result);
-        });
-    });
-
-    // MP3s in den Browser-Cache schreiben
-    const cache = await caches.open(CACHE_PREFIX + voice);
-    const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
-    const fileCount = files.length;
-    let done = 0;
-
-    for (const [zipPath, data] of files) {
-        const filename = zipPath.split('/').pop();
-        // Cache-Key muss mit buildAudioUrl übereinstimmen
-        const cacheUrl = AUDIO_BASE + '/' + voice + '/slow/' + encodeURIComponent(filename);
-        const blob = new Blob([data], { type: 'audio/mpeg' });
-        await cache.put(cacheUrl, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg' } }));
-        done++;
-        if (done % 100 === 0 || done === fileCount) {
-            const pct = 62 + Math.round(done / fileCount * 38);
-            onProgress && onProgress(pct, 'Speichere… ' + done + ' / ' + fileCount + ' Dateien');
-        }
-    }
-
-    onProgress && onProgress(100, 'Fertig! ' + fileCount + ' Dateien gespeichert.');
-    return fileCount;
-}
-
-
-// Lädt die deutsche ZIP und speichert MP3s im Cache (Ordner audio_de)
-async function downloadVoiceZipDe(voice, onProgress) {
-    const zipUrl = `${RELEASE_BASE}/${voice}_normal.zip`;
-    onProgress && onProgress(0, 'Verbinde…');
-
-    let response;
-    try {
-        response = await fetch(zipUrl);
-    } catch (e) {
-        throw new Error('Netzwerkfehler: ' + e.message);
-    }
-    if (!response.ok) {
-        throw new Error('ZIP nicht gefunden (' + response.status + '): ' + zipUrl);
-    }
-
-    const contentLength = response.headers.get('Content-Length');
-    const total = contentLength ? parseInt(contentLength, 10) : null;
-    let received = 0;
-    const chunks = [];
-    const reader = response.body.getReader();
-
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        received += value.length;
-        const mb = Math.round(received / 1024 / 1024 * 10) / 10;
-        if (total) {
-            const pct = Math.round(received / total * 60);
-            onProgress && onProgress(pct, 'Herunterladen… ' + mb + ' MB');
-        } else {
-            onProgress && onProgress(10, 'Herunterladen… ' + mb + ' MB');
-        }
-    }
-
-    const zipBuffer = new Uint8Array(received);
-    let offset = 0;
-    for (const chunk of chunks) { zipBuffer.set(chunk, offset); offset += chunk.length; }
-
-    onProgress && onProgress(62, 'Entpacke ZIP…');
-
-    if (!window._fflate) {
-        await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
-            s.onload = resolve;
-            s.onerror = () => reject(new Error('fflate konnte nicht geladen werden'));
-            document.head.appendChild(s);
-        });
-        window._fflate = fflate;
-    }
-
-    const unzipped = await new Promise((resolve, reject) => {
-        window._fflate.unzip(zipBuffer, (err, result) => {
-            if (err) reject(err); else resolve(result);
-        });
-    });
-
-    const cache = await caches.open(CACHE_PREFIX + 'de-' + voice);
-    const files = Object.entries(unzipped).filter(([name]) => /\.mp3$/i.test(name));
-    const fileCount = files.length;
-    let done = 0;
-
-    for (const [zipPath, data] of files) {
-        const filename = zipPath.split('/').pop();
-        const cacheUrl = AUDIO_BASE_DE + '/' + voice + '/normal/' + encodeURIComponent(filename);
-        const blob = new Blob([data], { type: 'audio/mpeg' });
-        await cache.put(cacheUrl, new Response(blob, { headers: { 'Content-Type': 'audio/mpeg' } }));
-        done++;
-        if (done % 100 === 0 || done === fileCount) {
-            const pct = 62 + Math.round(done / fileCount * 38);
-            onProgress && onProgress(pct, 'Speichere… ' + done + ' / ' + fileCount + ' Dateien');
-        }
-    }
-
-    onProgress && onProgress(100, 'Fertig! ' + fileCount + ' Dateien gespeichert.');
-    return fileCount;
-}
-
-async function isVoiceCachedDe(voice) {
-    try {
-        const cache = await caches.open(CACHE_PREFIX + 'de-' + voice);
-        const keys = await cache.keys();
-        return keys.length > 0;
-    } catch (e) {
-        return false;
-    }
-}
-
-async function deleteVoiceCacheDe(voice) {
-    try {
-        await caches.delete(CACHE_PREFIX + 'de-' + voice);
-    } catch (e) {
-        console.warn('DE Cache löschen fehlgeschlagen', e);
-    }
-}
-
 
 /* ============================ GLOBAL STATE =============================== */
 
@@ -717,9 +422,7 @@ const state = {
         browserVoiceZh: null,
         browserVoiceDe: null,
         autoplayGap: 800,
-        resumeIndexByLesson: {},
-        githubVoiceDe: null,
-        githubSpeedDe: 'normal'
+        resumeIndexByLesson: {}
     },
 
     session: {
@@ -744,7 +447,8 @@ const state = {
     },
 
     wakeLock: null,
-    trainingOn: false
+    trainingOn: false,
+	browseMode: false
 };
 
 	state.reinsertQueue = [];
@@ -927,15 +631,6 @@ function parseCSV(text) {
     const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
     if (lines.length < 2) return;
 
-    const headerCols = parseCSVLine(lines[0]).map(h => (h || "").replace(/\uFEFF/g, "").trim().toLowerCase());
-    const headerIndex = (name, fallback) => {
-        const idx = headerCols.indexOf(name.toLowerCase());
-        return idx !== -1 ? idx : fallback;
-    };
-
-    const audioWortIdx = headerIndex("Audio Wort", 9);
-    const audioSatzIdx = headerIndex("Audio Satz", 10);
-
     for (let i = 1; i < lines.length; i++) {
 
         const cols = parseCSVLine(lines[i]);
@@ -963,11 +658,7 @@ function parseCSV(text) {
                 zh: (cols[6] || "").trim()
             },
             id: (cols[7] || "").trim(),
-            lesson,
-            audio: {
-                wordFile: (cols[audioWortIdx] || "").trim(),
-                sentFile: (cols[audioSatzIdx] || "").trim()
-            }
+            lesson
         };
 
         // ✅ Insert lesson & entry into the map
@@ -1483,8 +1174,13 @@ function setCard(entry, fromHistory = false) {
     }
 
     /* -------- Karte anzeigen -------- */
-    const sol = $("#solBox");
-    sol.classList.add("masked");
+	const sol = $("#solBox");
+
+	if (state.browseMode) {
+		sol.classList.remove("masked");
+	} else {
+		sol.classList.add("masked");
+	}
 
     /* ✅ Hilfsfunktionen */
     const hasWordZh = entry.word?.zh && entry.word.zh.trim() !== "";
@@ -1499,25 +1195,6 @@ function setCard(entry, fromHistory = false) {
 
         $("#solWord").textContent = entry.word.de;
         $("#solSent").textContent = entry.sent.de;
-
-        /* ✅ Hanzi UND Pinyin ausgeblendet → Audio automatisch abspielen */
-        if (!state.showHanzi && !state.showPinyin) {
-            // Wort sofort abspielen
-            const ghVoice = state.settings.githubVoiceZh;
-            const ghSpeed = state.settings.githubSpeedZh || 'slow';
-            if (ghVoice) {
-                const wUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'words');
-                const sUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'sentences');
-                (async () => {
-                    if (wUrl) await playAudioResource(wUrl);
-                    if (sUrl) await new Promise(r => setTimeout(r, 600));
-                    if (sUrl) await playAudioResource(sUrl);
-                })();
-            } else {
-                ttsSpeak(entry.word.zh, "zh");
-                setTimeout(() => ttsSpeak(entry.sent.zh, "zh"), 600);
-            }
-        }
 
         /* ✅ KEIN Wort → kein Delay */
         if (!hasWordZh && !hasWordDe) {
@@ -1564,6 +1241,24 @@ function setCard(entry, fromHistory = false) {
     updateNavButtons();
 
     syncCardHeights();
+	if (state.browseMode) {
+    hideRatingButtons();
+	}
+	
+	if (state.browseMode) {
+
+    if (state.mode === "zh2de") {
+
+        renderPromptWordFull(entry);
+        renderPromptSentenceFull(entry);
+
+    } else {
+
+        $("#promptSent").textContent = entry.sent.de || "—";
+    }
+
+    syncCardHeights();
+	}
 }
 // =====================================================
 // LEITNER: pro-Karte Status sicherstellen
@@ -1651,7 +1346,13 @@ function hideNavButtons() {
 function showNavButtons() {
     if (!state.trainingOn || state.autoplay.on) return;  // Nur im Training UND nicht im Autoplay zeigen!
     $("#btnPrev").style.display = "";
-    $("#btnReveal").style.display = "";
+	
+	if (state.browseMode) {
+		$("#btnReveal").style.display = "none";
+	} else {
+		$("#btnReveal").style.display = "";
+	}
+	
     $("#btnNext").style.display = "";
 	scrollToBottom();
 }
@@ -1685,8 +1386,8 @@ function doReveal() {
 		}
 	}
 	
-    // ✅ Beim Aufdecken die Antwort-Sprache abspielen (ZH bei DE→ZH, DE bei ZH→DE)
-    playOnReveal(state.current);
+    // ✅ Beim Aufdecken IMMER Chinesisch abspielen
+	playChineseOnReveal(state.current);
 
 
     // -----------------------------------------
@@ -1912,6 +1613,54 @@ function startTraining() {
     }
 }
 
+function startBrowse() {
+
+    if (!state.browseMode) {
+
+        stopAutoplayOnUserAction();
+
+        state.trainingOn = false;
+        state.browseMode = true;
+
+        state.history = [];
+        state.historyPos = -1;
+
+        state.selectedLessons.clear();
+
+        const sel = $("#lessonSelect");
+        const picked = [];
+
+        for (const o of sel.selectedOptions) {
+            state.selectedLessons.add(o.value);
+            picked.push(o.value);
+        }
+
+        state.settings.lessons = picked;
+        saveSettings();
+
+        gatherPool();
+
+        if (!state.pool.length) {
+            alert(translate("selectLessonAlert"));
+            return;
+        }
+
+        state.idx = 0;
+
+        setCard(state.pool[state.idx]);
+
+        updateTrainingBtn();
+        updateBrowseBtn();
+
+        showNavButtons();
+
+    } else {
+
+        stopBrowse();
+    }
+}
+
+
 function stopTraining() {
     state.trainingOn = false;
 	
@@ -1936,12 +1685,34 @@ if (state.current && state.current.lesson && state.idx !== null) {
 	scrollToTop();
 }
 
+function stopBrowse() {
+
+    state.browseMode = false;
+
+    hideNavButtons();
+    hideRatingButtons();
+
+    $("#solBox").classList.add("masked");
+
+    updateBrowseBtn();
+
+    scrollToTop();
+}
+
 function updateTrainingBtn() {
     $("#btnStart").textContent =
         state.trainingOn ? translate("trainingStop") : translate("trainingStart");
 }
 
+function updateBrowseBtn() {
+    const btn = $("#btnBrowse");
+    if (!btn) return;
 
+    btn.textContent =
+        state.browseMode
+            ? translate("browseStop")
+            : translate("browseStart");
+}
 
 /* ========================================================================== */
 /*                                ENDE TEIL 2                                 */
@@ -2069,7 +1840,6 @@ function openSearchPanel() {
 function closeSearchPanel() {
     $("#searchPanel").classList.add("hidden");
     $("#searchOverlay")?.classList.remove("active");
-	
 }
 
 function getAllCards() {
@@ -2255,11 +2025,8 @@ function searchCSV(query) {
                 </div>
 
                 <div class="search-result-main">
-                <div>
-                    ${wordLine}
-                    ${entry.pos ? `<span class="search-pos">(${escapeHtml(entry.pos)})</span>` : ''}
+                    <div>${wordLine}</div>
                 </div>
-            </div>
 
                 <div class="search-result-line">${sentLine}</div>
                 <div class="search-result-line">${pyWord}</div>
@@ -2276,7 +2043,6 @@ function searchCSV(query) {
             if (selected) {
                 setCard(selected);
                 closeSearchPanel();
-                doReveal();
             }
         });
     });
@@ -2296,250 +2062,70 @@ function updateVoiceList() {
     );
 
     if (!list.length) {
-        const emptyMessage = document.createElement('div');
-        emptyMessage.textContent = translate("noVoicesFound");
-        box.appendChild(emptyMessage);
-    } else {
-        list.forEach(v => {
-            const row = document.createElement("div");
-            row.className = "voice";
-
-            const name = document.createElement("div");
-            name.className = "name";
-            name.textContent = v.name || translate("namelessVoice");
-
-            const meta = document.createElement("div");
-            meta.className = "meta";
-            meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
-
-            const actions = document.createElement("div");
-            actions.className = "actions";
-
-            const btnTest = document.createElement("button");
-            btnTest.className = "btn ghost";
-            btnTest.textContent = "▶ Probehören";
-
-            btnTest.onclick = () => {
-                const u = new SpeechSynthesisUtterance(
-                    state.voicePanelTarget === "zh" ? " 我很高兴见到你。" : "Dies ist ein Test."
-                );
-                u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
-                u.voice = v;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(u);
-            };
-
-            const btnPick = document.createElement("button");
-            btnPick.className = "btn";
-            btnPick.textContent = "✓ Übernehmen";
-
-            btnPick.onclick = () => {
-                if (state.voicePanelTarget === "zh") {
-                    state.browserVoice.zh = v;
-                    state.settings.browserVoiceZh = v.name || v.voiceURI;
-                } else {
-                    state.browserVoice.de = v;
-                    state.settings.browserVoiceDe = v.name || v.voiceURI;
-                }
-                saveSettings();
-                closeVoices();
-            };
-
-            const active = state.voicePanelTarget === "zh" ? state.browserVoice.zh : state.browserVoice.de;
-            if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
-                name.textContent += ` ${translate("voiceActiveSuffix")}`;
-            }
-
-            actions.appendChild(btnTest);
-            actions.appendChild(btnPick);
-
-            row.appendChild(name);
-            row.appendChild(meta);
-            row.appendChild(actions);
-
-            box.appendChild(row);
-        });
-    }
-
-    // --- GitHub MP3 voices (custom) ---
-     if (state.voicePanelTarget !== "zh") {
-        // --- Deutsche GitHub MP3-Stimmen ---
-        const deHeader = document.createElement('div');
-        deHeader.className = 'dbg-section';
-        deHeader.innerHTML = '<div class="h">GitHub Stimmen DE (MP3)</div>';
-        box.appendChild(deHeader);
-
-        GITHUB_VOICES_DE.forEach((voiceName) => {
-            const row = document.createElement('div');
-            row.className = 'voice';
-
-            const name = document.createElement('div');
-            name.className = 'name';
-            name.textContent = voiceName + ' (MP3)';
-            if (state.settings.githubVoiceDe === voiceName) {
-                name.textContent += ' ' + translate('voiceActiveSuffix');
-            }
-
-            const meta = document.createElement('div');
-            meta.className = 'meta';
-            meta.textContent = 'Prüfe Cache…';
-            isVoiceCachedDe(voiceName).then(cached => {
-                meta.textContent = cached ? '✅ Lokal gespeichert' : '☁️ Noch nicht heruntergeladen';
-            });
-
-            const progress = document.createElement('div');
-            progress.className = 'meta';
-            progress.style.display = 'none';
-            progress.style.color = 'var(--accent)';
-
-            const actions = document.createElement('div');
-            actions.className = 'actions';
-
-            const btnPreview = document.createElement('button');
-            btnPreview.className = 'btn ghost';
-            btnPreview.textContent = '▶ Probehören';
-            btnPreview.onclick = () => playPreviewAudioDe(voiceName, 'normal', 'sentences');
-
-            const btnDownload = document.createElement('button');
-            btnDownload.className = 'btn ghost';
-            btnDownload.textContent = '⬇ Herunterladen';
-            btnDownload.onclick = async () => {
-                [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = true);
-                progress.style.display = '';
-                try {
-                    const count = await downloadVoiceZipDe(voiceName, (pct, text) => {
-                        progress.textContent = pct + '% – ' + text;
-                    });
-                    meta.textContent = '✅ Lokal gespeichert (' + count + ' Dateien)';
-                    progress.style.display = 'none';
-                } catch (e) {
-                    progress.textContent = '❌ Fehler: ' + e.message;
-                } finally {
-                    [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = false);
-                }
-            };
-
-            const btnDelete = document.createElement('button');
-            btnDelete.className = 'btn ghost';
-            btnDelete.textContent = '🗑 Cache löschen';
-            btnDelete.onclick = async () => {
-                await deleteVoiceCacheDe(voiceName);
-                meta.textContent = '☁️ Noch nicht heruntergeladen';
-            };
-
-            const btnPick = document.createElement('button');
-            btnPick.className = 'btn';
-            btnPick.textContent = '✓ Übernehmen';
-            btnPick.onclick = () => {
-                state.settings.githubVoiceDe = voiceName;
-                state.settings.githubSpeedDe = 'normal';
-                saveSettings();
-                closeVoices();
-            };
-
-            actions.appendChild(btnPreview);
-            actions.appendChild(btnDownload);
-            actions.appendChild(btnDelete);
-            actions.appendChild(btnPick);
-
-            row.appendChild(name);
-            row.appendChild(meta);
-            row.appendChild(progress);
-            row.appendChild(actions);
-
-            box.appendChild(row);
-        });
-
+        box.innerHTML = `<div>${translate("noVoicesFound")}</div>`;
         return;
     }
 
-    const ghHeader = document.createElement('div');
-    ghHeader.className = 'dbg-section';
-    ghHeader.innerHTML = '<div class="h">GitHub Stimmen (MP3)</div>';
-    box.appendChild(ghHeader);
+list.forEach(v => {
+    const row = document.createElement("div");
+    row.className = "voice";
 
-    GITHUB_VOICES.forEach((voiceName) => {
-        const row = document.createElement('div');
-        row.className = 'voice';
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = v.name || translate("namelessVoice");
 
-        const name = document.createElement('div');
-        name.className = 'name';
-        name.textContent = voiceName + ' (MP3)';
-        if (state.settings.githubVoiceZh === voiceName) {
-            name.textContent += ' ' + translate('voiceActiveSuffix');
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${v.lang}${v.default ? " · default" : ""}`;
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const btnPick = document.createElement("button");
+    btnPick.className = "btn";
+    btnPick.textContent = translate("pickVoice");
+
+    btnPick.onclick = () => {
+        if (state.voicePanelTarget === "zh") {
+            state.browserVoice.zh = v;
+            state.settings.browserVoiceZh = v.name || v.voiceURI;
+        } else {
+            state.browserVoice.de = v;
+            state.settings.browserVoiceDe = v.name || v.voiceURI;
         }
+        saveSettings();
+        closeVoices();
+    };
 
-        // Cache-Status (wird asynchron befüllt)
-        const meta = document.createElement('div');
-        meta.className = 'meta';
-        meta.textContent = 'Prüfe Cache…';
-        isVoiceCached(voiceName).then(cached => {
-            meta.textContent = cached ? '✅ Lokal gespeichert' : '☁️ Noch nicht heruntergeladen';
-        });
+    const btnTest = document.createElement("button");
+    btnTest.className = "btn ghost";
+    btnTest.textContent = translate("testVoice");
 
-        // Fortschrittszeile (zunächst versteckt)
-        const progress = document.createElement('div');
-        progress.className = 'meta';
-        progress.style.display = 'none';
-        progress.style.color = 'var(--accent)';
+    btnTest.onclick = () => {
+        const u = new SpeechSynthesisUtterance(
+            state.voicePanelTarget === "zh" ? "这是一个测试。" : "Dies ist ein Test."
+        );
+        u.lang = state.voicePanelTarget === "zh" ? "zh-CN" : "de-DE";
+        u.voice = v;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+    };
 
-        const actions = document.createElement('div');
-        actions.className = 'actions';
+    // Aktive Stimme markieren
+    const active = state.voicePanelTarget === "zh" ? state.browserVoice.zh : state.browserVoice.de;
+    if (active && (active.name === v.name || active.voiceURI === v.voiceURI)) {
+        name.textContent += ` ${translate("voiceActiveSuffix")}`;
+    }
 
-        const btnPreview = document.createElement('button');
-        btnPreview.className = 'btn ghost';
-        btnPreview.textContent = '▶ Probehören';
-        btnPreview.onclick = () => playPreviewAudio(voiceName, 'slow', 'sentences');
+    actions.appendChild(btnPick);
+    actions.appendChild(btnTest);
 
-        const btnDownload = document.createElement('button');
-        btnDownload.className = 'btn ghost';
-        btnDownload.textContent = '⬇ Herunterladen';
-        btnDownload.onclick = async () => {
-            [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = true);
-            progress.style.display = '';
-            try {
-                const count = await downloadVoiceZip(voiceName, (pct, text) => {
-                    progress.textContent = pct + '% – ' + text;
-                });
-                meta.textContent = '✅ Lokal gespeichert (' + count + ' Dateien)';
-                progress.style.display = 'none';
-            } catch (e) {
-                progress.textContent = '❌ Fehler: ' + e.message;
-            } finally {
-                [btnDownload, btnDelete, btnPick, btnPreview].forEach(b => b.disabled = false);
-            }
-        };
+    row.appendChild(name);
+    row.appendChild(meta);
+    row.appendChild(actions);
 
-        const btnDelete = document.createElement('button');
-        btnDelete.className = 'btn ghost';
-        btnDelete.textContent = '🗑 Cache löschen';
-        btnDelete.onclick = async () => {
-            await deleteVoiceCache(voiceName);
-            meta.textContent = '☁️ Noch nicht heruntergeladen';
-        };
-
-        const btnPick = document.createElement('button');
-        btnPick.className = 'btn';
-        btnPick.textContent = '✓ Übernehmen';
-        btnPick.onclick = () => {
-            state.settings.githubVoiceZh = voiceName;
-            state.settings.githubSpeedZh = 'slow';
-            saveSettings();
-            closeVoices();
-        };
-
-        actions.appendChild(btnPreview);
-        actions.appendChild(btnDownload);
-        actions.appendChild(btnDelete);
-        actions.appendChild(btnPick);
-
-        row.appendChild(name);
-        row.appendChild(meta);
-        row.appendChild(progress);
-        row.appendChild(actions);
-
-        box.appendChild(row);
-    });
+    box.appendChild(row);
+});
 }
 
 
@@ -2549,40 +2135,16 @@ function playQuestion() {
     if (!state.current) return;
 
     if (state.mode === "de2zh") {
-        speechSynthesis.cancel();
-        const ghVoiceDe = state.settings.githubVoiceDe;
-        const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
-        if (ghVoiceDe) {
-            const wUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'words');
-            const sUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'sentences');
-            (async () => {
-                if (wUrl) await playAudioResource(wUrl);
-                if (sUrl) await new Promise(r => setTimeout(r, 400));
-                if (sUrl) await playAudioResource(sUrl);
-            })();
-            return;
-        }
         playSequence(
             state.current.word.de, "de",
             state.current.sent.de, "de"
         );
     } else {
         speechSynthesis.cancel();
-        const ghVoice = state.settings.githubVoiceZh;
-        const ghSpeed = state.settings.githubSpeedZh || 'normal';
-        if (ghVoice) {
-            const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
-            const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
-            (async () => {
-                if (wUrl) await playAudioResource(wUrl);
-                if (sUrl) await new Promise(r => setTimeout(r, 400));
-                if (sUrl) await playAudioResource(sUrl);
-            })();
-            return;
-        }
-
         ttsSpeak(state.current.word.zh, "zh");
-        setTimeout(() => ttsSpeak(state.current.sent.zh, "zh"), 600);
+        setTimeout(() =>
+            ttsSpeak(state.current.sent.zh, "zh"),
+        600);
     }
 }
 
@@ -2590,35 +2152,11 @@ function playAnswer() {
     if (!state.current) return;
 
     if (state.mode === "de2zh") {
-        const ghVoice = state.settings.githubVoiceZh;
-        const ghSpeed = state.settings.githubSpeedZh || 'normal';
-        if (ghVoice) {
-            const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
-            const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
-            (async () => {
-                if (wUrl) await playAudioResource(wUrl);
-                if (sUrl) await new Promise(r => setTimeout(r, 400));
-                if (sUrl) await playAudioResource(sUrl);
-            })();
-            return;
-        }
-
         ttsSpeak(state.current.word.zh, "zh");
-        setTimeout(() => ttsSpeak(state.current.sent.zh, "zh"), 600);
+        setTimeout(() =>
+            ttsSpeak(state.current.sent.zh, "zh"),
+        600);
     } else {
-        speechSynthesis.cancel();
-        const ghVoiceDe = state.settings.githubVoiceDe;
-        const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
-        if (ghVoiceDe) {
-            const wUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'words');
-            const sUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'sentences');
-            (async () => {
-                if (wUrl) await playAudioResource(wUrl);
-                if (sUrl) await new Promise(r => setTimeout(r, 400));
-                if (sUrl) await playAudioResource(sUrl);
-            })();
-            return;
-        }
         playSequence(
             state.current.word.de, "de",
             state.current.sent.de, "de"
@@ -2710,50 +2248,8 @@ function ensurePoolForAutoplay() {
 
 function speakPair(word, sent, langKey, done) {
 
-    if (!state.autoplay.on) { done && done(); return; }
+    if (!state.autoplay.on) return;
 
-    const ghVoice = state.settings.githubVoiceZh;
-    const ghSpeed = state.settings.githubSpeedZh || 'slow';
-
-    // ── MP3-Zweig: GitHub-Stimme und Chinesisch ──────────────
-    if (ghVoice && langKey === 'zh') {
-        (async () => {
-            const wUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'words');
-            const sUrl = buildAudioUrl(state.current, ghVoice, ghSpeed, 'sentences');
-            if (wUrl) await playAudioResource(wUrl);
-            if (!state.autoplay.on) return;
-            if (sUrl) {
-                await new Promise(r => setTimeout(r, 400));
-                if (!state.autoplay.on) return;
-                await playAudioResource(sUrl);
-            }
-            if (!state.autoplay.on) return;
-            done && done();
-        })();
-        return;
-    }
-
-    // ── MP3-Zweig: GitHub-Stimme und Deutsch ─────────────────
-    const ghVoiceDe = state.settings.githubVoiceDe;
-    const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
-    if (ghVoiceDe && langKey === 'de') {
-        (async () => {
-            const wUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'words');
-            const sUrl = buildAudioUrlDe(state.current, ghVoiceDe, ghSpeedDe, 'sentences');
-            if (wUrl) await playAudioResource(wUrl);
-            if (!state.autoplay.on) return;
-            if (sUrl) {
-                await new Promise(r => setTimeout(r, 400));
-                if (!state.autoplay.on) return;
-                await playAudioResource(sUrl);
-            }
-            if (!state.autoplay.on) return;
-            done && done();
-        })();
-        return;
-    }
-
-    // ── Fallback: Browser-TTS ────────────────────────────────
     const u1 = buildUtterance(word, langKey);
 
     u1.onend = () => {
@@ -2781,90 +2277,21 @@ function speakPair(word, sent, langKey, done) {
     speechSynthesis.speak(u1);
 }
 
-// Spielt beim Aufdecken die Antwort-Sprache ab:
-// DE→ZH: Chinesisch (Antwort ist ZH)
-// ZH→DE: Deutsch (Antwort ist DE)
-function playOnReveal(entry) {
+function playChineseOnReveal(entry) {
     if (!entry) return;
 
     speechSynthesis.cancel();
 
-    if (state.mode === "de2zh") {
-        // ── Antwort ist Chinesisch ───────────────────────────
-        const ghVoice = state.settings.githubVoiceZh;
-        const ghSpeed = state.settings.githubSpeedZh || 'normal';
-        if (ghVoice) {
-            const wUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'words');
-            const sUrl = buildAudioUrl(entry, ghVoice, ghSpeed, 'sentences');
-            (async () => {
-                if (wUrl) await playAudioResource(wUrl);
-                if (sUrl) await new Promise(r => setTimeout(r, 600));
-                if (sUrl) await playAudioResource(sUrl);
-            })();
-            return;
-        }
-        // Fallback: Browser-TTS Chinesisch
-        ttsSpeak(entry.word.zh, "zh");
-        setTimeout(() => ttsSpeak(entry.sent.zh, "zh"), 600);
+    // Wort zuerst
+    ttsSpeak(entry.word.zh, "zh");
 
-    } else {
-        // ── Antwort ist Deutsch ──────────────────────────────
-        const ghVoiceDe = state.settings.githubVoiceDe;
-        const ghSpeedDe = state.settings.githubSpeedDe || 'normal';
-        if (ghVoiceDe) {
-            const wUrl = buildAudioUrlDe(entry, ghVoiceDe, ghSpeedDe, 'words');
-            const sUrl = buildAudioUrlDe(entry, ghVoiceDe, ghSpeedDe, 'sentences');
-            (async () => {
-                if (wUrl) await playAudioResource(wUrl);
-                if (sUrl) await new Promise(r => setTimeout(r, 600));
-                if (sUrl) await playAudioResource(sUrl);
-            })();
-            return;
-        }
-        // Fallback: Browser-TTS Deutsch
-        ttsSpeak(entry.word.de, "de");
-        setTimeout(() => ttsSpeak(entry.sent.de, "de"), 600);
-    }
+    // Satz leicht verzögert danach
+    setTimeout(() => {
+        ttsSpeak(entry.sent.zh, "zh");
+    }, 600);
 }
 
-// Abwärtskompatibilität – falls irgendwo noch direkt aufgerufen
-function playChineseOnReveal(entry) {
-    playOnReveal(entry);
-}
-
-async function playAudioResource(url) {
-    // Hilfsfunktion: spielt einen Blob ab und wartet bis er fertig ist
-    function playBlob(blob) {
-        return new Promise((resolve) => {
-            const obj = URL.createObjectURL(blob);
-            const a = new Audio(obj);
-            a.onended = () => { URL.revokeObjectURL(obj); resolve(); };
-            a.onerror = () => { URL.revokeObjectURL(obj); resolve(); };
-            a.play().catch(() => resolve());
-        });
-    }
-
-    try {
-        // Zuerst im Browser-Cache nachschauen
-        const cached = await caches.match(url);
-        if (cached) {
-            const blob = await cached.blob();
-            await playBlob(blob);
-            return;
-        }
-
-        // Nicht gecacht → vom Server laden
-        const res = await fetch(url);
-        if (res.ok) {
-            const blob = await res.blob();
-            await playBlob(blob);
-        }
-    } catch (e) {
-        console.warn('playAudioResource error', e);
-    }
-}
-
-async function autoplayStep() {
+function autoplayStep() {
 
     if (!state.autoplay.on) return;
 
@@ -2879,56 +2306,56 @@ async function autoplayStep() {
     const qLang = (state.mode === "de2zh") ? "de" : "zh";
     const aLang = (state.mode === "de2zh") ? "zh" : "de";
 
-    await new Promise(resolve => ttsPrime(resolve));
+    ttsPrime(() => {
 
-    speechSynthesis.cancel();
+        speechSynthesis.cancel();
 
-    // Frage abspielen – warten bis fertig
-    await new Promise(resolve => speakPair(
-        state.current.word[qLang],
-        state.current.sent[qLang],
-        qLang,
-        resolve
-    ));
+        speakPair(
+            state.current.word[qLang],
+            state.current.sent[qLang],
+            qLang,
 
-    if (!state.autoplay.on) return;
+            () => {
 
-    // Einstellbares Delay vor der Antwort
-    await new Promise(r => setTimeout(r, state.sentenceDelay || 1000));
+                if (!state.autoplay.on) return;
 
-    if (!state.autoplay.on) return;
+                $("#solBox").classList.remove("masked");
 
-    // Antwort aufdecken
-    $("#solBox").classList.remove("masked");
+                speakPair(
+                    state.current.word[aLang],
+                    state.current.sent[aLang],
+                    aLang,
 
-    // Antwort abspielen – warten bis fertig
-    await new Promise(resolve => speakPair(
-        state.current.word[aLang],
-        state.current.sent[aLang],
-        aLang,
-        resolve
-    ));
+                    () => {
 
-    if (!state.autoplay.on) return;
+                        if (!state.autoplay.on) return;
 
-    // Pause zwischen Karten, dann nächste Karte
-    const t = setTimeout(() => {
+                        const t = setTimeout(() => {
 
-        if (!state.autoplay.on) return;
+                            if (!state.autoplay.on) return;
 
-        if (state.order === "seq") {
-            if (state.idx == null) state.idx = 0;
-            else state.idx = (state.idx + 1) % state.pool.length;
-            setCard(state.pool[state.idx]);
-        } else {
-            setCard(state.pool[Math.floor(Math.random() * state.pool.length)]);
-        }
+                            if (state.order === "seq") {
+                                if (state.idx == null) state.idx = 0;
+                                else state.idx = (state.idx + 1) % state.pool.length;
 
-        autoplayStep();
+                                setCard(state.pool[state.idx]);
+                            } else {
+                                setCard(
+                                    state.pool[Math.floor(Math.random() * state.pool.length)]
+                                );
+                            }
 
-    }, state.autoplay.gapMs);
+                            autoplayStep();
 
-    state.autoplay.timers.push(t);
+                        }, state.autoplay.gapMs);
+
+                        state.autoplay.timers.push(t);
+                    }
+                );
+            }
+        );
+
+    });
 }
 
 
@@ -3158,8 +2585,12 @@ if (installButton) {
     state.rateZh  = state.settings.rateZh;
     state.pitchZh = state.settings.pitchZh;
 
-    renderModeUI();
-    hideNavButtons();  // Buttons initial unsichtbar beim App-Start
+	renderModeUI();
+
+	updateTrainingBtn();
+	updateBrowseBtn();
+
+	hideNavButtons();  // Buttons initial unsichtbar beim App-Start
 
     /* ============================================================
        CSV LADEN
@@ -3430,7 +2861,9 @@ if (uiLangSelect) {
         stopAutoplayOnUserAction();
         startTraining();
     });
-
+	$("#btnBrowse").addEventListener("click", () => {
+		startBrowse();
+	});
     $("#btnNext").addEventListener("click", () => {
        
         nextCard();
