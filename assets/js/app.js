@@ -1124,6 +1124,13 @@ function gatherPoolFromSettings() {
 
 /* ============================ UTILS =============================== */
 
+function hapticFeedback() {
+    // Prüft, ob das Gerät Vibration unterstützt
+    if ("vibrate" in navigator) {
+        navigator.vibrate(40); // Kurzer 40ms Impuls
+    }
+}
+
 function formatZh(hz, py) {
     hz = (hz || "").trim();
     py = (py || "").trim();
@@ -1536,6 +1543,7 @@ function updateNavButtons() {
 }
 
 function nextCard() {
+    hapticFeedback();
 	state.cardCounter++;
     if (!state.pool.length) return;
 
@@ -1570,6 +1578,7 @@ function nextCard() {
 }
 
 function prevCard() {
+    hapticFeedback();
     if (state.historyPos > 0) {
         state.historyPos--;
         setCard(state.history[state.historyPos], true);
@@ -1614,6 +1623,7 @@ function showNavButtons() {
 /* ============================ REVEAL / RATING ============================ */
 
 function doReveal() {
+    hapticFeedback();
     $("#solBox").classList.remove("masked");
     state.revealedAt = Date.now();
 	
@@ -1704,6 +1714,7 @@ function disableRating() {
 
 function rate(mark) {
     if (!state.current) return;
+    hapticFeedback();
 
     // -----------------------------------------
     // LEITNER: Bewertung
@@ -3328,6 +3339,7 @@ if (uiLangSelect) {
        MODUS, REIHENFOLGE, AUTOPLAY
        ============================================================ */
     $("#btnSwapMode").addEventListener("click", function() {
+        hapticFeedback();
         const btn = this;
         btn.classList.add("active");
 
@@ -3343,6 +3355,7 @@ if (uiLangSelect) {
     });
 
     $("#btnOrderToggle").addEventListener("click", () => {
+        hapticFeedback();
    
         state.order = state.order === "random" ? "seq" : "random";
         state.settings.order = state.order;
@@ -3351,6 +3364,7 @@ if (uiLangSelect) {
     });
 
     $("#btnToggleHanzi").addEventListener("click", () => {
+        hapticFeedback();
      
         state.showHanzi = !state.showHanzi;
         state.settings.showHanzi = state.showHanzi;
@@ -3360,6 +3374,7 @@ if (uiLangSelect) {
     });
 
     $("#btnTogglePinyin").addEventListener("click", () => {
+        hapticFeedback();
    
         state.showPinyin = !state.showPinyin;
         state.settings.showPinyin = state.showPinyin;
@@ -3369,6 +3384,7 @@ if (uiLangSelect) {
     });
 
     $("#btnAutoplay").addEventListener("click", () => {
+        hapticFeedback();
         toggleAutoplay();
     });
 
@@ -3386,10 +3402,12 @@ if (uiLangSelect) {
        ============================================================ */
 
     $("#btnStart").addEventListener("click", () => {
+        hapticFeedback();
         stopAutoplayOnUserAction();
         startTraining();
     });
 	$("#btnBrowse").addEventListener("click", () => {
+        hapticFeedback();
 		startBrowse();
 	});
     $("#btnNext").addEventListener("click", () => {
