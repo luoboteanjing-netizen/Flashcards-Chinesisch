@@ -958,10 +958,10 @@ body.menu-open #menuToggle::before {
 
 #searchToggle {
     position: absolute;
-    top: -10px;
-    right: 11px;
-    width: 100px;
-    height: 100px;
+    top: 12px;   /* Angepasst, um die visuelle Position zu halten */
+    right: 33px; /* Angepasst, um die visuelle Position zu halten */
+    width: 56px; /* Reduziert auf eine fingerfreundliche Größe um das 40px SVG */
+    height: 56px; /* Reduziert auf eine fingerfreundliche Größe um das 40px SVG */
     display: flex;
     align-items: center;
     justify-content: center;
