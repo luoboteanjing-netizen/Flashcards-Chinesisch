@@ -1128,6 +1128,7 @@ function hapticFeedback() {
     // Prüft, ob das Gerät Vibration unterstützt
     if ("vibrate" in navigator) {
         navigator.vibrate(40); // Kurzer 40ms Impuls
+        navigator.vibrate(100); // Erhöht auf 100ms für deutlichere Spürbarkeit
     }
 }
 
