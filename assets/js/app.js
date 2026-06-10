@@ -3610,6 +3610,48 @@ if (uiLangSelect) {
     window.addEventListener("mouseup", onEnd);
 })();
 
+/* ============================================================
+   SWIPE-NAVIGATION FÜR KARTEN (Browse & Training)
+   ============================================================ */
+(function enableSwipeNavigation() {
+    const card = document.querySelector("#learnSection");
+    if (!card) return;
+
+    let startX = 0;
+    let startY = 0;
+    const threshold = 60; // Mindestdistanz für einen Swipe
+
+    card.addEventListener("touchstart", (e) => {
+        // Nur reagieren, wenn Training oder Browse-Modus aktiv ist
+        if (!state.trainingOn && !state.browseMode) return;
+        if (state.autoplay.on) return; // Autoplay nicht stören
+
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    card.addEventListener("touchend", (e) => {
+        if (!state.trainingOn && !state.browseMode) return;
+        if (state.autoplay.on) return;
+
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = endX - startX;
+        const diffY = endY - startY;
+
+        // Sicherstellen, dass die horizontale Bewegung dominiert und weit genug ist
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+            if (diffX > 0) {
+                // Swipe nach Rechts -> Vorherige Karte
+                if (state.historyPos > 0) prevCard();
+            } else {
+                // Swipe nach Links -> Nächste Karte
+                if (state.pool.length > 0) nextCard();
+            }
+        }
+    }, { passive: true });
+})();
+
 /* ============================================
    Overlay tap-to-close
    ============================================ */
