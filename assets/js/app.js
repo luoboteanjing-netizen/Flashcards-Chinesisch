@@ -15,7 +15,7 @@
 if (window.APP_VERSION) {
   console.warn("app.js bereits geladen – Abbruch");
 } else {
-  window.APP_VERSION = "6.3.2";
+  window.APP_VERSION = "6.3.4";
 }
 
 
@@ -1127,8 +1127,7 @@ function gatherPoolFromSettings() {
 function hapticFeedback() {
     // Prüft, ob das Gerät Vibration unterstützt
     if ("vibrate" in navigator) {
-        navigator.vibrate(40); // Kurzer 40ms Impuls
-        navigator.vibrate(100); // Erhöht auf 100ms für deutlichere Spürbarkeit
+        navigator.vibrate(70); // Kurzer 40ms Impuls
     }
 }
 
@@ -3686,7 +3685,7 @@ if (overlay) {
 console.log("[INIT] Alles bereit ✅");
 });  // ✅ schließt NUR den DOMContentLoaded – korrekt!
 
-/* ==
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js")
@@ -3694,7 +3693,7 @@ if ("serviceWorker" in navigator) {
       .catch(err => console.error("SW error", err));
   });
 }
-==== */
+
 /* ========================================================================== */
 /*                                ENDE TEIL 4                                 */
 /* ========================================================================== */
