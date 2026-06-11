@@ -1127,7 +1127,7 @@ function gatherPoolFromSettings() {
 function hapticFeedback() {
     // Prüft, ob das Gerät Vibration unterstützt
     if ("vibrate" in navigator) {
-        navigator.vibrate(70); // Kurzer 40ms Impuls
+        navigator.vibrate(60); // Kurzer 40ms Impuls
     }
 }
 
