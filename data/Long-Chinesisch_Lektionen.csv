@@ -1,5 +1,5 @@
 ﻿Wort Deutsch;Wort Pinyin ;Wortart;Satz Pinyin;Satz Deutsch;Wort Hanyu;Satz Hanyu;ID;Lektion;Audio Wort;Audio Satz
-* Lektion 0;*Lektion 0;* Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;L00-1-00;L00 - Vokabeln Unterricht;;
+* Lektion 0 -2026-06-16;*Lektion 0;* Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;*Lektion 0;L00-1-00;L00 - Vokabeln Unterricht;;
 öffnen;dǎkāi;Verb;qǐng dǎkāi shū.;Bitte öffnen Sie das Buch.;打开;请打开书。;L00-1-01;L00 - Vokabeln Unterricht;L00-1-01_wrd.mp3;L00-1-01_snt.mp3
 sprechen (vorlesen);niàn;Verb;gēn wǒ niàn.;Sprechen Sie mir nach.;念;跟我念。;L00-1-02;L00 - Vokabeln Unterricht;L00-1-02_wrd.mp3;L00-1-02_snt.mp3
 Text / Lektionstext;kè wén;Nomen.;qǐng niàn kè wén.;Lesen Sie den Text.;课文;请念课文。;L00-1-03;L00 - Vokabeln Unterricht;L00-1-03_wrd.mp3;L00-1-03_snt.mp3
@@ -7,7 +7,7 @@ Vokabel;shēng cí;Nomen;qǐng niàn shēng cí.;Lesen Sie die neuen Vokabeln.;�
 hören;tīng;Verb;qǐng tīng.;Hören Sie.;听;请听。;L00-1-05;L00 - Vokabeln Unterricht;L00-1-05_wrd.mp3;L00-1-05_snt.mp3
 schreiben;xiě;Verb;qǐng xiě.;Schreiben Sie.;写;请写。;L00-1-06;L00 - Vokabeln Unterricht;L00-1-06_wrd.mp3;L00-1-06_snt.mp3
 sprechen (reden);shuō;Verb;qǐng gēn tóng xué shuō.;Bitte sprechen Sie mit einem Mitschüler.;说;请跟同学说。;L00-1-07;L00 - Vokabeln Unterricht;L00-1-07_wrd.mp3;L00-1-07_snt.mp3
-Bitte machen Sie die Übung.;liàn xí;Nomen / Verb / Satz;qǐng zuò liàn xí.;Bitte machen Sie die Übung.;练习;请做练习。;L00-1-08;L00 - Vokabeln Unterricht;L00-1-08_wrd.mp3;L00-1-08_snt.mp3
+Übung.;liàn xí;Nomen / Verb / Satz;qǐng zuò liàn xí.;Bitte machen Sie die Übung.;练习;请做练习。;L00-1-08;L00 - Vokabeln Unterricht;L00-1-08_wrd.mp3;L00-1-08_snt.mp3
 Aussprache;fā yīn;Nomen;Qǐng zhùyì fāyīn.;Bitte achten Sie auf die Aussprache (Ton/Phonologie).;发音;请注意发音。;L00-1-09;L00 - Vokabeln Unterricht;L00-1-09_wrd.mp3;L00-1-09_snt.mp3
 Verstehen Sie das?;dǒng;Satz;dǒng bù dǒng?;Verstehen Sie das?;懂;懂不懂?;L00-1-10;L00 - Vokabeln Unterricht;L00-1-10_wrd.mp3;L00-1-10_snt.mp3
 verstehen;dǒng;Verb;dǒng le.;Ja, ich verstehe.;懂;懂了。;L00-1-11;L00 - Vokabeln Unterricht;L00-1-11_wrd.mp3;L00-1-11_snt.mp3
@@ -20,9 +20,9 @@ Pinyin;pīnyīn;Nomen;Nín néng xiě chū pīnyīn ma?;Können Sie die Pinyin s
 Bedeutung;yìsi;Nomen;zhè shì shén me yìsi?;Was bedeutet das?;意思;这是什么意思?;L00-1-18;L00 - Vokabeln Unterricht;L00-1-18_wrd.mp3;L00-1-18_snt.mp3
 Satz;jù zi;Nomen;qǐng jiě shì zhè ge jù zi.;Bitte erklären Sie diesen Satz.;句子;请解释这个句子。;L00-1-19;L00 - Vokabeln Unterricht;L00-1-19_wrd.mp3;L00-1-19_snt.mp3
 Schriftzeichen;zì;Nomen;qǐng jiě shì zhè ge zì.;Bitte erklären Sie dieses Schriftzeichen.;字;请解释这个字。;L00-1-20;L00 - Vokabeln Unterricht;L00-1-20_wrd.mp3;L00-1-20_snt.mp3
-richtig;duì;Adjektiv;duì bù duì?;Ist das richtig? Stimmt das?;对;对不对?;L00-1-21;L00 - Vokabeln Unterricht;L00-1-21_wrd.mp3;L00-1-21_snt.mp3
-Ja, richtig.;duì;Satz;duì.;Ja, richtig. ;对;对。;L00-1-22;L00 - Vokabeln Unterricht;L00-1-22_wrd.mp3;L00-1-22_snt.mp3
-Nein, nicht richtig.;bù duì;Satz;bù duì.;Nein, nicht richtig.;不对;不对。;L00-1-23;L00 - Vokabeln Unterricht;L00-1-23_wrd.mp3;L00-1-23_snt.mp3
+stimmt;duì;Adjektiv;duì bù duì?;Ist das richtig? Stimmt das?;对;对不对?;L00-1-21;L00 - Vokabeln Unterricht;L00-1-21_wrd.mp3;L00-1-21_snt.mp3
+Ja;duì;Adjektiv;duì.;Ja, richtig. ;对;对。;L00-1-22;L00 - Vokabeln Unterricht;L00-1-22_wrd.mp3;L00-1-22_snt.mp3
+richtig;duì;Adjektiv;bù duì.;Nein, nicht richtig.;不对;不对。;L00-1-23;L00 - Vokabeln Unterricht;L00-1-23_wrd.mp3;L00-1-23_snt.mp3
 sagen;shuō;Verb;wǒ shuō de duì ma?;Habe ich das richtig gesagt?;说;我说得对吗？;L00-1-24;L00 - Vokabeln Unterricht;L00-1-24_wrd.mp3;L00-1-24_snt.mp3
 schreiben;xiě;Verb;wǒ xiě de duì ma?;Habe ich das richtig geschrieben?;写;我写得对吗？;L00-1-25;L00 - Vokabeln Unterricht;L00-1-25_wrd.mp3;L00-1-25_snt.mp3
 Frage;wèn tí;Nomen;Lǎoshī, wǒ yǒu yī gè wèntí.;Lehrer, ich habe eine Frage.;问题;老师，我有一个问题。;L00-1-28;L00 - Vokabeln Unterricht;L00-1-28_wrd.mp3;L00-1-28_snt.mp3
@@ -579,49 +579,49 @@ Nichte (Tochter des Bruders);zhínǚ;Nomen;Zhínǚ shì wǒ xiōngdì de nǚ’�
 Neffe (Sohn der Schwester);wàishēng;Nomen;Wàishēng shì wǒ jiěmèi de érzi.;Der Sohn meiner Schwester ist mein Neffe.;外甥;外甥是我姐妹的儿子。;L07-2-46;L07 - Familien-  mitglieder;;
 Nichte (Tochter der Schwester);wàishēngnǚ;Nomen;Wàishēngnǚ shì wǒ jiěmèi de nǚ’ér.;Die Tochter meiner Schwester ist meine Nichte.;外甥女;外甥女是我姐妹的女儿。;L07-2-47;L07 - Familien-  mitglieder;;
 * Lektion 8;*Lektion 8;* Lektion 8;*Lektion 8;*Lektion 8;*Lektion 8;*Lektion 8;L08-1-00;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;;
-entfernt sein von;lí;Präposition;;;离;;L08-1-01;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-01_wrd.mp3;
-gehen;zǒu;Verb;;;走;;L08-1-02;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-02_wrd.mp3;
-Bar;jiǔbā;Nomen;;;酒吧;;L08-1-03;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-03_wrd.mp3;
-so, auf diese Weise;nàme;Adverb;;;那么;;L08-1-04;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-04_wrd.mp3;
-Taxi nehmen;dǎdī;Verb;;;打的;;L08-1-05;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-05_wrd.mp3;
-fahren, öffnen;kāi;Verb;;;开;;L08-1-06;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-06_wrd.mp3;
-Fahrrad;zìxíngchē;Nomen;;;自行车;;L08-1-07;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-07_wrd.mp3;
-weit;yuǎn;Adjektiv;;;远;;L08-1-08;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-08_wrd.mp3;
-fragen;wèn;Verb;;;问;;L08-1-09;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-09_wrd.mp3;
-Fräulein;xiǎojiě;Nomen;;;小姐;;L08-1-10;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-10_wrd.mp3;
-hinten, hinter;hòu / hòumiàn;Nomen;;;后/后面;;L08-1-11;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-11_wrd.mp3;
-Auto;chē / qìchē;Nomen;;;车/汽车;;L08-1-12;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-12_wrd.mp3;
-nah;jìn;Adjektiv;;;近;;L08-1-13;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-13_wrd.mp3;
-oder;huòzhě;Konjunktion;;;或者;;L08-1-14;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-14_wrd.mp3;
-öffentliche Toilette;gōnggòng cèsuǒ;Nomen;;;公共厕所;;L08-1-15;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-15_wrd.mp3;
-Bus;gōngjiāochē;Nomen;;;公交车;;L08-1-16;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-16_wrd.mp3;
-reiten, fahren (Fahrrad);qí;Verb;;;骑;;L08-1-17;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-17_wrd.mp3;
-Taxi;chūzūchē;Nomen;;;出租车;;L08-1-18;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-18_wrd.mp3;
-viel;duō;Adjektiv;;;多;;L08-1-19;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-19_wrd.mp3;
-zu Fuß gehen;zǒulù;Verb;;;走路;;L08-1-20;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-20_wrd.mp3;
-zu viel;tàiduōle;Redewendung;;;太多了;;L08-1-21;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-21_wrd.mp3;
-zurückgehen;huí;Verb;;;回;;L08-1-22;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-22_wrd.mp3;
-abbiegen;guǎi;Verb;;;拐;;L08-1-23;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-23_wrd.mp3;
-draußen, außerhalb;wài / wàimiàn;Nomen;;;外/外面;;L08-1-24;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-24_wrd.mp3;
-aussteigen;xiàchē;Verb;;;下车;;L08-1-25;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-25_wrd.mp3;
-ankommen, bis;dào;Verb;;;到;;L08-1-26;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-26_wrd.mp3;
-genau, eben;jiù;Adverb;;;就;;L08-1-27;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-27_wrd.mp3;
-einsteigen;shàngchē;Verb;;;上车;;L08-1-28;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-28_wrd.mp3;
-Linie;xiàn;Nomen;;;线;;L08-1-29;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-29_wrd.mp3;
-links;zuǒ / zuǒbiān;Nomen;;;左/左边;;L08-1-30;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-30_wrd.mp3;
-nach, in Richtung;wǎng;Präposition;;;往;;L08-1-31;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-31_wrd.mp3;
-Nanjing;Nánjīng;Eigenname;;;南京;;L08-1-32;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-32_wrd.mp3;
-neben;pángbiān;Nomen;;;旁边;;L08-1-33;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-33_wrd.mp3;
-Osten;dōng;Nomen;;;东;;L08-1-34;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-34_wrd.mp3;
-Zählwort (für Reihenfolge);dì;Präfix;;;第;;L08-1-35;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-35_wrd.mp3;
-rechts;yòu / yòubiān;Nomen;;;右/右边;;L08-1-36;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-36_wrd.mp3;
-Station, Haltestelle;zhàn;Nomen;;;站;;L08-1-37;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-37_wrd.mp3;
-Straße, Weg;lù;Nomen;;;路;;L08-1-38;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-38_wrd.mp3;
-Straßenkreuzung;lùkǒu;Nomen;;;路口;;L08-1-39;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-39_wrd.mp3;
-U-Bahn;dìtiě;Nomen;;;地铁;;L08-1-40;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-40_wrd.mp3;
-vorne;qián / qiánmiàn;Nomen;;;前/前面;;L08-1-41;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-41_wrd.mp3;
-Westen;xī;Nomen;;;西;;L08-1-42;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-42_wrd.mp3;
-Der Bund (in Shanghai);Wàitān;Eigenname;;;外滩;;L08-1-43;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-43_wrd.mp3;
+entfernt sein von;lí;Präposition;Zhèlǐ lí dìtiě hěn yuǎn.;Es ist weit von hier zur U-Bahn.;离;这里离地铁很远。;L08-1-01;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-01_wrd.mp3;
+gehen;zǒu;Verb;Wǒmen zǒu ba.;Lass uns gehen.;走;我们走吧。;L08-1-02;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-02_wrd.mp3;
+Bar;jiǔbā;Nomen;Tā zài jiǔbā gōngzuò.;Er arbeitet in einer Bar.;酒吧;他在酒吧工作。;L08-1-03;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-03_wrd.mp3;
+so, auf diese Weise;nàme;Adverb;Nàme yuǎn zěnme zǒu?;Wie kommt man so weit?;那么;那么远怎么走？;L08-1-04;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-04_wrd.mp3;
+Taxi nehmen;dǎdī;Verb;Wǒmen dǎ dī qù ba.;Lass uns ein Taxi nehmen.;打的;我们打的去吧。;L08-1-05;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-05_wrd.mp3;
+fahren, öffnen;kāi;Verb;Tā huì kāichē.;Er kann Auto fahren.;开;他会开车。;L08-1-06;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-06_wrd.mp3;
+Fahrrad;zìxíngchē;Nomen;Wǒ qí zìxíngchē shàngbān.;Ich fahre mit dem Fahrrad zur Arbeit.;自行车;我骑自行车上班。;L08-1-07;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-07_wrd.mp3;
+weit;yuǎn;Adjektiv;Shāngdiàn hěn yuǎn.;Der Laden ist weit weg.;远;商店很远。;L08-1-08;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-08_wrd.mp3;
+fragen;wèn;Verb;Wǒ xiǎng wèn yíxià.;Ich möchte etwas fragen.;问;我想问一下。;L08-1-09;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-09_wrd.mp3;
+Fräulein;xiǎojiě;Nomen;Xiǎojiě, qǐngwèn cèsuǒ zài nǎr?;Entschuldigung, wo ist die Toilette?;小姐;小姐，请问厕所在哪儿？;L08-1-10;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-10_wrd.mp3;
+hinten, hinter;hòu / hòumiàn;Nomen;Zài chēzhàn hòumiàn.;Hinter der Haltestelle.;后/后面;在车站后面。;L08-1-11;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-11_wrd.mp3;
+Auto;chē / qìchē;Nomen;Wǒ yǒu yí liàng chē.;Ich habe ein Auto.;车/汽车;我有一辆车。;L08-1-12;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-12_wrd.mp3;
+nah;jìn;Adjektiv;Xuéxiào hěn jìn.;Die Schule ist nah.;近;学校很近。;L08-1-13;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-13_wrd.mp3;
+oder;huòzhě;Konjunktion;Zuò dìtiě huòzhě dǎchē.;Nimm die U-Bahn oder ein Taxi.;或者;坐地铁或者打车。;L08-1-14;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-14_wrd.mp3;
+öffentliche Toilette;gōnggòng cèsuǒ;Nomen;Gōnggòng cèsuǒ zài nǎr?;Wo ist die öffentliche Toilette?;公共厕所;公共厕所在哪儿？;L08-1-15;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-15_wrd.mp3;
+Bus;gōngjiāochē;Nomen;Wǒ zuò gōngjiāochē.;Ich fahre mit dem Bus.;公交车;我坐公交车。;L08-1-16;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-16_wrd.mp3;
+reiten, fahren (Fahrrad);qí;Verb;Tā měitiān qí chē.;Er fährt jeden Tag Fahrrad.;骑;他每天骑车。;L08-1-17;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-17_wrd.mp3;
+Taxi;chūzūchē;Nomen;Chūzūchē lái le.;Das Taxi kommt.;出租车;出租车来了。;L08-1-18;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-18_wrd.mp3;
+viel;duō;Adjektiv;Rén hěn duō.;Es sind viele Leute da.;多;人很多。;L08-1-19;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-19_wrd.mp3;
+zu Fuß gehen;zǒulù;Verb;Wǒ xǐhuān zǒulù.;Ich gehe gerne zu Fuß.;走路;我喜欢走路。;L08-1-20;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-20_wrd.mp3;
+zu viel;tàiduōle;Redewendung;Rén tài duō le.;Es sind zu viele Leute.;太多了;人太多了。;L08-1-21;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-21_wrd.mp3;
+zurückgehen;huí;Verb;Wǒ huí jiā le.;Ich gehe nach Hause.;回;我回家了。;L08-1-22;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-22_wrd.mp3;
+abbiegen;guǎi;Verb;Zài lùkǒu yòu guǎi.;An der Kreuzung rechts abbiegen.;拐;在路口右拐。;L08-1-23;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-23_wrd.mp3;
+draußen, außerhalb;wài / wàimiàn;Nomen;Tā zài wàimiàn děng.;Er wartet draußen.;外/外面;他在外面等。;L08-1-24;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-24_wrd.mp3;
+aussteigen;xiàchē;Verb;Xià yí zhàn xià chē.;An der nächsten Station aussteigen.;下车;下一站下车。;L08-1-25;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-25_wrd.mp3;
+ankommen, bis;dào;Verb;Wǒ dào le.;Ich bin angekommen.;到;我到了。;L08-1-26;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-26_wrd.mp3;
+genau, eben;jiù;Adverb;Wǒ mǎshàng jiù lái.;Ich komme sofort.;就;我马上就来。;L08-1-27;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-27_wrd.mp3;
+einsteigen;shàngchē;Verb;Qǐng shàng chē.;Bitte einsteigen.;上车;请上车。;L08-1-28;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-28_wrd.mp3;
+Linie;xiàn;Nomen;Zhè tiáo xiàn hěn kuài.;Diese Linie ist schnell.;线;这条线很快。;L08-1-29;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-29_wrd.mp3;
+links;zuǒ / zuǒbiān;Nomen;Zài zuǒbiān.;Auf der linken Seite.;左/左边;在左边。;L08-1-30;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-30_wrd.mp3;
+nach, in Richtung;wǎng;Präposition;Wǎng qián zǒu.;Geh nach vorne.;往;往前走。;L08-1-31;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-31_wrd.mp3;
+Nanjing;Nánjīng;Eigenname;Wǒ qù Nánjīng.;Ich fahre nach Nanjing.;南京;我去南京。;L08-1-32;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-32_wrd.mp3;
+neben;pángbiān;Nomen;Shāngdiàn zài pángbiān.;Der Laden ist daneben.;旁边;商店在旁边。;L08-1-33;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-33_wrd.mp3;
+Osten;dōng;Nomen;Xiàng dōng zǒu.;Geh nach Osten.;东;向东走。;L08-1-34;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-34_wrd.mp3;
+Zählwort (für Reihenfolge);dì;Präfix;Zhè shì dì yī zhàn.;Das ist die erste Station.;第;这是第一站。;L08-1-35;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-35_wrd.mp3;
+rechts;yòu / yòubiān;Nomen;Zài yòubiān.;Auf der rechten Seite.;右/右边;在右边。;L08-1-36;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-36_wrd.mp3;
+Station, Haltestelle;zhàn;Nomen;Xià yí zhàn shì yīyuàn.;Die nächste Station ist das Krankenhaus.;站;下一站是医院。;L08-1-37;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-37_wrd.mp3;
+Straße, Weg;lù;Nomen;Zhè tiáo lù hěn cháng.;Diese Straße ist lang.;路;这条路很长。;L08-1-38;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-38_wrd.mp3;
+Straßenkreuzung;lùkǒu;Nomen;Zài lùkǒu děng.;Warte an der Kreuzung.;路口;在路口等。;L08-1-39;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-39_wrd.mp3;
+U-Bahn;dìtiě;Nomen;Wǒ zuò dìtiě qù.;Ich fahre mit der U-Bahn.;地铁;我坐地铁去。;L08-1-40;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-40_wrd.mp3;
+vorne;qián / qiánmiàn;Nomen;Zài qiánmiàn.;Vorne.;前/前面;在前面。;L08-1-41;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-41_wrd.mp3;
+Westen;xī;Nomen;Xiàng xī zǒu.;Geh nach Westen.;西;向西走。;L08-1-42;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-42_wrd.mp3;
+Der Bund (in Shanghai);Wàitān;Eigenname;Wǒ qù Wàitān.;Ich gehe zum Bund (Shanghai).;外滩;我去外滩。;L08-1-43;L08 - Vokabeln  Fortbewegung, Verkehrsmittel;L08-1-43_wrd.mp3;
 * Lektion 8 Dialoge;*Lektion 8 Dialoge;* Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;*Lektion 8 Dialoge;L08-D-00;L08 - Dialog    Fortbewegung, Verkehrsmittel;;
 ;;;Wǒ xiǎng qù jiǔbā.;Ich möchte in die Bar gehen.;;我想去酒吧。;L08-D-01;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-01_snt.mp3
 ;;;Jiǔbā lí zhèr bù yuǎn, nǐ zěnme qù?;Die Bar ist nicht weit von hier. Wie kommst du dorthin?;;酒吧离这儿不远，你怎么去？;L08-D-02;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-02_snt.mp3
@@ -629,7 +629,7 @@ Der Bund (in Shanghai);Wàitān;Eigenname;;;外滩;;L08-1-43;L08 - Vokabeln  For
 ;;;Chéng dìtiě huòzhě zuò gōnggòng qìchē qù.;Ich nehme die U-Bahn oder den Bus.;;乘地铁或者坐公共汽车去。;L08-D-04;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-04_snt.mp3
 ;;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern mit dem Bus.;;我不喜欢坐公车。;L08-D-05;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-05_snt.mp3
 ;;;Chē lǐ de rén dàduō lè huòzhě shuìjiào.;In den Bussen sind die meisten Leute müde oder schlafen.;;车里的人大多累或者睡觉。;L08-D-06;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-06_snt.mp3
-;;;Nàme, nǐ zǒulù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin und nimm ein Taxi zurück. Wie wäre das?;;那么，你走路去，打的回家，怎么样？;L08-D-07;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-07_snt.mp3
+;;;Nàme, nǐ zǒu lù qù, dǎdī huí jiā, zěnme yàng?;Dann geh doch zu Fuß hin und nimm ein Taxi zurück. Wie wäre das?;;那么，你走路去，打的回家，怎么样？;L08-D-07;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-07_snt.mp3
 ;;;Nǐ kěyǐ zuò gōngchē qù.;Du kannst mit dem Bus hinfahren.;;你可以坐公车去。;L08-D-08;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-08_snt.mp3
 ;;;Wǒ bù xǐhuan zuò gōngchē.;Ich fahre nicht gern Bus.;;我不喜欢坐公车。;L08-D-09;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-09_snt.mp3
 ;;;Gōngchē lǐ rén tài duō le.;Im Bus gibt es zu viele Menschen.;;公车里人太多了。;L08-D-10;L08 - Dialog    Fortbewegung, Verkehrsmittel;;L08-D-10_snt.mp3
