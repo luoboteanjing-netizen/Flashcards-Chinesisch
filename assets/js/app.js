@@ -2543,17 +2543,19 @@ function updateVoiceList() {
         const btnPick = document.createElement("button");
         btnPick.className = "btn";
         btnPick.textContent = translate("pickVoice");
-        btnPick.onclick = () => {
-            if (state.voicePanelTarget === "zh") {
-                state.browserVoice.zh = v;
-                state.settings.browserVoiceZh = v.name || v.voiceURI;
-            } else {
-                state.browserVoice.de = v;
-                state.settings.browserVoiceDe = v.name || v.voiceURI;
-            }
-            saveSettings();
-            closeVoices();
-        };
+		btnPick.onclick = () => {
+			if (state.voicePanelTarget === "zh") {
+				state.browserVoice.zh = v;
+				state.settings.browserVoiceZh = v.name || v.voiceURI;
+				state.settings.githubVoiceZh = null;   // ← NEU: MP3-Stimme deaktivieren
+			} else {
+				state.browserVoice.de = v;
+				state.settings.browserVoiceDe = v.name || v.voiceURI;
+				state.settings.githubVoiceDe = null;   // ← NEU: MP3-Stimme deaktivieren
+			}
+			saveSettings();
+			closeVoices();
+		};
 
         const btnTest = document.createElement("button");
         btnTest.className = "btn ghost";
