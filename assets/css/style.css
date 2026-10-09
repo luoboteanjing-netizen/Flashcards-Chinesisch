@@ -326,7 +326,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     padding: 10px 12px;
     font-size: 16px;
     line-height: 1.2;
-    white-space: pre-line;
+    white-space: normal;
     border: 2px solid var(--color-border);
     border-radius: 12px;
     background: color-mix(in srgb, var(--color-text) 8%, var(--color-card));
