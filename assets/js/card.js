@@ -404,7 +404,7 @@ function choiceAnswerText(entry) {
     const parts = [];
     if (state.showHanzi !== false && hanzi) parts.push(hanzi);
     if (state.showPinyin !== false && pinyin) parts.push(pinyin);
-    return parts.join("\n") || hanzi || pinyin || "—";
+    return parts.join(" ") || hanzi || pinyin || "—";
 }
 
 function buildChoiceOptions(entry) {
