@@ -1,8 +1,8 @@
 // ==========================================
-// Service Worker - Learning App v6.4.9
+// Service Worker - Learning App v6.4.10
 // ==========================================
 
-const APP_CACHE = "flashcards-v6.4.9";
+const APP_CACHE = "flashcards-v6.4.10";
 const CSV_CACHE = "learning-app-csv-v1";
 
 // Statische Dateien (App-Shell)
