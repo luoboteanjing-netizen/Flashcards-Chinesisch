@@ -90,17 +90,7 @@ function syncCardHeights() {
     q.style.maxHeight = "";
     a.style.maxHeight = "";
 
-    const mobileChoice = state.choiceMode && window.matchMedia("(max-width: 800px)").matches;
-    if (mobileChoice) {
-        const learn = document.querySelector("#learnSection");
-        const viewport = window.innerHeight;
-        const chrome = learn ? Math.max(0, learn.offsetHeight - q.offsetHeight - a.offsetHeight) : 140;
-        const room = Math.max(160, viewport - chrome - 12);
-        const cap = Math.min(room / 2, viewport * 0.352);
-        q.style.maxHeight = cap + "px";
-        a.style.maxHeight = cap + "px";
-        return;
-    }
+    if (state.choiceMode) return;
 
     const h = Math.max(q.offsetHeight, a.offsetHeight);
     q.style.minHeight = h + "px";
