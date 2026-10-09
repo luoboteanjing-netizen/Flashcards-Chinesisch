@@ -99,10 +99,6 @@ function syncCardHeights() {
 
 function scrollToBottom() {
     requestAnimationFrame(() => {
-    if (state.choiceMode && window.matchMedia("(max-width: 800px)").matches) {
-        document.querySelector("#learnSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-    }
     window.scrollTo({
         top: document.body.scrollHeight,
         behavior: "smooth"
