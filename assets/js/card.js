@@ -87,6 +87,20 @@ function syncCardHeights() {
 
     q.style.minHeight = "";
     a.style.minHeight = "";
+    q.style.maxHeight = "";
+    a.style.maxHeight = "";
+
+    const mobileChoice = state.choiceMode && window.matchMedia("(max-width: 800px)").matches;
+    if (mobileChoice) {
+        const learn = document.querySelector("#learnSection");
+        const viewport = window.innerHeight;
+        const chrome = learn ? Math.max(0, learn.offsetHeight - q.offsetHeight - a.offsetHeight) : 140;
+        const room = Math.max(160, viewport - chrome - 12);
+        const cap = Math.min(room / 2, viewport * 0.352);
+        q.style.maxHeight = cap + "px";
+        a.style.maxHeight = cap + "px";
+        return;
+    }
 
     const h = Math.max(q.offsetHeight, a.offsetHeight);
     q.style.minHeight = h + "px";
@@ -95,6 +109,10 @@ function syncCardHeights() {
 
 function scrollToBottom() {
     requestAnimationFrame(() => {
+    if (state.choiceMode && window.matchMedia("(max-width: 800px)").matches) {
+        document.querySelector("#learnSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+    }
     window.scrollTo({
         top: document.body.scrollHeight,
         behavior: "smooth"
@@ -433,6 +451,10 @@ function buildChoiceOptions(entry) {
     return picked;
 }
 
+function setChoiceLayout(on) {
+    document.querySelector("#learnSection")?.classList.toggle("choice-active", !!on);
+}
+
 function clearChoiceBox() {
     const box = $("#choiceBox");
     if (box) {
@@ -441,6 +463,7 @@ function clearChoiceBox() {
     }
     const speaker = $("#speakerAnswer");
     if (speaker) speaker.style.visibility = "";
+    setChoiceLayout(false);
 }
 
 function selectChoice(id) {
@@ -460,6 +483,7 @@ function renderChoices(entry) {
     }
 
     state.choiceSelected = null;
+    setChoiceLayout(true);
     box.hidden = false;
     box.innerHTML = "";
     buildChoiceOptions(entry).forEach((card) => {
@@ -474,6 +498,7 @@ function renderChoices(entry) {
 
     const speaker = $("#speakerAnswer");
     if (speaker) speaker.style.visibility = "hidden";
+    syncCardHeights();
 }
 
 function gradeChoices() {
@@ -1010,6 +1035,10 @@ function updateModeButtons() {
 }
 
 state.setCard = setCard;
+
+window.addEventListener("resize", () => {
+    if (state.choiceMode) syncCardHeights();
+});
 
 
 export {
