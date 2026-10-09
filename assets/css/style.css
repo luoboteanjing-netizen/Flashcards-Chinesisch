@@ -234,7 +234,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 /* NEU: Gruppe für Training + Autoplay (unter Sliders) – Flex-Row für nebeneinander */
 .training-group {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     width: 100%;
     margin-top: 14px;
@@ -311,6 +311,42 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .sol .sol-part{margin-bottom:10px}
 .sol .sol-text{font-size:20px;white-space:pre-wrap}
 .sol.masked .sol-text{filter:blur(10px); opacity:0.05; user-select:none}
+.choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 8px;
+}
+.choice-list[hidden] { display: none !important; }
+.choice-btn {
+    width: 100%;
+    min-height: 56px;
+    padding: 12px 14px;
+    font-size: 18px;
+    line-height: 1.35;
+    white-space: pre-line;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-text) 8%, var(--color-card));
+    color: var(--color-text);
+    cursor: pointer;
+}
+.choice-btn.selected {
+    border: 4px solid var(--color-text);
+    font-weight: 700;
+}
+.choice-btn.correct {
+    border: 4px solid var(--color-positive);
+    background: color-mix(in srgb, var(--color-positive) 24%, var(--color-card));
+    font-weight: 700;
+}
+.choice-btn.wrong {
+    border: 4px solid var(--color-negative);
+    background: color-mix(in srgb, var(--color-negative) 24%, var(--color-card));
+    font-weight: 700;
+}
+.choice-btn:disabled { cursor: default; }
 .card-controls{display:flex;gap:12px;justify-content:center;margin-top:10px}
 .card-controls.second{margin-top:6px}
 .stats-bar{margin-top:8px;color:#a7b5c5;font-size:13px;text-align:center}
@@ -431,6 +467,23 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     color: var(--color-accent-text) !important;
 }
 .voice-config{display:flex;flex-direction:column;gap:10px}
+.voice-tts-config {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 4px 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+.voice-tts-slider .lbl {
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+.voice-tts-slider .hint {
+    font-size: 12px;
+    font-weight: 500;
+}
 .voice-range{width:100%}
 .ratebar{
   display:flex;
@@ -507,7 +560,7 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 @media (max-width: 480px) {
  .top-actions { margin-top: 10px; gap: 6px; }
 .training-group {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
 .training-group .btn {
@@ -798,9 +851,9 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 #lessonSelect option {
     display: grid;
     grid-template-columns:
-        115px   /* Lektion */
-         25px   /* Karten */
-         25px   /* strong (✅) */
+        105px   /* Lektion */
+         30px   /* Karten */
+         30px   /* strong (✅) */
          30px   /* weak   (🤔) */
          30px;  /* unknown (❌) */  
     gap: 8px;
@@ -864,11 +917,11 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 .lt-row {
     display: grid;
     grid-template-columns:
-       115px   /* Lektion */
-        25px   /* Karten */
-        25px   /* strong (✅) */
-        30px   /* weak   (🤔) */
-        30px;  /* unknown (❌) */
+        var(--lt-c1, 115px)
+        var(--lt-c2, 25px)
+        var(--lt-c3, 25px)
+        var(--lt-c4, 30px)
+        var(--lt-c5, 30px);
 
     gap: 8px;
     padding: 4px 6px;
@@ -878,6 +931,21 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     background: var(--color-card);
     border-radius: 6px;
     cursor: pointer;
+}
+
+/* Header: eigenes, unabhängiges Grid */
+.lt-head {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--color-card);
+    font-weight: 600;
+    padding: 6px;
+    border-bottom: 2px solid var(--color-border);
+
+    display: grid;
+    grid-template-columns: 105px 35px 30px 30px 30px;  /* bleibt fix */
+    gap: 8px;
 }
 
 /* ✅ Sticky Header oben fixiert */
