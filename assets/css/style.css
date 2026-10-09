@@ -347,6 +347,35 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
     font-weight: 700;
 }
 .choice-btn:disabled { cursor: default; }
+
+@media (max-width: 800px) {
+  #learnSection.choice-active #promptBox,
+  #learnSection.choice-active #solBox {
+    min-height: 0;
+    max-height: 35dvh;
+  }
+  #learnSection.choice-active #solBox.masked {
+    overflow: hidden;
+  }
+  #learnSection.choice-active #solBox:not(.masked) {
+    overflow: auto;
+  }
+  #learnSection.choice-active #solBox.masked .sol-part {
+    display: none;
+  }
+  #learnSection.choice-active .choice-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 6px;
+    margin-bottom: 0;
+  }
+  #learnSection.choice-active .choice-btn {
+    min-height: 0;
+    flex: 1 1 0;
+    padding: 8px 10px;
+    font-size: 16px;
+  }
+}
 .card-controls{display:flex;gap:12px;justify-content:center;margin-top:10px}
 .card-controls.second{margin-top:6px}
 .stats-bar{margin-top:8px;color:#a7b5c5;font-size:13px;text-align:center}
