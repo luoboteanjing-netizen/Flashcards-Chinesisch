@@ -352,20 +352,71 @@ header h1{margin:0 0 2px 0;font-size:26px;line-height:1.1}
 }
 .choice-btn:disabled { cursor: default; }
 
+#learnSection.choice-active #choiceBox {
+  flex: 0 0 auto;
+}
 #learnSection.choice-active #promptBox {
-  height: 32vh;
-  min-height: 32vh;
-  max-height: 32vh;
+  height: 28vh;
+  min-height: 28vh;
+  max-height: 28vh;
   overflow: auto;
 }
 #learnSection.choice-active #solBox {
-  height: 38.4vh;
-  min-height: 38.4vh;
-  max-height: 38.4vh;
+  height: 42.4vh;
+  min-height: 42.4vh;
+  max-height: 42.4vh;
   overflow: auto;
 }
-#learnSection.choice-active #solBox.masked .sol-part {
+/* Antwort nicht noch einmal unter den Buttons zeigen; Lautsprecher bleibt. */
+#learnSection.choice-active #solBox .sol-part {
+  display: contents;
+}
+#learnSection.choice-active #solBox .sol-text {
   display: none;
+}
+#learnSection.choice-active #choiceBox:has(.choice-btn.expanded) {
+  padding-bottom: 3.4rem;
+}
+.choice-btn.expanded {
+  height: auto;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.choice-btn .choice-answer,
+.choice-btn .choice-pos,
+.choice-btn .choice-sent {
+  display: block;
+  width: 100%;
+}
+.choice-btn .choice-answer {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.choice-btn .choice-pos {
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.9;
+  line-height: 1.2;
+}
+.choice-btn .choice-sent {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+.choice-btn .zh-pinyin {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.3;
 }
 .card-controls{display:flex;gap:12px;justify-content:center;margin-top:10px}
 .card-controls.second{margin-top:6px}
