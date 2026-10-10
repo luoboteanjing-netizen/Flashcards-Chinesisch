@@ -487,14 +487,85 @@ function renderChoices(entry) {
     syncCardHeights();
 }
 
+function appendZhBlock(el, zh, py) {
+    const hz = (zh || "").trim();
+    const pinyin = (py || "").trim();
+    if (hz) el.appendChild(document.createTextNode(hz));
+    if (pinyin) {
+        if (hz) el.appendChild(document.createElement("br"));
+        const span = document.createElement("span");
+        span.className = "zh-pinyin";
+        span.textContent = pinyin;
+        el.appendChild(span);
+    }
+}
+
+function choiceRevealNodes(entry) {
+    const nodes = [];
+    const posText = (entry.pos || "").trim();
+    const answer = document.createElement("span");
+    answer.className = "choice-answer";
+    const sent = document.createElement("span");
+    sent.className = "choice-sent";
+
+    if (state.mode === "zh2de") {
+        const word = (entry.word?.de || "").trim();
+        const sentence = (entry.sent?.de || "").trim();
+        if (word) answer.textContent = word;
+        if (sentence) sent.textContent = sentence;
+    } else {
+        appendZhBlock(answer, entry.word?.zh, entry.word?.py);
+        appendZhBlock(sent, entry.sent?.zh, entry.sent?.py);
+    }
+
+    if (answer.childNodes.length || answer.textContent) nodes.push(answer);
+    if (posText) {
+        const pos = document.createElement("span");
+        pos.className = "choice-pos";
+        pos.textContent = posText;
+        nodes.push(pos);
+    }
+    if (sent.childNodes.length || sent.textContent) nodes.push(sent);
+    if (!nodes.length) {
+        answer.textContent = "—";
+        nodes.push(answer);
+    }
+    return nodes;
+}
+
+function scrollChoiceIntoView(btn) {
+    const box = document.querySelector("#solBox");
+    if (!box || !btn) return;
+    const top = btn.offsetTop;
+    const bottom = top + btn.offsetHeight;
+    const viewBottom = box.scrollTop + box.clientHeight;
+    if (bottom > viewBottom - 8) {
+        box.scrollTop = bottom - box.clientHeight + 12;
+    } else if (top < box.scrollTop) {
+        box.scrollTop = Math.max(0, top - 8);
+    }
+}
+
+function expandCorrectChoice(entry) {
+    if (!entry) return;
+    const btn = [...document.querySelectorAll(".choice-btn")]
+        .find((item) => item.dataset.choiceId === entry.id);
+    if (!btn) return;
+    btn.classList.add("correct", "expanded");
+    btn.replaceChildren(...choiceRevealNodes(entry));
+    requestAnimationFrame(() => scrollChoiceIntoView(btn));
+}
+
 function gradeChoices() {
     const selected = state.choiceSelected;
     const correct = state.current?.id;
     document.querySelectorAll(".choice-btn").forEach((btn) => {
         btn.disabled = true;
-        if (!selected || btn.dataset.choiceId !== selected) return;
-        btn.classList.add(selected === correct ? "correct" : "wrong");
+        if (selected && btn.dataset.choiceId === selected && selected !== correct) {
+            btn.classList.add("wrong");
+        }
     });
+    expandCorrectChoice(state.current);
     const speaker = $("#speakerAnswer");
     if (speaker) speaker.style.visibility = "";
 }
