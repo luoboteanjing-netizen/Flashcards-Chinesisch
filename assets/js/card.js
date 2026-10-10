@@ -655,6 +655,8 @@ function showNavButtons() {
 	} else {
 
 		$("#btnReveal").style.display = "";
+		$("#btnReveal").style.visibility = "";
+		$("#btnReveal").style.pointerEvents = "";
 
 	}
 
@@ -728,11 +730,31 @@ if (state.delayedSentenceTimer) {
     // -----------------------------------------
     // Buttons anzeigen
     // -----------------------------------------
-    if (!state.autoplay.on) hideNavButtons();
-    if (state.choiceMode) gradeChoices();
-    showRatingButtons();
-    enableRating();
+    if (state.choiceMode) {
+        gradeChoices();
+        applyRating(null, { advance: false });
+        hideRatingButtons();
+        $("#btnPrev").style.display = "";
+        $("#btnNext").style.display = "";
+        const revealBtn = $("#btnReveal");
+        if (revealBtn) {
+            revealBtn.disabled = true;
+            revealBtn.style.visibility = "hidden";
+            revealBtn.style.pointerEvents = "none";
+        }
+        refreshCardLeitner();
+    } else {
+        if (!state.autoplay.on) hideNavButtons();
+        showRatingButtons();
+        enableRating();
+    }
     syncCardHeights();
+}
+
+function refreshCardLeitner() {
+    const asciiEl = document.querySelector("#cardTitle .leitner-ascii");
+    if (!asciiEl || !state.current) return;
+    asciiEl.textContent = getLeitnerAscii(ensureCardProgress(state.current).box);
 }
 
 function showRatingButtons() {
@@ -763,11 +785,15 @@ function disableRating() {
 }
 
 function rate(mark) {
+    applyRating(mark, { advance: true });
+}
+
+function applyRating(mark, { advance = true } = {}) {
     if (!state.current) return;
     if (state.choiceMode) {
         mark = state.choiceSelected === state.current.id ? "known" : "unknown";
     }
-    hapticFeedback();
+    if (advance) hapticFeedback();
 
     // -----------------------------------------
     // LEITNER: Bewertung
@@ -828,6 +854,7 @@ function rate(mark) {
 
     disableRating();
     hideRatingButtons();
+    if (!advance) return;
     showNavButtons();
     nextCard();
 }
